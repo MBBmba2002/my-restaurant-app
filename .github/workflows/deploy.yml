@@ -36,6 +36,21 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
+      - name: Verify build output
+        run: |
+          if [ ! -d "out" ]; then
+            echo "Error: out directory not found"
+            exit 1
+          fi
+          echo "Build output verified:"
+          ls -la out/
+          if [ -d "out/login" ]; then
+            echo "✓ Login page found"
+          else
+            echo "✗ Login page not found - checking for login.html"
+            ls -la out/ | grep login || echo "No login files found"
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
