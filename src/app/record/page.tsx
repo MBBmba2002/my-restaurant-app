@@ -551,7 +551,7 @@ function RecordPageContent() {
 
           {/* 第二板块：销量追踪 */}
           <div className="bg-white rounded-lg p-6 shadow-md">
-            <h2 className="text-2xl font-bold mb-4 text-orange-600">📊 销量追踪</h2>
+            <h2 className="text-2xl font-bold mb-4 text-orange-600">📊 当日产品销量追踪</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xl font-medium mb-2 text-gray-700">
@@ -565,9 +565,17 @@ function RecordPageContent() {
                   >
                     -
                   </button>
-                  <span className="text-3xl font-bold min-w-[60px] text-center">
-                    {skuBing}
-                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={skuBing}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value) || 0;
+                      setSkuBing(Math.max(0, value));
+                    }}
+                    className="w-20 text-3xl font-bold text-center border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
+                  />
                   <button
                     type="button"
                     onClick={() => setSkuBing(skuBing + 1)}
@@ -590,9 +598,17 @@ function RecordPageContent() {
                   >
                     -
                   </button>
-                  <span className="text-3xl font-bold min-w-[60px] text-center">
-                    {skuTangSu}
-                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={skuTangSu}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value) || 0;
+                      setSkuTangSu(Math.max(0, value));
+                    }}
+                    className="w-20 text-3xl font-bold text-center border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
+                  />
                   <button
                     type="button"
                     onClick={() => setSkuTangSu(skuTangSu + 1)}
@@ -615,9 +631,17 @@ function RecordPageContent() {
                   >
                     -
                   </button>
-                  <span className="text-3xl font-bold min-w-[60px] text-center">
-                    {skuMixianSu}
-                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={skuMixianSu}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value) || 0;
+                      setSkuMixianSu(Math.max(0, value));
+                    }}
+                    className="w-20 text-3xl font-bold text-center border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
+                  />
                   <button
                     type="button"
                     onClick={() => setSkuMixianSu(skuMixianSu + 1)}
@@ -640,9 +664,17 @@ function RecordPageContent() {
                   >
                     -
                   </button>
-                  <span className="text-3xl font-bold min-w-[60px] text-center">
-                    {skuMixianRou}
-                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={skuMixianRou}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value) || 0;
+                      setSkuMixianRou(Math.max(0, value));
+                    }}
+                    className="w-20 text-3xl font-bold text-center border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
+                  />
                   <button
                     type="button"
                     onClick={() => setSkuMixianRou(skuMixianRou + 1)}
@@ -665,9 +697,17 @@ function RecordPageContent() {
                   >
                     -
                   </button>
-                  <span className="text-3xl font-bold min-w-[60px] text-center">
-                    {skuChaomian}
-                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={skuChaomian}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value) || 0;
+                      setSkuChaomian(Math.max(0, value));
+                    }}
+                    className="w-20 text-3xl font-bold text-center border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
+                  />
                   <button
                     type="button"
                     onClick={() => setSkuChaomian(skuChaomian + 1)}
