@@ -213,10 +213,14 @@ jobs:
       - name: Create .nojekyll file
         run: |
           echo "📝 Creating .nojekyll file to disable Jekyll processing..."
-          touch out/.nojekyll
+          echo "" > out/.nojekyll
           if [ -f "out/.nojekyll" ]; then
             echo "✓ .nojekyll file created successfully"
+            echo "File location:"
             ls -la out/.nojekyll
+            echo ""
+            echo "Verifying .nojekyll is in the upload directory:"
+            ls -la out/ | grep -E "(\.nojekyll|_next)" || echo "Warning: .nojekyll or _next not found in listing"
           else
             echo "❌ Failed to create .nojekyll file"
             exit 1
