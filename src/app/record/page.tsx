@@ -203,6 +203,73 @@ function ExpenseModal({ isOpen, onClose, type, onSubmit }: ExpenseModalProps) {
   );
 }
 
+// 销量输入组件（可复用）
+interface SkuInputProps {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+}
+
+function SkuInput({ label, value, onChange }: SkuInputProps) {
+  const [inputValue, setInputValue] = useState(value.toString());
+
+  useEffect(() => {
+    setInputValue(value.toString());
+  }, [value]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    const numValue = parseInt(newValue) || 0;
+    if (numValue >= 0) {
+      onChange(numValue);
+    }
+  };
+
+  const handleDecrement = () => {
+    onChange(Math.max(0, value - 1));
+  };
+
+  const handleIncrement = () => {
+    onChange(value + 1);
+  };
+
+  return (
+    <div>
+      <label className="block text-lg font-medium mb-2 text-gray-700">
+        {label}
+      </label>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleDecrement}
+          className="w-12 h-12 text-2xl bg-gray-200 rounded-lg hover:bg-gray-300 flex items-center justify-center"
+        >
+          -
+        </button>
+        <input
+          type="number"
+          min="0"
+          value={inputValue}
+          onChange={handleInputChange}
+          onBlur={() => {
+            const numValue = parseInt(inputValue) || 0;
+            onChange(Math.max(0, numValue));
+          }}
+          className="flex-1 text-2xl font-bold text-center p-3 border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
+        />
+        <button
+          type="button"
+          onClick={handleIncrement}
+          className="w-12 h-12 text-2xl bg-orange-400 text-white rounded-lg hover:bg-orange-500 flex items-center justify-center"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function RecordPageContent() {
   const { user } = useAuth();
   const router = useRouter();
@@ -213,7 +280,42 @@ function RecordPageContent() {
   const [incomeAlipay, setIncomeAlipay] = useState("");
   const [incomeCash, setIncomeCash] = useState("");
 
-  // 销量
+  // 销量状态 - 按产品分类定义
+  // 饼类产品
+  const [skuRoubing, setSkuRoubing] = useState(0);  // 肉饼
+  const [skuShouroubing, setSkuShouroubing] = useState(0);  // 瘦肉饼
+  const [skuChangdanbing, setSkuChangdanbing] = useState(0);  // 肠蛋饼
+  const [skuRoudanbing, setSkuRoudanbing] = useState(0);  // 肉蛋饼
+  const [skuDanbing, setSkuDanbing] = useState(0);  // 蛋饼
+
+  // 汤类(素)
+  const [skuFentang, setSkuFentang] = useState(0);  // 粉汤
+  const [skuHundun, setSkuHundun] = useState(0);  // 馄炖
+  const [skuXiaomizhou, setSkuXiaomizhou] = useState(0);  // 小米粥
+  const [skuDoujiang, setSkuDoujiang] = useState(0);  // 豆浆
+  const [skuJidantang, setSkuJidantang] = useState(0);  // 鸡蛋汤
+  const [skuSanxiantang, setSkuSanxiantang] = useState(0);  // 三鲜汤
+
+  // 【素】米线/面
+  const [skuSanxianSu, setSkuSanxianSu] = useState(0);  // 三鲜(素)
+  const [skuSuancaiSu, setSkuSuancaiSu] = useState(0);  // 酸菜(素)
+  const [skuMalaSu, setSkuMalaSu] = useState(0);  // 麻辣(素)
+
+  // 【肉】米线/面
+  const [skuSanxianRou, setSkuSanxianRou] = useState(0);  // 三鲜(肉)
+  const [skuSuancaiRou, setSkuSuancaiRou] = useState(0);  // 酸菜(肉)
+  const [skuMalaRou, setSkuMalaRou] = useState(0);  // 麻辣(肉)
+  const [skuMalamixian, setSkuMalamixian] = useState(0);  // 麻辣米线
+
+  // 酸辣粉
+  const [skuSuanlafen, setSkuSuanlafen] = useState(0);  // 酸辣粉
+
+  // 炒面/炒河粉
+  const [skuXiangcuichaomian, setSkuXiangcuichaomian] = useState(0);  // 香脆炒面
+  const [skuSuancaichaohufenkuan, setSkuSuancaichaohufenkuan] = useState(0);  // 酸菜炒河粉[宽]
+  const [skuMalachaohufenxi, setSkuMalachaohufenxi] = useState(0);  // 麻辣炒河粉[细]
+
+  // 保留旧字段用于兼容（如果需要）
   const [skuBing, setSkuBing] = useState(0);
   const [skuTangSu, setSkuTangSu] = useState(0);
   const [skuMixianSu, setSkuMixianSu] = useState(0);
@@ -302,16 +404,17 @@ function RecordPageContent() {
       parseFloat(incomeAlipay || "0") +
       parseFloat(incomeCash || "0");
 
+    // 检查是否有销量数据
+    const hasSalesData = 
+      skuRoubing > 0 || skuShouroubing > 0 || skuChangdanbing > 0 || skuRoudanbing > 0 || skuDanbing > 0 ||
+      skuFentang > 0 || skuHundun > 0 || skuXiaomizhou > 0 || skuDoujiang > 0 || skuJidantang > 0 || skuSanxiantang > 0 ||
+      skuSanxianSu > 0 || skuSuancaiSu > 0 || skuMalaSu > 0 ||
+      skuSanxianRou > 0 || skuSuancaiRou > 0 || skuMalaRou > 0 || skuMalamixian > 0 ||
+      skuSuanlafen > 0 ||
+      skuXiangcuichaomian > 0 || skuSuancaichaohufenkuan > 0 || skuMalachaohufenxi > 0;
+
     // 如果没有任何数据，提示用户
-    if (
-      totalIncome === 0 &&
-      skuBing === 0 &&
-      skuTangSu === 0 &&
-      skuMixianSu === 0 &&
-      skuMixianRou === 0 &&
-      skuChaomian === 0 &&
-      expenses.length === 0
-    ) {
+    if (totalIncome === 0 && !hasSalesData && expenses.length === 0) {
       alert("请至少输入一项数据");
       return;
     }
@@ -337,8 +440,17 @@ function RecordPageContent() {
         parseFloat(incomeAlipay || "0") +
         parseFloat(incomeCash || "0");
 
+      // 检查是否有销量数据
+      const hasSalesData = 
+        skuRoubing > 0 || skuShouroubing > 0 || skuChangdanbing > 0 || skuRoudanbing > 0 || skuDanbing > 0 ||
+        skuFentang > 0 || skuHundun > 0 || skuXiaomizhou > 0 || skuDoujiang > 0 || skuJidantang > 0 || skuSanxiantang > 0 ||
+        skuSanxianSu > 0 || skuSuancaiSu > 0 || skuMalaSu > 0 ||
+        skuSanxianRou > 0 || skuSuancaiRou > 0 || skuMalaRou > 0 || skuMalamixian > 0 ||
+        skuSuanlafen > 0 ||
+        skuXiangcuichaomian > 0 || skuSuancaichaohufenkuan > 0 || skuMalachaohufenxi > 0;
+
       // 如果有收入或销量，创建一条记录
-      if (totalIncome > 0 || skuBing > 0 || skuTangSu > 0 || skuMixianSu > 0 || skuMixianRou > 0 || skuChaomian > 0) {
+      if (totalIncome > 0 || hasSalesData) {
         const { error: recordError } = await supabase
           .from("daily_records")
           .insert({
@@ -346,6 +458,35 @@ function RecordPageContent() {
             income_wechat: parseFloat(incomeWechat || "0"),
             income_alipay: parseFloat(incomeAlipay || "0"),
             income_cash: parseFloat(incomeCash || "0"),
+            // 饼类产品
+            sku_roubing: skuRoubing,
+            sku_shouroubing: skuShouroubing,
+            sku_changdanbing: skuChangdanbing,
+            sku_roudanbing: skuRoudanbing,
+            sku_danbing: skuDanbing,
+            // 汤类(素)
+            sku_fentang: skuFentang,
+            sku_hundun: skuHundun,
+            sku_xiaomizhou: skuXiaomizhou,
+            sku_doujiang: skuDoujiang,
+            sku_jidantang: skuJidantang,
+            sku_sanxiantang: skuSanxiantang,
+            // 【素】米线/面
+            sku_sanxian_su: skuSanxianSu,
+            sku_suancai_su: skuSuancaiSu,
+            sku_mala_su: skuMalaSu,
+            // 【肉】米线/面
+            sku_sanxian_rou: skuSanxianRou,
+            sku_suancai_rou: skuSuancaiRou,
+            sku_mala_rou: skuMalaRou,
+            sku_malamixian: skuMalamixian,
+            // 酸辣粉
+            sku_suanlafen: skuSuanlafen,
+            // 炒面/炒河粉
+            sku_xiangcuichaomian: skuXiangcuichaomian,
+            sku_suancaichaohufenkuan: skuSuancaichaohufenkuan,
+            sku_malachaohufenxi: skuMalachaohufenxi,
+            // 兼容旧字段
             sku_bing: skuBing,
             sku_tang_su: skuTangSu,
             sku_mixian_su: skuMixianSu,
@@ -385,11 +526,14 @@ function RecordPageContent() {
       setIncomeWechat("");
       setIncomeAlipay("");
       setIncomeCash("");
-      setSkuBing(0);
-      setSkuTangSu(0);
-      setSkuMixianSu(0);
-      setSkuMixianRou(0);
-      setSkuChaomian(0);
+      // 清空所有销量
+      setSkuRoubing(0); setSkuShouroubing(0); setSkuChangdanbing(0); setSkuRoudanbing(0); setSkuDanbing(0);
+      setSkuFentang(0); setSkuHundun(0); setSkuXiaomizhou(0); setSkuDoujiang(0); setSkuJidantang(0); setSkuSanxiantang(0);
+      setSkuSanxianSu(0); setSkuSuancaiSu(0); setSkuMalaSu(0);
+      setSkuSanxianRou(0); setSkuSuancaiRou(0); setSkuMalaRou(0); setSkuMalamixian(0);
+      setSkuSuanlafen(0);
+      setSkuXiangcuichaomian(0); setSkuSuancaichaohufenkuan(0); setSkuMalachaohufenxi(0);
+      setSkuBing(0); setSkuTangSu(0); setSkuMixianSu(0); setSkuMixianRou(0); setSkuChaomian(0);
       setExpenses([]);
       setShowSuccess(true);
 
@@ -414,7 +558,7 @@ function RecordPageContent() {
         </div>
       )}
 
-      <div className="max-w-2xl mx-auto p-4">
+      <div className="max-w-4xl mx-auto p-4">
         {/* 顶部日期 */}
         <div className="text-center py-6">
           <h1 className="text-3xl font-bold text-gray-800">{todayDate}</h1>
@@ -549,173 +693,71 @@ function RecordPageContent() {
             </div>
           </div>
 
-          {/* 第二板块：销量追踪 */}
+          {/* 第二板块：当日产品销量追踪 */}
           <div className="bg-white rounded-lg p-6 shadow-md">
             <h2 className="text-2xl font-bold mb-4 text-orange-600">📊 当日产品销量追踪</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xl font-medium mb-2 text-gray-700">
-                  饼类
-                </label>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setSkuBing(Math.max(0, skuBing - 1))}
-                    className="w-12 h-12 text-2xl bg-gray-200 rounded-lg hover:bg-gray-300"
-                  >
-                    -
-                  </button>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={skuBing}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value) || 0;
-                      setSkuBing(Math.max(0, value));
-                    }}
-                    className="w-20 text-3xl font-bold text-center border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setSkuBing(skuBing + 1)}
-                    className="w-12 h-12 text-2xl bg-orange-400 text-white rounded-lg hover:bg-orange-500"
-                  >
-                    +
-                  </button>
-                </div>
+            
+            {/* 饼类产品 */}
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-3 text-gray-800">饼类产品</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} />
+                <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} />
+                <SkuInput label="肠蛋饼" value={skuChangdanbing} onChange={setSkuChangdanbing} />
+                <SkuInput label="肉蛋饼" value={skuRoudanbing} onChange={setSkuRoudanbing} />
+                <SkuInput label="蛋饼" value={skuDanbing} onChange={setSkuDanbing} />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-xl font-medium mb-2 text-gray-700">
-                  汤类(素)
-                </label>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setSkuTangSu(Math.max(0, skuTangSu - 1))}
-                    className="w-12 h-12 text-2xl bg-gray-200 rounded-lg hover:bg-gray-300"
-                  >
-                    -
-                  </button>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={skuTangSu}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value) || 0;
-                      setSkuTangSu(Math.max(0, value));
-                    }}
-                    className="w-20 text-3xl font-bold text-center border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setSkuTangSu(skuTangSu + 1)}
-                    className="w-12 h-12 text-2xl bg-orange-400 text-white rounded-lg hover:bg-orange-500"
-                  >
-                    +
-                  </button>
-                </div>
+            {/* 汤类(素) */}
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-3 text-gray-800">汤类(素)</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <SkuInput label="粉汤" value={skuFentang} onChange={setSkuFentang} />
+                <SkuInput label="馄炖" value={skuHundun} onChange={setSkuHundun} />
+                <SkuInput label="小米粥" value={skuXiaomizhou} onChange={setSkuXiaomizhou} />
+                <SkuInput label="豆浆" value={skuDoujiang} onChange={setSkuDoujiang} />
+                <SkuInput label="鸡蛋汤" value={skuJidantang} onChange={setSkuJidantang} />
+                <SkuInput label="三鲜汤" value={skuSanxiantang} onChange={setSkuSanxiantang} />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-xl font-medium mb-2 text-gray-700">
-                  米线(素)
-                </label>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setSkuMixianSu(Math.max(0, skuMixianSu - 1))}
-                    className="w-12 h-12 text-2xl bg-gray-200 rounded-lg hover:bg-gray-300"
-                  >
-                    -
-                  </button>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={skuMixianSu}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value) || 0;
-                      setSkuMixianSu(Math.max(0, value));
-                    }}
-                    className="w-20 text-3xl font-bold text-center border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setSkuMixianSu(skuMixianSu + 1)}
-                    className="w-12 h-12 text-2xl bg-orange-400 text-white rounded-lg hover:bg-orange-500"
-                  >
-                    +
-                  </button>
-                </div>
+            {/* 【素】米线/面 */}
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-3 text-gray-800">【素】米线/面</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <SkuInput label="三鲜" value={skuSanxianSu} onChange={setSkuSanxianSu} />
+                <SkuInput label="酸菜" value={skuSuancaiSu} onChange={setSkuSuancaiSu} />
+                <SkuInput label="麻辣" value={skuMalaSu} onChange={setSkuMalaSu} />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-xl font-medium mb-2 text-gray-700">
-                  米线(肉)
-                </label>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setSkuMixianRou(Math.max(0, skuMixianRou - 1))}
-                    className="w-12 h-12 text-2xl bg-gray-200 rounded-lg hover:bg-gray-300"
-                  >
-                    -
-                  </button>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={skuMixianRou}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value) || 0;
-                      setSkuMixianRou(Math.max(0, value));
-                    }}
-                    className="w-20 text-3xl font-bold text-center border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setSkuMixianRou(skuMixianRou + 1)}
-                    className="w-12 h-12 text-2xl bg-orange-400 text-white rounded-lg hover:bg-orange-500"
-                  >
-                    +
-                  </button>
-                </div>
+            {/* 【肉】米线/面 */}
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-3 text-gray-800">【肉】米线/面</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <SkuInput label="三鲜" value={skuSanxianRou} onChange={setSkuSanxianRou} />
+                <SkuInput label="酸菜" value={skuSuancaiRou} onChange={setSkuSuancaiRou} />
+                <SkuInput label="麻辣" value={skuMalaRou} onChange={setSkuMalaRou} />
+                <SkuInput label="麻辣米线" value={skuMalamixian} onChange={setSkuMalamixian} />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-xl font-medium mb-2 text-gray-700">
-                  炒面/炒河粉
-                </label>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setSkuChaomian(Math.max(0, skuChaomian - 1))}
-                    className="w-12 h-12 text-2xl bg-gray-200 rounded-lg hover:bg-gray-300"
-                  >
-                    -
-                  </button>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={skuChaomian}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value) || 0;
-                      setSkuChaomian(Math.max(0, value));
-                    }}
-                    className="w-20 text-3xl font-bold text-center border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setSkuChaomian(skuChaomian + 1)}
-                    className="w-12 h-12 text-2xl bg-orange-400 text-white rounded-lg hover:bg-orange-500"
-                  >
-                    +
-                  </button>
-                </div>
+            {/* 酸辣粉 */}
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-3 text-gray-800">酸辣粉</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} />
+              </div>
+            </div>
+
+            {/* 炒面/炒河粉 */}
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-3 text-gray-800">炒面/炒河粉</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <SkuInput label="香脆炒面" value={skuXiangcuichaomian} onChange={setSkuXiangcuichaomian} />
+                <SkuInput label="酸菜炒河粉[宽]" value={skuSuancaichaohufenkuan} onChange={setSkuSuancaichaohufenkuan} />
+                <SkuInput label="麻辣炒河粉[细]" value={skuMalachaohufenxi} onChange={setSkuMalachaohufenxi} />
               </div>
             </div>
           </div>
@@ -894,4 +936,3 @@ export default function RecordPage() {
     </RequireAuth>
   );
 }
-
