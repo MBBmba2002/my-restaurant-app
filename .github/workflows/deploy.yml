@@ -82,49 +82,59 @@ jobs:
           echo ""
           
           echo "🔑 Environment variables check:"
-          SUPABASE_URL_IS_SET="false"
-          ANON_KEY_IS_SET="false"
           
-          if [ -n "$NEXT_PUBLIC_SUPABASE_URL" ]; then
-            SUPABASE_URL_IS_SET="true"
-            # Extract host from URL (safe to display)
-            SUPABASE_URL_HOST=$(echo "$NEXT_PUBLIC_SUPABASE_URL" | sed 's#https\?://##' | cut -d/ -f1)
-            echo "✓ SUPABASE_URL is set? true"
-            echo "  SUPABASE_URL_HOST: ${SUPABASE_URL_HOST}"
-          else
-            echo "❌ SUPABASE_URL is set? false"
-            echo "   ERROR: NEXT_PUBLIC_SUPABASE_URL is not set"
-            echo "   Please set this secret in GitHub repository settings:"
-            echo "   Settings → Secrets and variables → Actions → New repository secret"
-            exit 1
-          fi
-          
-          if [ -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
-            ANON_KEY_IS_SET="true"
-            echo "✓ ANON_KEY is set? true"
-          else
-            echo "❌ ANON_KEY is set? false"
-            echo "   ERROR: NEXT_PUBLIC_SUPABASE_ANON_KEY is not set"
-            echo "   Please set this secret in GitHub repository settings:"
-            echo "   Settings → Secrets and variables → Actions → New repository secret"
-            exit 1
-          fi
-          echo ""
-          
-          # Double-check environment variables are available to npm
-          echo "🔍 Verifying environment variables are available to npm:"
           if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ]; then
-            echo "❌ ERROR: NEXT_PUBLIC_SUPABASE_URL is not available"
+            echo "❌ ERROR: NEXT_PUBLIC_SUPABASE_URL is not set"
+            echo "   Please set this secret in GitHub repository settings:"
+            echo "   Settings → Secrets and variables → Actions → New repository secret"
             exit 1
           fi
+          
           if [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
-            echo "❌ ERROR: NEXT_PUBLIC_SUPABASE_ANON_KEY is not available"
+            echo "❌ ERROR: NEXT_PUBLIC_SUPABASE_ANON_KEY is not set"
+            echo "   Please set this secret in GitHub repository settings:"
+            echo "   Settings → Secrets and variables → Actions → New repository secret"
             exit 1
           fi
-          echo "✓ Environment variables confirmed available"
+          
+          # Trim whitespace from environment variables and re-export
+          NEXT_PUBLIC_SUPABASE_URL=$(echo "$NEXT_PUBLIC_SUPABASE_URL" | xargs)
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=$(echo "$NEXT_PUBLIC_SUPABASE_ANON_KEY" | xargs)
+          
+          # Re-export trimmed values so they're available to npm
+          export NEXT_PUBLIC_SUPABASE_URL
+          export NEXT_PUBLIC_SUPABASE_ANON_KEY
+          
+          # Validate URL format
+          echo "✓ SUPABASE_URL is set (length: ${#NEXT_PUBLIC_SUPABASE_URL})"
+          if [[ ! "$NEXT_PUBLIC_SUPABASE_URL" =~ ^https?:// ]]; then
+            echo "❌ ERROR: NEXT_PUBLIC_SUPABASE_URL must start with http:// or https://"
+            echo "   Current value starts with: ${NEXT_PUBLIC_SUPABASE_URL:0:10}..."
+            exit 1
+          fi
+          
+          # Extract and display host (safe to show)
+          SUPABASE_URL_HOST=$(echo "$NEXT_PUBLIC_SUPABASE_URL" | sed 's#https\?://##' | cut -d/ -f1)
+          if [ -z "$SUPABASE_URL_HOST" ]; then
+            echo "❌ ERROR: Could not extract host from NEXT_PUBLIC_SUPABASE_URL"
+            exit 1
+          fi
+          echo "  SUPABASE_URL_HOST: ${SUPABASE_URL_HOST}"
+          
+          # Validate host contains supabase.co
+          if [[ ! "$SUPABASE_URL_HOST" =~ supabase\.co$ ]]; then
+            echo "⚠️  WARNING: SUPABASE_URL_HOST does not end with supabase.co"
+            echo "   Host: ${SUPABASE_URL_HOST}"
+          fi
+          
+          echo "✓ ANON_KEY is set (length: ${#NEXT_PUBLIC_SUPABASE_ANON_KEY})"
+          if [ ${#NEXT_PUBLIC_SUPABASE_ANON_KEY} -lt 20 ]; then
+            echo "⚠️  WARNING: ANON_KEY seems too short (expected > 20 characters)"
+          fi
           echo ""
           
           echo "🚀 Starting build..."
+          echo "   Using NEXT_PUBLIC_SUPABASE_URL: ${SUPABASE_URL_HOST} (host only, for security)"
           if npm run export; then
             echo "✅ Build completed successfully"
           else

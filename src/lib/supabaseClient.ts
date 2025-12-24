@@ -21,19 +21,24 @@ if (!anon || typeof anon !== "string" || anon.trim() === "") {
   throw new Error("Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_ANON_KEY must be set at build time. Please set it in GitHub Secrets.");
 }
 
+// Trim whitespace
+const trimmedUrl = url.trim();
+const trimmedAnon = anon.trim();
+
 // Validate URL format before passing to createClient
+let parsedUrl: URL;
 try {
-  const testUrl = new URL(url);
-  if (testUrl.protocol !== "https:" && testUrl.protocol !== "http:") {
-    throw new Error(`Invalid protocol: ${testUrl.protocol}. Must be http: or https:`);
+  parsedUrl = new URL(trimmedUrl);
+  if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") {
+    throw new Error(`Invalid protocol: ${parsedUrl.protocol}. Must be http: or https:`);
   }
-} catch (error) {
-  throw new Error(`NEXT_PUBLIC_SUPABASE_URL is not a valid URL: "${url}". Error: ${error}`);
+} catch (error: any) {
+  throw new Error(`NEXT_PUBLIC_SUPABASE_URL is not a valid URL: "${trimmedUrl}". Error: ${error?.message || error}`);
 }
 
 export const supabase = createClient(
-  url,
-  anon,
+  trimmedUrl,
+  trimmedAnon,
   {
     auth: {
       persistSession: true,
