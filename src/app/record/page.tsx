@@ -239,6 +239,8 @@ function RecordPageContent() {
   // 成功提示
   const [showSuccess, setShowSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  // 提交前确认对话框
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   useEffect(() => {
     const today = new Date();
@@ -257,7 +259,7 @@ function RecordPageContent() {
     setExpenses([...expenses, data]);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
       alert("请先登录");
@@ -265,6 +267,38 @@ function RecordPageContent() {
       return;
     }
 
+    // 先检查是否有数据
+    const totalIncome =
+      parseFloat(incomeWechat || "0") +
+      parseFloat(incomeAlipay || "0") +
+      parseFloat(incomeCash || "0");
+
+    // 如果没有任何数据，提示用户
+    if (
+      totalIncome === 0 &&
+      skuBing === 0 &&
+      skuTangSu === 0 &&
+      skuMixianSu === 0 &&
+      skuMixianRou === 0 &&
+      skuChaomian === 0 &&
+      expenses.length === 0
+    ) {
+      alert("请至少输入一项数据");
+      return;
+    }
+
+    // 有数据，显示确认对话框
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    if (!user) {
+      alert("请先登录");
+      router.push("/login/");
+      return;
+    }
+
+    setShowConfirmDialog(false);
     setSubmitting(true);
 
     try {
@@ -273,21 +307,6 @@ function RecordPageContent() {
         parseFloat(incomeWechat || "0") +
         parseFloat(incomeAlipay || "0") +
         parseFloat(incomeCash || "0");
-
-      // 如果没有任何数据，提示用户
-      if (
-        totalIncome === 0 &&
-        skuBing === 0 &&
-        skuTangSu === 0 &&
-        skuMixianSu === 0 &&
-        skuMixianRou === 0 &&
-        skuChaomian === 0 &&
-        expenses.length === 0
-      ) {
-        alert("请至少输入一项数据");
-        setSubmitting(false);
-        return;
-      }
 
       // 如果有收入或销量，创建一条记录
       if (totalIncome > 0 || skuBing > 0 || skuTangSu > 0 || skuMixianSu > 0 || skuMixianRou > 0 || skuChaomian > 0) {
@@ -644,6 +663,36 @@ function RecordPageContent() {
         type={expenseModal.type}
         onSubmit={handleExpenseSubmit}
       />
+
+      {/* 提交前确认对话框 */}
+      {showConfirmDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-8 w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+              请再次检查
+            </h2>
+            <p className="text-xl text-center text-gray-600 mb-6">
+              请再次检查是否当天数据都准确无误
+            </p>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => setShowConfirmDialog(false)}
+                className="flex-1 p-4 text-xl bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+              >
+                我再看看
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSubmit}
+                className="flex-1 p-4 text-xl bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium"
+              >
+                确认提交
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

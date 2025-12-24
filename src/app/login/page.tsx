@@ -56,8 +56,8 @@ export default function LoginPage() {
       // 注册成功后，如果有 session，说明自动登录成功，直接跳转
       if (data?.session) {
         console.log("[SUCCESS] Sign up and auto-login successful");
-        // 直接跳转到首页，不等待
-        window.location.href = "/my-restaurant-app/";
+        // 直接跳转到记账页面，不等待
+        window.location.href = "/my-restaurant-app/record/";
       } else {
         // 如果没有 session，可能是需要邮箱验证，但我们配置为不需要验证
         console.warn("[WARNING] signUp succeeded but no session returned");
@@ -103,8 +103,8 @@ export default function LoginPage() {
       }
 
       console.log("[SUCCESS] Sign in successful");
-      // Redirect to home page with basePath consideration
-      window.location.href = "/my-restaurant-app/";
+      // Redirect to record page after login
+      window.location.href = "/my-restaurant-app/record/";
     } catch (err: any) {
       console.error("[ERROR] Unexpected error in handleSignIn:", err);
       const errorMessage = err?.message ?? JSON.stringify(err) ?? "Unknown error";
