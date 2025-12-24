@@ -241,6 +241,12 @@ function RecordPageContent() {
   const [submitting, setSubmitting] = useState(false);
   // 提交前确认对话框
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  // 收入保存状态
+  const [incomeSaved, setIncomeSaved] = useState(false);
+  const [incomeSavedMessage, setIncomeSavedMessage] = useState(false);
+  // 总收入确认提交状态
+  const [totalIncomeConfirmed, setTotalIncomeConfirmed] = useState(false);
+  const [showTotalIncomeConfirmDialog, setShowTotalIncomeConfirmDialog] = useState(false);
 
   useEffect(() => {
     const today = new Date();
@@ -257,6 +263,29 @@ function RecordPageContent() {
     usage_duration?: string;
   }) => {
     setExpenses([...expenses, data]);
+  };
+
+  // 保存收入（临时保存到本地存储）
+  const handleSaveIncome = () => {
+    const incomeData = {
+      wechat: incomeWechat,
+      alipay: incomeAlipay,
+      cash: incomeCash,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem("daily_income_temp", JSON.stringify(incomeData));
+    setIncomeSaved(true);
+    setIncomeSavedMessage(true);
+    // 3秒后隐藏"已保存"提示
+    setTimeout(() => {
+      setIncomeSavedMessage(false);
+    }, 3000);
+  };
+
+  // 确认提交总收入
+  const handleConfirmTotalIncome = () => {
+    setTotalIncomeConfirmed(true);
+    setShowTotalIncomeConfirmDialog(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -404,9 +433,19 @@ function RecordPageContent() {
                   type="number"
                   step="0.01"
                   value={incomeWechat}
-                  onChange={(e) => setIncomeWechat(e.target.value)}
+                  onChange={(e) => {
+                    if (!totalIncomeConfirmed) {
+                      setIncomeWechat(e.target.value);
+                      setIncomeSaved(false);
+                    }
+                  }}
                   placeholder="0.00"
-                  className="w-full text-2xl p-4 border-2 border-red-300 rounded-lg focus:outline-none focus:border-red-500"
+                  disabled={totalIncomeConfirmed}
+                  className={`w-full text-2xl p-4 border-2 rounded-lg focus:outline-none ${
+                    totalIncomeConfirmed
+                      ? "border-gray-300 bg-gray-100 cursor-not-allowed"
+                      : "border-red-300 focus:border-red-500"
+                  }`}
                 />
               </div>
               <div>
@@ -417,9 +456,19 @@ function RecordPageContent() {
                   type="number"
                   step="0.01"
                   value={incomeAlipay}
-                  onChange={(e) => setIncomeAlipay(e.target.value)}
+                  onChange={(e) => {
+                    if (!totalIncomeConfirmed) {
+                      setIncomeAlipay(e.target.value);
+                      setIncomeSaved(false);
+                    }
+                  }}
                   placeholder="0.00"
-                  className="w-full text-2xl p-4 border-2 border-red-300 rounded-lg focus:outline-none focus:border-red-500"
+                  disabled={totalIncomeConfirmed}
+                  className={`w-full text-2xl p-4 border-2 rounded-lg focus:outline-none ${
+                    totalIncomeConfirmed
+                      ? "border-gray-300 bg-gray-100 cursor-not-allowed"
+                      : "border-red-300 focus:border-red-500"
+                  }`}
                 />
               </div>
               <div>
@@ -430,26 +479,70 @@ function RecordPageContent() {
                   type="number"
                   step="0.01"
                   value={incomeCash}
-                  onChange={(e) => setIncomeCash(e.target.value)}
+                  onChange={(e) => {
+                    if (!totalIncomeConfirmed) {
+                      setIncomeCash(e.target.value);
+                      setIncomeSaved(false);
+                    }
+                  }}
                   placeholder="0.00"
-                  className="w-full text-2xl p-4 border-2 border-red-300 rounded-lg focus:outline-none focus:border-red-500"
+                  disabled={totalIncomeConfirmed}
+                  className={`w-full text-2xl p-4 border-2 rounded-lg focus:outline-none ${
+                    totalIncomeConfirmed
+                      ? "border-gray-300 bg-gray-100 cursor-not-allowed"
+                      : "border-red-300 focus:border-red-500"
+                  }`}
                 />
+              </div>
+
+              {/* 保存收入按钮 */}
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={handleSaveIncome}
+                  disabled={totalIncomeConfirmed}
+                  className={`w-full p-4 text-xl font-bold rounded-lg ${
+                    totalIncomeConfirmed
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : incomeSavedMessage
+                      ? "bg-green-500 text-white"
+                      : "bg-blue-500 text-white hover:bg-blue-600"
+                  }`}
+                >
+                  {incomeSavedMessage ? "✅ 已保存" : "💾 保存"}
+                </button>
               </div>
 
               {/* 今日总收入显示 */}
               <div className="mt-4 pt-4 border-t-2 border-red-200">
                 <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg p-5 shadow-sm">
                   <div className="text-center">
-                    <div className="text-xl font-semibold text-gray-700 mb-2">
-                      今日总收入
+                    <div className="flex items-center justify-center gap-3 mb-2">
+                      <div className="text-xl font-semibold text-gray-700">
+                        今日总收入
+                      </div>
+                      {totalIncomeConfirmed && (
+                        <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full">
+                          已确认
+                        </span>
+                      )}
                     </div>
-                    <div className="text-4xl font-bold text-red-600">
+                    <div className="text-4xl font-bold text-red-600 mb-3">
                       ¥ {(
                         parseFloat(incomeWechat || "0") +
                         parseFloat(incomeAlipay || "0") +
                         parseFloat(incomeCash || "0")
                       ).toFixed(2)}
                     </div>
+                    {!totalIncomeConfirmed && (
+                      <button
+                        type="button"
+                        onClick={() => setShowTotalIncomeConfirmDialog(true)}
+                        className="px-6 py-3 bg-red-600 text-white text-lg font-bold rounded-lg hover:bg-red-700"
+                      >
+                        🔒 确认提交总收入
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -706,6 +799,45 @@ function RecordPageContent() {
                 className="flex-1 p-4 text-xl bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium"
               >
                 确认提交
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 确认提交总收入对话框 */}
+      {showTotalIncomeConfirmDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-8 w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+              确认提交今日总收入
+            </h2>
+            <p className="text-xl text-center text-red-600 mb-6 font-semibold">
+              确认提交今日总收入，无法再修改
+            </p>
+            <div className="text-center mb-6">
+              <div className="text-3xl font-bold text-red-600">
+                ¥ {(
+                  parseFloat(incomeWechat || "0") +
+                  parseFloat(incomeAlipay || "0") +
+                  parseFloat(incomeCash || "0")
+                ).toFixed(2)}
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => setShowTotalIncomeConfirmDialog(false)}
+                className="flex-1 p-4 text-xl bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+              >
+                再想想
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmTotalIncome}
+                className="flex-1 p-4 text-xl bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium"
+              >
+                确认
               </button>
             </div>
           </div>
