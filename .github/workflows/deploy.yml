@@ -31,7 +31,25 @@ jobs:
         run: npm ci
 
       - name: Build (Static Export)
-        run: npm run export
+        run: |
+          echo "🔧 Build Configuration:"
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo ""
+          echo "📋 Next.js config check:"
+          if [ -f "next.config.ts" ]; then
+            echo "✓ next.config.ts exists"
+            grep -E "(output|basePath|trailingSlash)" next.config.ts || echo "⚠️  Some config not found"
+          else
+            echo "❌ next.config.ts not found"
+          fi
+          echo ""
+          echo "📦 Source files check:"
+          ls -la src/app/login/page.tsx 2>/dev/null && echo "✓ login page exists" || echo "❌ login page missing"
+          ls -la src/lib/supabaseClient.ts 2>/dev/null && echo "✓ supabaseClient exists" || echo "❌ supabaseClient missing"
+          echo ""
+          echo "🚀 Starting build..."
+          npm run export
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -92,8 +110,23 @@ jobs:
           if [ $MISSING_FILES -eq 1 ]; then
             echo "❌ Verification failed: Required files are missing"
             echo ""
-            echo "Full directory tree (out/):"
-            find out -type f -name "*.html" | sort
+            echo "📊 Full directory tree (out/):"
+            echo "-----------------------------------"
+            find out -type f -name "*.html" | sort || echo "No HTML files found"
+            echo ""
+            echo "📂 All directories in out/:"
+            find out -type d | head -30
+            echo ""
+            echo "📋 Complete file listing (first 50 files):"
+            find out -type f | head -50
+            echo ""
+            echo "🔍 Checking if build actually completed:"
+            if [ -d ".next" ]; then
+              echo "✓ .next directory exists (build ran)"
+              echo "   .next size: $(du -sh .next 2>/dev/null | cut -f1 || echo 'unknown')"
+            else
+              echo "⚠️  .next directory not found"
+            fi
             exit 1
           fi
           
