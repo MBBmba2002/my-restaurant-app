@@ -83,15 +83,21 @@ jobs:
           
           echo "🔑 Environment variables check:"
           if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ]; then
-            echo "⚠️  NEXT_PUBLIC_SUPABASE_URL is not set (build may fail)"
+            echo "❌ ERROR: NEXT_PUBLIC_SUPABASE_URL is not set"
+            echo "   Please set this secret in GitHub repository settings:"
+            echo "   Settings → Secrets and variables → Actions → New repository secret"
+            exit 1
           else
-            echo "✓ NEXT_PUBLIC_SUPABASE_URL is set"
+            echo "✓ NEXT_PUBLIC_SUPABASE_URL is set (length: ${#NEXT_PUBLIC_SUPABASE_URL})"
           fi
           
           if [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
-            echo "⚠️  NEXT_PUBLIC_SUPABASE_ANON_KEY is not set (build may fail)"
+            echo "❌ ERROR: NEXT_PUBLIC_SUPABASE_ANON_KEY is not set"
+            echo "   Please set this secret in GitHub repository settings:"
+            echo "   Settings → Secrets and variables → Actions → New repository secret"
+            exit 1
           else
-            echo "✓ NEXT_PUBLIC_SUPABASE_ANON_KEY is set"
+            echo "✓ NEXT_PUBLIC_SUPABASE_ANON_KEY is set (length: ${#NEXT_PUBLIC_SUPABASE_ANON_KEY})"
           fi
           echo ""
           
