@@ -1,17 +1,57 @@
+"use client";
+
 import Image from "next/image";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
+        <div className="flex w-full items-center justify-between mb-8">
+          <Image
+            className="dark:invert"
+            src="/next.svg"
+            alt="Next.js logo"
+            width={100}
+            height={20}
+            priority
+          />
+          {!loading && (
+            <div className="flex items-center gap-4">
+              {user && (
+                <>
+                  <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                    已登录: {user.email}
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="rounded-md bg-red-600 px-4 py-2 text-sm text-white font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    退出登录
+                  </button>
+                </>
+              )}
+              {!user && (
+                <a
+                  href="/login"
+                  className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  登录
+                </a>
+              )}
+            </div>
+          )}
+        </div>
         <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
           <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
             To get started, edit the page.tsx file.
