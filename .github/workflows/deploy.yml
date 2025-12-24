@@ -223,6 +223,12 @@ jobs:
             echo "⚠️  out/test/index.html not found (optional)"
           fi
           
+          if [ -f "out/record/index.html" ]; then
+            echo "✓ out/record/index.html exists"
+          else
+            echo "⚠️  out/record/index.html not found (optional)"
+          fi
+          
           echo ""
           if [ $MISSING_FILES -eq 1 ]; then
             echo "❌ Verification failed: Required files are missing"
