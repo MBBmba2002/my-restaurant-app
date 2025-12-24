@@ -30,8 +30,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Build (Static Export)
+        run: npm run export
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -39,59 +39,64 @@ jobs:
       - name: Verify build output
         run: |
           if [ ! -d "out" ]; then
-            echo "❌ Error: out directory not found"
+            echo "❌ Error: out directory not found after build"
+            echo "Build may have failed or output configuration is incorrect"
             exit 1
           fi
           
-          echo "🔍 Detecting build output structure..."
-          echo "Contents of out/ directory:"
-          ls -la out/ | head -20
-          
-          # Detect if Next.js generated files in a basePath subdirectory
-          BASE_DIR="out"
-          if [ -d "out/my-restaurant-app" ]; then
-            BASE_DIR="out/my-restaurant-app"
-            echo "✓ Detected basePath: files are in out/my-restaurant-app/"
-          else
-            echo "✓ No basePath detected: using out/ as base directory"
-          fi
-          
+          echo "📂 Build output directory structure:"
+          echo "-----------------------------------"
+          find out -maxdepth 3 -type f | head -50
           echo ""
-          echo "📁 Using BASE_DIR: $BASE_DIR"
-          echo "Contents of $BASE_DIR/:"
-          ls -la "$BASE_DIR/" | head -20
+          
+          echo "📁 Top-level contents of out/:"
+          echo "-----------------------------------"
+          ls -la out/ | head -20
+          echo ""
           
           # Verify required files exist
-          echo ""
           echo "🔎 Verifying required files..."
+          echo "-----------------------------------"
           
-          if [ -f "$BASE_DIR/index.html" ]; then
-            echo "✓ $BASE_DIR/index.html exists"
+          MISSING_FILES=0
+          
+          if [ -f "out/index.html" ]; then
+            echo "✓ out/index.html exists"
           else
-            echo "❌ $BASE_DIR/index.html not found"
-            echo "Available files in $BASE_DIR/:"
-            ls -la "$BASE_DIR/" || true
-            exit 1
+            echo "❌ out/index.html NOT FOUND"
+            MISSING_FILES=1
           fi
           
-          if [ -f "$BASE_DIR/login/index.html" ]; then
-            echo "✓ $BASE_DIR/login/index.html exists"
+          if [ -f "out/login/index.html" ]; then
+            echo "✓ out/login/index.html exists"
           else
-            echo "❌ $BASE_DIR/login/index.html not found"
-            echo "Checking $BASE_DIR/login/ directory:"
-            ls -la "$BASE_DIR/login/" 2>/dev/null || echo "$BASE_DIR/login/ directory does not exist"
-            exit 1
+            echo "❌ out/login/index.html NOT FOUND"
+            echo "   Checking out/login/ directory:"
+            if [ -d "out/login" ]; then
+              ls -la out/login/ || true
+            else
+              echo "   ❌ out/login/ directory does not exist"
+              echo "   Available directories in out/:"
+              find out -type d -maxdepth 2 | head -20
+            fi
+            MISSING_FILES=1
           fi
           
-          if [ -f "$BASE_DIR/test/index.html" ]; then
-            echo "✓ $BASE_DIR/test/index.html exists"
+          if [ -f "out/test/index.html" ]; then
+            echo "✓ out/test/index.html exists"
           else
-            echo "⚠️  $BASE_DIR/test/index.html not found (optional)"
+            echo "⚠️  out/test/index.html not found (optional)"
           fi
           
-          # Export BASE_DIR for next step if needed
-          echo "BASE_DIR=$BASE_DIR" >> $GITHUB_ENV
           echo ""
+          if [ $MISSING_FILES -eq 1 ]; then
+            echo "❌ Verification failed: Required files are missing"
+            echo ""
+            echo "Full directory tree (out/):"
+            find out -type f -name "*.html" | sort
+            exit 1
+          fi
+          
           echo "✅ All required files verified successfully!"
 
       - name: Setup Pages
@@ -100,7 +105,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.BASE_DIR || './out' }}
+          path: ./out
 
   deploy:
     environment:
