@@ -82,22 +82,32 @@ jobs:
           echo ""
           
           echo "🔑 Environment variables check:"
-          if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ]; then
-            echo "❌ ERROR: NEXT_PUBLIC_SUPABASE_URL is not set"
+          SUPABASE_URL_IS_SET="false"
+          ANON_KEY_IS_SET="false"
+          
+          if [ -n "$NEXT_PUBLIC_SUPABASE_URL" ]; then
+            SUPABASE_URL_IS_SET="true"
+            # Extract host from URL (safe to display)
+            SUPABASE_URL_HOST=$(echo "$NEXT_PUBLIC_SUPABASE_URL" | sed 's#https\?://##' | cut -d/ -f1)
+            echo "✓ SUPABASE_URL is set? true"
+            echo "  SUPABASE_URL_HOST: ${SUPABASE_URL_HOST}"
+          else
+            echo "❌ SUPABASE_URL is set? false"
+            echo "   ERROR: NEXT_PUBLIC_SUPABASE_URL is not set"
             echo "   Please set this secret in GitHub repository settings:"
             echo "   Settings → Secrets and variables → Actions → New repository secret"
             exit 1
-          else
-            echo "✓ NEXT_PUBLIC_SUPABASE_URL is set (length: ${#NEXT_PUBLIC_SUPABASE_URL})"
           fi
           
-          if [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
-            echo "❌ ERROR: NEXT_PUBLIC_SUPABASE_ANON_KEY is not set"
+          if [ -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
+            ANON_KEY_IS_SET="true"
+            echo "✓ ANON_KEY is set? true"
+          else
+            echo "❌ ANON_KEY is set? false"
+            echo "   ERROR: NEXT_PUBLIC_SUPABASE_ANON_KEY is not set"
             echo "   Please set this secret in GitHub repository settings:"
             echo "   Settings → Secrets and variables → Actions → New repository secret"
             exit 1
-          else
-            echo "✓ NEXT_PUBLIC_SUPABASE_ANON_KEY is set (length: ${#NEXT_PUBLIC_SUPABASE_ANON_KEY})"
           fi
           echo ""
           
