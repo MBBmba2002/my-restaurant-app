@@ -20,12 +20,20 @@ export default function Home() {
             <p className="text-lg text-zinc-700 dark:text-zinc-300">
               已登录: {user.email}
             </p>
-            <Link
-              href="/test/"
-              className="inline-block rounded-md bg-blue-600 px-6 py-3 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-            >
-              进入 /test/
-            </Link>
+            <div className="space-y-3">
+              <Link
+                href="/record/"
+                className="inline-block w-full rounded-md bg-green-600 px-6 py-3 text-white font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors text-center"
+              >
+                开始记账
+              </Link>
+              <Link
+                href="/test/"
+                className="inline-block w-full rounded-md bg-blue-600 px-6 py-3 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-center"
+              >
+                测试页面
+              </Link>
+            </div>
           </div>
         ) : (
           <Link
