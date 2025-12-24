@@ -53,14 +53,11 @@ export default function LoginPage() {
         return;
       }
 
-      // 注册成功后，如果有 session，说明自动登录成功
+      // 注册成功后，如果有 session，说明自动登录成功，直接跳转
       if (data?.session) {
         console.log("[SUCCESS] Sign up and auto-login successful");
-        setMessage("注册成功，已自动登录");
-        // 延迟一下显示成功消息，然后跳转
-        setTimeout(() => {
-          window.location.href = "/my-restaurant-app/";
-        }, 1000);
+        // 直接跳转到首页，不等待
+        window.location.href = "/my-restaurant-app/";
       } else {
         // 如果没有 session，可能是需要邮箱验证，但我们配置为不需要验证
         console.warn("[WARNING] signUp succeeded but no session returned");
