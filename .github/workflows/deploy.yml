@@ -39,17 +39,30 @@ jobs:
       - name: Verify build output
         run: |
           if [ ! -d "out" ]; then
-            echo "Error: out directory not found"
+            echo "❌ Error: out directory not found"
             exit 1
           fi
-          echo "Build output verified:"
-          ls -la out/
-          if [ -d "out/login" ]; then
-            echo "✓ Login page found"
+          echo "✓ Build output verified"
+          echo "Checking key files..."
+          ls -la out/ | head -20
+          if [ -f "out/index.html" ]; then
+            echo "✓ out/index.html exists"
           else
-            echo "✗ Login page not found - checking for login.html"
-            ls -la out/ | grep login || echo "No login files found"
+            echo "❌ out/index.html not found"
+            exit 1
           fi
+          if [ -f "out/login/index.html" ]; then
+            echo "✓ out/login/index.html exists"
+          else
+            echo "❌ out/login/index.html not found"
+            echo "Checking out/login/ directory:"
+            ls -la out/login/ 2>/dev/null || echo "out/login/ directory does not exist"
+            exit 1
+          fi
+          if [ -f "out/test/index.html" ]; then
+            echo "✓ out/test/index.html exists"
+          fi
+          echo "✓ All required files found"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

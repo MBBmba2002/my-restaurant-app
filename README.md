@@ -29,36 +29,36 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deployment
-
-### GitHub Pages
-
-This project is configured for GitHub Pages deployment at the path `/my-restaurant-app`.
-
-#### Online Routes
-
-When deployed to GitHub Pages, access routes with the base path and trailing slash:
-
-- **Homepage**: `https://[你的GitHub用户名].github.io/my-restaurant-app/`
-- **Login Page**: `https://[你的GitHub用户名].github.io/my-restaurant-app/login/` ⚠️ **Note: URL must end with `/`**
-- **Test Page**: `https://[你的GitHub用户名].github.io/my-restaurant-app/test/`
-
-#### Important Notes
-
-1. **Trailing Slash Required**: All routes must end with `/` when accessing via GitHub Pages
-   - ✅ Correct: `/my-restaurant-app/login/`
-   - ❌ Wrong: `/my-restaurant-app/login`
-
-2. **Build Output**: Static files are exported to the `out/` directory after running `npm run build`
-
-3. **Auto Deployment**: Pushing to the `main` branch triggers automatic deployment via GitHub Actions
-
-### Local Development
-
-Local development runs at `http://localhost:3000` without the base path prefix.
-
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Deploy on GitHub Pages
+
+This project is configured for GitHub Pages deployment with basePath `/my-restaurant-app`.
+
+### Build and Export
+
+```bash
+npm run build
+# or
+npm run export
+```
+
+The static export will be generated in the `out/` directory.
+
+### Deployment
+
+The project uses GitHub Actions to automatically deploy to GitHub Pages when pushing to the `main` branch.
+
+### Accessing Routes on GitHub Pages
+
+**Important:** All routes must end with a trailing slash `/` because `trailingSlash: true` is configured.
+
+- **Home page:** `https://[your-username].github.io/my-restaurant-app/`
+- **Login page:** `https://[your-username].github.io/my-restaurant-app/login/`
+- **Test page (protected):** `https://[your-username].github.io/my-restaurant-app/test/`
+
+**Note:** The login page route is `/login/` (with trailing slash). Accessing `/login` without the trailing slash may result in a 404 error on GitHub Pages.

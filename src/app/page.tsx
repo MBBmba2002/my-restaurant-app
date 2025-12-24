@@ -11,7 +11,7 @@ export default function Home() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push("/login");
+    window.location.href = "/login/";
   };
 
   return (
@@ -43,7 +43,7 @@ export default function Home() {
               )}
               {!user && (
                 <a
-                  href="/login"
+                  href="/login/"
                   className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   登录

@@ -50,7 +50,8 @@ export default function LoginPage() {
 
       if (error) throw error;
 
-      router.push("/");
+      // Redirect to home page with basePath consideration
+      window.location.href = "/";
     } catch (err: any) {
       setError(err.message || "OTP 验证失败");
     } finally {
