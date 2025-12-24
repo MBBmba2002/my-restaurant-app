@@ -10,7 +10,7 @@ export default function Home() {
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black px-4">
       <main className="w-full max-w-md text-center">
         <h1 className="mb-8 text-4xl font-bold text-black dark:text-zinc-50">
-          父母记账
+          蒙记肉夹馍记账
         </h1>
         
         {loading ? (
