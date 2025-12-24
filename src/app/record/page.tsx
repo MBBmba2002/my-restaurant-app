@@ -435,6 +435,24 @@ function RecordPageContent() {
                   className="w-full text-2xl p-4 border-2 border-red-300 rounded-lg focus:outline-none focus:border-red-500"
                 />
               </div>
+
+              {/* 今日总收入显示 */}
+              <div className="mt-4 pt-4 border-t-2 border-red-200">
+                <div className="bg-red-50 rounded-lg p-4">
+                  <div className="text-center">
+                    <div className="text-lg font-medium text-gray-700 mb-1">
+                      今日总收入
+                    </div>
+                    <div className="text-3xl font-bold text-red-600">
+                      ¥ {(
+                        parseFloat(incomeWechat || "0") +
+                        parseFloat(incomeAlipay || "0") +
+                        parseFloat(incomeCash || "0")
+                      ).toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
