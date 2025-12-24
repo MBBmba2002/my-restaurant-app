@@ -203,14 +203,15 @@ function ExpenseModal({ isOpen, onClose, type, onSubmit }: ExpenseModalProps) {
   );
 }
 
-// 销量输入组件（可复用）
+// 销量输入组件（可复用）- 极简美化版
 interface SkuInputProps {
   label: string;
   value: number;
   onChange: (value: number) => void;
+  disabled?: boolean;
 }
 
-function SkuInput({ label, value, onChange }: SkuInputProps) {
+function SkuInput({ label, value, onChange, disabled = false }: SkuInputProps) {
   const [inputValue, setInputValue] = useState(value.toString());
 
   useEffect(() => {
@@ -218,6 +219,7 @@ function SkuInput({ label, value, onChange }: SkuInputProps) {
   }, [value]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     const newValue = e.target.value;
     setInputValue(newValue);
     const numValue = parseInt(newValue) || 0;
@@ -227,41 +229,59 @@ function SkuInput({ label, value, onChange }: SkuInputProps) {
   };
 
   const handleDecrement = () => {
+    if (disabled) return;
     onChange(Math.max(0, value - 1));
   };
 
   const handleIncrement = () => {
+    if (disabled) return;
     onChange(value + 1);
   };
 
   return (
-    <div>
-      <label className="block text-lg font-medium mb-2 text-gray-700">
+    <div className="flex flex-col">
+      <label className="block text-base font-medium mb-2 text-gray-600">
         {label}
       </label>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-3">
         <button
           type="button"
           onClick={handleDecrement}
-          className="w-12 h-12 text-2xl bg-gray-200 rounded-lg hover:bg-gray-300 flex items-center justify-center"
+          disabled={disabled}
+          className={`w-10 h-10 text-xl font-semibold bg-gray-100 rounded-full flex items-center justify-center transition-transform ${
+            disabled
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-200 active:scale-90"
+          }`}
         >
           -
         </button>
-        <input
-          type="number"
-          min="0"
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={() => {
-            const numValue = parseInt(inputValue) || 0;
-            onChange(Math.max(0, numValue));
-          }}
-          className="flex-1 text-2xl font-bold text-center p-3 border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
-        />
+        <div className="flex-1 max-w-[80px]">
+          <input
+            type="number"
+            min="0"
+            value={inputValue}
+            onChange={handleInputChange}
+            onBlur={() => {
+              if (disabled) return;
+              const numValue = parseInt(inputValue) || 0;
+              onChange(Math.max(0, numValue));
+            }}
+            disabled={disabled}
+            className={`w-full text-xl font-bold text-center py-2 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:border-blue-400 transition-colors ${
+              disabled ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          />
+        </div>
         <button
           type="button"
           onClick={handleIncrement}
-          className="w-12 h-12 text-2xl bg-orange-400 text-white rounded-lg hover:bg-orange-500 flex items-center justify-center"
+          disabled={disabled}
+          className={`w-10 h-10 text-xl font-semibold bg-gray-100 rounded-full flex items-center justify-center transition-transform ${
+            disabled
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-200 active:scale-90"
+          }`}
         >
           +
         </button>
@@ -694,70 +714,84 @@ function RecordPageContent() {
           </div>
 
           {/* 第二板块：当日产品销量追踪 */}
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <h2 className="text-2xl font-bold mb-4 text-orange-600">📊 当日产品销量追踪</h2>
+          <div className={`space-y-4 ${totalIncomeConfirmed ? "opacity-60" : ""}`}>
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">📊 当日产品销量追踪</h2>
             
-            {/* 饼类产品 */}
-            <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-gray-800">饼类产品</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} />
-                <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} />
-                <SkuInput label="肠蛋饼" value={skuChangdanbing} onChange={setSkuChangdanbing} />
-                <SkuInput label="肉蛋饼" value={skuRoudanbing} onChange={setSkuRoudanbing} />
-                <SkuInput label="蛋饼" value={skuDanbing} onChange={setSkuDanbing} />
+            {/* 饼类产品卡片 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="w-1 h-6 bg-amber-400 rounded-full mr-3"></div>
+                <h3 className="text-lg font-bold text-gray-800">饼类产品</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={totalIncomeConfirmed} />
+                <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} disabled={totalIncomeConfirmed} />
+                <SkuInput label="肠蛋饼" value={skuChangdanbing} onChange={setSkuChangdanbing} disabled={totalIncomeConfirmed} />
+                <SkuInput label="肉蛋饼" value={skuRoudanbing} onChange={setSkuRoudanbing} disabled={totalIncomeConfirmed} />
+                <SkuInput label="蛋饼" value={skuDanbing} onChange={setSkuDanbing} disabled={totalIncomeConfirmed} />
               </div>
             </div>
 
-            {/* 汤类(素) */}
-            <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-gray-800">汤类(素)</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <SkuInput label="粉汤" value={skuFentang} onChange={setSkuFentang} />
-                <SkuInput label="馄炖" value={skuHundun} onChange={setSkuHundun} />
-                <SkuInput label="小米粥" value={skuXiaomizhou} onChange={setSkuXiaomizhou} />
-                <SkuInput label="豆浆" value={skuDoujiang} onChange={setSkuDoujiang} />
-                <SkuInput label="鸡蛋汤" value={skuJidantang} onChange={setSkuJidantang} />
-                <SkuInput label="三鲜汤" value={skuSanxiantang} onChange={setSkuSanxiantang} />
+            {/* 粉面类产品卡片 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="w-1 h-6 bg-blue-400 rounded-full mr-3"></div>
+                <h3 className="text-lg font-bold text-gray-800">粉面类</h3>
+              </div>
+              
+              {/* 【素】米线/面 */}
+              <div className="mb-6">
+                <h4 className="text-base font-semibold text-gray-700 mb-3 ml-4">【素】米线/面</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <SkuInput label="三鲜" value={skuSanxianSu} onChange={setSkuSanxianSu} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="酸菜" value={skuSuancaiSu} onChange={setSkuSuancaiSu} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="麻辣" value={skuMalaSu} onChange={setSkuMalaSu} disabled={totalIncomeConfirmed} />
+                </div>
+              </div>
+
+              {/* 【肉】米线/面 */}
+              <div className="mb-6">
+                <h4 className="text-base font-semibold text-gray-700 mb-3 ml-4">【肉】米线/面</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <SkuInput label="三鲜" value={skuSanxianRou} onChange={setSkuSanxianRou} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="酸菜" value={skuSuancaiRou} onChange={setSkuSuancaiRou} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="麻辣" value={skuMalaRou} onChange={setSkuMalaRou} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="麻辣米线" value={skuMalamixian} onChange={setSkuMalamixian} disabled={totalIncomeConfirmed} />
+                </div>
+              </div>
+
+              {/* 酸辣粉 */}
+              <div className="mb-6">
+                <h4 className="text-base font-semibold text-gray-700 mb-3 ml-4">酸辣粉</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} disabled={totalIncomeConfirmed} />
+                </div>
+              </div>
+
+              {/* 炒面/炒河粉 */}
+              <div>
+                <h4 className="text-base font-semibold text-gray-700 mb-3 ml-4">炒面/炒河粉</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <SkuInput label="香脆炒面" value={skuXiangcuichaomian} onChange={setSkuXiangcuichaomian} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="酸菜炒河粉[宽]" value={skuSuancaichaohufenkuan} onChange={setSkuSuancaichaohufenkuan} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="麻辣炒河粉[细]" value={skuMalachaohufenxi} onChange={setSkuMalachaohufenxi} disabled={totalIncomeConfirmed} />
+                </div>
               </div>
             </div>
 
-            {/* 【素】米线/面 */}
-            <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-gray-800">【素】米线/面</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <SkuInput label="三鲜" value={skuSanxianSu} onChange={setSkuSanxianSu} />
-                <SkuInput label="酸菜" value={skuSuancaiSu} onChange={setSkuSuancaiSu} />
-                <SkuInput label="麻辣" value={skuMalaSu} onChange={setSkuMalaSu} />
+            {/* 汤粥类产品卡片 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="w-1 h-6 bg-green-400 rounded-full mr-3"></div>
+                <h3 className="text-lg font-bold text-gray-800">汤粥类</h3>
               </div>
-            </div>
-
-            {/* 【肉】米线/面 */}
-            <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-gray-800">【肉】米线/面</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <SkuInput label="三鲜" value={skuSanxianRou} onChange={setSkuSanxianRou} />
-                <SkuInput label="酸菜" value={skuSuancaiRou} onChange={setSkuSuancaiRou} />
-                <SkuInput label="麻辣" value={skuMalaRou} onChange={setSkuMalaRou} />
-                <SkuInput label="麻辣米线" value={skuMalamixian} onChange={setSkuMalamixian} />
-              </div>
-            </div>
-
-            {/* 酸辣粉 */}
-            <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-gray-800">酸辣粉</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} />
-              </div>
-            </div>
-
-            {/* 炒面/炒河粉 */}
-            <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 text-gray-800">炒面/炒河粉</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <SkuInput label="香脆炒面" value={skuXiangcuichaomian} onChange={setSkuXiangcuichaomian} />
-                <SkuInput label="酸菜炒河粉[宽]" value={skuSuancaichaohufenkuan} onChange={setSkuSuancaichaohufenkuan} />
-                <SkuInput label="麻辣炒河粉[细]" value={skuMalachaohufenxi} onChange={setSkuMalachaohufenxi} />
+              <div className="grid grid-cols-2 gap-4">
+                <SkuInput label="粉汤" value={skuFentang} onChange={setSkuFentang} disabled={totalIncomeConfirmed} />
+                <SkuInput label="馄炖" value={skuHundun} onChange={setSkuHundun} disabled={totalIncomeConfirmed} />
+                <SkuInput label="小米粥" value={skuXiaomizhou} onChange={setSkuXiaomizhou} disabled={totalIncomeConfirmed} />
+                <SkuInput label="豆浆" value={skuDoujiang} onChange={setSkuDoujiang} disabled={totalIncomeConfirmed} />
+                <SkuInput label="鸡蛋汤" value={skuJidantang} onChange={setSkuJidantang} disabled={totalIncomeConfirmed} />
+                <SkuInput label="三鲜汤" value={skuSanxiantang} onChange={setSkuSanxiantang} disabled={totalIncomeConfirmed} />
               </div>
             </div>
           </div>
