@@ -42,27 +42,57 @@ jobs:
             echo "❌ Error: out directory not found"
             exit 1
           fi
-          echo "✓ Build output verified"
-          echo "Checking key files..."
+          
+          echo "🔍 Detecting build output structure..."
+          echo "Contents of out/ directory:"
           ls -la out/ | head -20
-          if [ -f "out/index.html" ]; then
-            echo "✓ out/index.html exists"
+          
+          # Detect if Next.js generated files in a basePath subdirectory
+          BASE_DIR="out"
+          if [ -d "out/my-restaurant-app" ]; then
+            BASE_DIR="out/my-restaurant-app"
+            echo "✓ Detected basePath: files are in out/my-restaurant-app/"
           else
-            echo "❌ out/index.html not found"
+            echo "✓ No basePath detected: using out/ as base directory"
+          fi
+          
+          echo ""
+          echo "📁 Using BASE_DIR: $BASE_DIR"
+          echo "Contents of $BASE_DIR/:"
+          ls -la "$BASE_DIR/" | head -20
+          
+          # Verify required files exist
+          echo ""
+          echo "🔎 Verifying required files..."
+          
+          if [ -f "$BASE_DIR/index.html" ]; then
+            echo "✓ $BASE_DIR/index.html exists"
+          else
+            echo "❌ $BASE_DIR/index.html not found"
+            echo "Available files in $BASE_DIR/:"
+            ls -la "$BASE_DIR/" || true
             exit 1
           fi
-          if [ -f "out/login/index.html" ]; then
-            echo "✓ out/login/index.html exists"
+          
+          if [ -f "$BASE_DIR/login/index.html" ]; then
+            echo "✓ $BASE_DIR/login/index.html exists"
           else
-            echo "❌ out/login/index.html not found"
-            echo "Checking out/login/ directory:"
-            ls -la out/login/ 2>/dev/null || echo "out/login/ directory does not exist"
+            echo "❌ $BASE_DIR/login/index.html not found"
+            echo "Checking $BASE_DIR/login/ directory:"
+            ls -la "$BASE_DIR/login/" 2>/dev/null || echo "$BASE_DIR/login/ directory does not exist"
             exit 1
           fi
-          if [ -f "out/test/index.html" ]; then
-            echo "✓ out/test/index.html exists"
+          
+          if [ -f "$BASE_DIR/test/index.html" ]; then
+            echo "✓ $BASE_DIR/test/index.html exists"
+          else
+            echo "⚠️  $BASE_DIR/test/index.html not found (optional)"
           fi
-          echo "✓ All required files found"
+          
+          # Export BASE_DIR for next step if needed
+          echo "BASE_DIR=$BASE_DIR" >> $GITHUB_ENV
+          echo ""
+          echo "✅ All required files verified successfully!"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -70,7 +100,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out
+          path: ${{ env.BASE_DIR || './out' }}
 
   deploy:
     environment:
