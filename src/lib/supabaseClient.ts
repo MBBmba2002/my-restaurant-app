@@ -9,11 +9,11 @@ const getStorage = () => {
 };
 
 // Get environment variables
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 // Validate URL format
-const isValidUrl = (url: string | undefined): boolean => {
+const isValidUrl = (url: string): boolean => {
   if (!url) return false;
   try {
     const parsed = new URL(url);
@@ -25,12 +25,12 @@ const isValidUrl = (url: string | undefined): boolean => {
 
 // Use placeholder URLs only during build if environment variables are missing/invalid
 // For static export, these will be replaced at build time if env vars are set
-const finalUrl = isValidUrl(supabaseUrl) 
+const finalUrl: string = isValidUrl(supabaseUrl) 
   ? supabaseUrl 
-  : (typeof window === "undefined" ? "https://placeholder.supabase.co" : "");
-const finalKey = (supabaseAnonKey && supabaseAnonKey.length > 10)
+  : (typeof window === "undefined" ? "https://placeholder.supabase.co" : "https://placeholder.supabase.co");
+const finalKey: string = (supabaseAnonKey && supabaseAnonKey.length > 10)
   ? supabaseAnonKey 
-  : (typeof window === "undefined" ? "placeholder-anon-key-for-build" : "");
+  : (typeof window === "undefined" ? "placeholder-anon-key-for-build" : "placeholder-anon-key-for-build");
 
 export const supabase = createClient(
   finalUrl,
