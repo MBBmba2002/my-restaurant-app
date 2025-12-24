@@ -210,6 +210,18 @@ jobs:
           
           echo "✅ All required files verified successfully!"
 
+      - name: Create .nojekyll file
+        run: |
+          echo "📝 Creating .nojekyll file to disable Jekyll processing..."
+          touch out/.nojekyll
+          if [ -f "out/.nojekyll" ]; then
+            echo "✓ .nojekyll file created successfully"
+            ls -la out/.nojekyll
+          else
+            echo "❌ Failed to create .nojekyll file"
+            exit 1
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
