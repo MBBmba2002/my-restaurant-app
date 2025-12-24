@@ -111,6 +111,19 @@ jobs:
           fi
           echo ""
           
+          # Double-check environment variables are available to npm
+          echo "🔍 Verifying environment variables are available to npm:"
+          if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ]; then
+            echo "❌ ERROR: NEXT_PUBLIC_SUPABASE_URL is not available"
+            exit 1
+          fi
+          if [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
+            echo "❌ ERROR: NEXT_PUBLIC_SUPABASE_ANON_KEY is not available"
+            exit 1
+          fi
+          echo "✓ Environment variables confirmed available"
+          echo ""
+          
           echo "🚀 Starting build..."
           if npm run export; then
             echo "✅ Build completed successfully"

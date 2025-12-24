@@ -9,12 +9,16 @@ const getStorage = () => {
 };
 
 // Get environment variables - these MUST be set at build time
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 // Validate that environment variables are set - throw error if missing
-if (!url || !anon) {
-  throw new Error("Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY must be set");
+if (!url || url.trim() === "") {
+  throw new Error("Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_URL must be set at build time. Please set it in GitHub Secrets.");
+}
+
+if (!anon || anon.trim() === "") {
+  throw new Error("Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_ANON_KEY must be set at build time. Please set it in GitHub Secrets.");
 }
 
 export const supabase = createClient(
