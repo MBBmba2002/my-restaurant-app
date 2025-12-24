@@ -29,38 +29,116 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        continue-on-error: false
+
+      - name: Pre-build diagnostics
+        run: |
+          echo "📊 Pre-build Diagnostics"
+          echo "========================"
+          echo "Working directory: $(pwd)"
+          echo "Repository contents:"
+          ls -la | head -20
+          echo ""
+          echo "Source structure:"
+          find src -type f -name "*.tsx" -o -name "*.ts" | head -20
+          echo ""
+          echo "Config files:"
+          ls -la *.ts *.json *.mjs 2>/dev/null | head -10 || echo "Some config files may not exist"
+          echo ""
 
       - name: Build (Static Export)
         run: |
+          set -e  # Exit immediately if a command exits with a non-zero status
+          
           echo "🔧 Build Configuration:"
           echo "Node version: $(node --version)"
           echo "NPM version: $(npm --version)"
           echo ""
+          
           echo "📋 Next.js config check:"
           if [ -f "next.config.ts" ]; then
             echo "✓ next.config.ts exists"
             grep -E "(output|basePath|trailingSlash)" next.config.ts || echo "⚠️  Some config not found"
           else
             echo "❌ next.config.ts not found"
+            exit 1
           fi
           echo ""
+          
           echo "📦 Source files check:"
-          ls -la src/app/login/page.tsx 2>/dev/null && echo "✓ login page exists" || echo "❌ login page missing"
-          ls -la src/lib/supabaseClient.ts 2>/dev/null && echo "✓ supabaseClient exists" || echo "❌ supabaseClient missing"
+          if [ -f "src/app/login/page.tsx" ]; then
+            echo "✓ login page exists"
+          else
+            echo "❌ login page missing"
+            exit 1
+          fi
+          
+          if [ -f "src/lib/supabaseClient.ts" ]; then
+            echo "✓ supabaseClient exists"
+          else
+            echo "❌ supabaseClient missing"
+            exit 1
+          fi
           echo ""
+          
+          echo "🔑 Environment variables check:"
+          if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ]; then
+            echo "⚠️  NEXT_PUBLIC_SUPABASE_URL is not set (build may fail)"
+          else
+            echo "✓ NEXT_PUBLIC_SUPABASE_URL is set"
+          fi
+          
+          if [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
+            echo "⚠️  NEXT_PUBLIC_SUPABASE_ANON_KEY is not set (build may fail)"
+          else
+            echo "✓ NEXT_PUBLIC_SUPABASE_ANON_KEY is set"
+          fi
+          echo ""
+          
           echo "🚀 Starting build..."
-          npm run export
+          if npm run export; then
+            echo "✅ Build completed successfully"
+          else
+            BUILD_EXIT_CODE=$?
+            echo "❌ Build failed with exit code: $BUILD_EXIT_CODE"
+            echo ""
+            echo "Checking for common issues:"
+            if [ -d ".next" ]; then
+              echo "  - .next directory exists (partial build)"
+            fi
+            if [ -d "out" ]; then
+              echo "  - out directory exists but may be incomplete"
+              ls -la out/ | head -10
+            else
+              echo "  - out directory was not created"
+            fi
+            exit $BUILD_EXIT_CODE
+          fi
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
       - name: Verify build output
         run: |
+          set -e  # Exit immediately if a command exits with a non-zero status
+          
+          echo "🔍 Verifying build output..."
+          echo "=================================="
+          
           if [ ! -d "out" ]; then
             echo "❌ Error: out directory not found after build"
-            echo "Build may have failed or output configuration is incorrect"
+            echo ""
+            echo "Build may have failed. Checking build artifacts:"
+            if [ -d ".next" ]; then
+              echo "  - .next directory exists (build ran but didn't export)"
+              echo "  - This suggests next.config.ts may not have output: 'export'"
+            else
+              echo "  - .next directory not found (build didn't complete)"
+            fi
             exit 1
           fi
+          
+          echo "✓ out directory exists"
           
           echo "📂 Build output directory structure:"
           echo "-----------------------------------"
