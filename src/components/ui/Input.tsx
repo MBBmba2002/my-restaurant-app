@@ -25,9 +25,10 @@ export function Input({
         border
         transition-all
         focus:outline-none
-        disabled:bg-gray-50
+        disabled:bg-gray-100
         disabled:cursor-not-allowed
-        disabled:opacity-60
+        disabled:opacity-70
+        disabled:text-gray-500
         ${className}
       `}
       style={{

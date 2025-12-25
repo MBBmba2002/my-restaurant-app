@@ -242,20 +242,12 @@ function RecordPageContent() {
   const [submitting, setSubmitting] = useState(false);
   // 提交前确认对话框
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  // 收入保存状态
-  const [incomeSaved, setIncomeSaved] = useState(false);
-  const [incomeSavedMessage, setIncomeSavedMessage] = useState(false);
+  // 收入保存状态（已废弃，统一使用全局保存）
   // 总收入确认提交状态
   const [isDayLocked, setIsDayLocked] = useState(false);
   const [showTotalIncomeConfirmDialog, setShowTotalIncomeConfirmDialog] = useState(false);
 
-  // 销量模块保存状态
-  const [salesModulesSaved, setSalesModulesSaved] = useState({
-    bing: false,      // 饼类
-    tang: false,      // 汤粥类
-    mixian: false,    // 米线面类
-    chaomian: false,  // 炒面河粉类
-  });
+  // 销量模块保存状态（已废弃，统一使用全局保存）
 
   // Toast 通知状态
   const [toast, setToast] = useState<{
@@ -722,97 +714,9 @@ function RecordPageContent() {
     }
   };
 
-  // 保存收入（临时保存到本地存储）
-  const handleSaveIncome = () => {
-    const incomeData = {
-      wechat: incomeWechat,
-      alipay: incomeAlipay,
-      cash: incomeCash,
-      timestamp: Date.now(),
-    };
-    localStorage.setItem("daily_income_temp", JSON.stringify(incomeData));
-    setIncomeSaved(true);
-    setIncomeSavedMessage(true);
-    // 3秒后隐藏"已保存"提示
-    setTimeout(() => {
-      setIncomeSavedMessage(false);
-    }, 3000);
-  };
+  // 保存收入（已废弃，统一使用handleGlobalSave）
 
-  // 处理销量模块局部保存
-  const handleSaveSalesModule = async (module: SalesModule) => {
-    if (!user) {
-      showToast("请先登录", "error");
-      return;
-    }
-
-    try {
-      const salesData: Partial<DailyRecord> = {
-        user_id: user.id,
-        record_date: new Date().toISOString().split('T')[0],
-      };
-
-      // 根据模块类型设置不同的字段
-      switch (module) {
-        case "bing":
-          salesData.sku_roubing = skuRoubing;
-          salesData.sku_shouroubing = skuShouroubing;
-          salesData.sku_changdanbing = skuChangdanbing;
-          salesData.sku_roudanbing = skuRoudanbing;
-          salesData.sku_danbing = skuDanbing;
-          salesData.sku_changbing = skuChangbing;
-          salesData.total_bing_count = salesTotals.bingTotal;
-          break;
-        case "tang":
-          salesData.sku_fentang = skuFentang;
-          salesData.sku_hundun = skuHundun;
-          salesData.sku_mizhou = skuXiaomizhou;
-          salesData.sku_doujiang = skuDoujiang;
-          salesData.sku_jidantang = skuJidantang;
-          salesData.total_tang_count = salesTotals.tangTotal;
-          break;
-        case "mixian":
-          salesData.sku_mixian_su_sanxian = skuMixianSuSanxian;
-          salesData.sku_mixian_su_suancai = skuMixianSuSuancai;
-          salesData.sku_mixian_su_mala = skuMixianSuMala;
-          salesData.sku_mixian_rou_sanxian = skuMixianRouSanxian;
-          salesData.sku_mixian_rou_suancai = skuMixianRouSuancai;
-          salesData.sku_mixian_rou_mala = skuMixianRouMala;
-          salesData.sku_suanlafen = skuSuanlafen;
-          salesData.total_mixian_count = salesTotals.mixianTotal;
-          break;
-        case "chaomian":
-          salesData.sku_chaomian_xiangcui = skuChaomianXiangcui;
-          salesData.sku_chaohefen_kuan = skuChaohufenKuan;
-          salesData.sku_chaohefen_xi = skuChaohufenXi;
-          salesData.total_chaomian_count = salesTotals.chaomianTotal;
-          break;
-      }
-
-      // 插入或更新销量记录
-      const { error } = await supabase
-        .from("daily_records")
-        .upsert(salesData, {
-          onConflict: 'user_id,record_date',
-          ignoreDuplicates: false
-        });
-
-      if (error) {
-        console.error("Error saving sales:", error);
-        showToast("保存销量失败：" + error.message, "error");
-        return;
-      }
-
-      // 更新保存状态
-      setSalesModulesSaved(prev => ({ ...prev, [module]: true }));
-      showToast(`已保存${module === "bing" ? "饼类" : module === "tang" ? "汤粥类" : module === "mixian" ? "米线面类" : "炒面河粉类"}销量`, "success");
-
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "未知错误";
-      console.error("Error:", err);
-      showToast("保存失败：" + errorMessage, "error");
-    }
-  };
+  // 处理销量模块局部保存（已废弃，统一使用handleGlobalSave）
 
   // 确认提交总收入（已废弃，使用handleGlobalSave代替）
   const handleConfirmTotalIncome = () => {
@@ -1185,7 +1089,6 @@ function RecordPageContent() {
                   onChange={(e) => {
                     if (!isDayLocked) {
                       handleNumberChange(e.target.value, setIncomeWechat);
-                      setIncomeSaved(false);
                     }
                   }}
                   placeholder="0.00"
@@ -1201,7 +1104,6 @@ function RecordPageContent() {
                   onChange={(e) => {
                     if (!isDayLocked) {
                       handleNumberChange(e.target.value, setIncomeAlipay);
-                      setIncomeSaved(false);
                     }
                   }}
                   placeholder="0.00"
@@ -1217,7 +1119,6 @@ function RecordPageContent() {
                   onChange={(e) => {
                     if (!isDayLocked) {
                       handleNumberChange(e.target.value, setIncomeCash);
-                      setIncomeSaved(false);
                     }
                   }}
                   placeholder="0.00"
@@ -1226,20 +1127,7 @@ function RecordPageContent() {
                 />
               </FormRow>
 
-              {/* 保存收入按钮 */}
-              <div className="mt-4">
-                <Button
-                  type="button"
-                  onClick={handleSaveIncome}
-                  disabled={isDayLocked}
-                  accentColor="red"
-                  variant={incomeSavedMessage ? "primary" : "secondary"}
-                  size="lg"
-                  className="w-full"
-                >
-                  {incomeSavedMessage ? "✅ 已保存" : "💾 保存"}
-                </Button>
-              </div>
+              {/* 收入保存按钮已移除，统一使用底部全局保存按钮 */}
 
               {/* 今日总收入显示 - 视觉焦点 */}
               <div className="mt-8 pt-8 border-t border-gray-200">
@@ -1285,12 +1173,12 @@ function RecordPageContent() {
             <div>
               <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">饼类产品</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
-                <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={isDayLocked || salesModulesSaved.bing} />
-                <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} disabled={isDayLocked || salesModulesSaved.bing} />
-                <SkuInput label="肠蛋饼" value={skuChangdanbing} onChange={setSkuChangdanbing} disabled={isDayLocked || salesModulesSaved.bing} />
-                <SkuInput label="肉蛋饼" value={skuRoudanbing} onChange={setSkuRoudanbing} disabled={isDayLocked || salesModulesSaved.bing} />
-                <SkuInput label="蛋饼" value={skuDanbing} onChange={setSkuDanbing} disabled={isDayLocked || salesModulesSaved.bing} />
-                <SkuInput label="肠饼" value={skuChangbing} onChange={setSkuChangbing} disabled={isDayLocked || salesModulesSaved.bing} />
+                <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={isDayLocked || false} />
+                <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} disabled={isDayLocked || false} />
+                <SkuInput label="肠蛋饼" value={skuChangdanbing} onChange={setSkuChangdanbing} disabled={isDayLocked || false} />
+                <SkuInput label="肉蛋饼" value={skuRoudanbing} onChange={setSkuRoudanbing} disabled={isDayLocked || false} />
+                <SkuInput label="蛋饼" value={skuDanbing} onChange={setSkuDanbing} disabled={isDayLocked || false} />
+                <SkuInput label="肠饼" value={skuChangbing} onChange={setSkuChangbing} disabled={isDayLocked || false} />
               </div>
               
               {/* 汇总显示 - 视觉焦点 */}
@@ -1302,24 +1190,7 @@ function RecordPageContent() {
                 className="mb-4"
               />
 
-              {/* 保存按钮 */}
-              {!salesModulesSaved.bing && !isDayLocked && (
-                <Button
-                  type="button"
-                  onClick={() => handleSaveSalesModule("bing")}
-                  accentColor="yellow"
-                  variant="primary"
-                  size="lg"
-                  className="w-full"
-                >
-                  保存饼类销量
-                </Button>
-              )}
-              {salesModulesSaved.bing && (
-                <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-lg">
-                  ✓ 已保存
-                </div>
-              )}
+              {/* 保存按钮已移除，统一使用底部全局保存按钮 */}
             </div>
 
             {/* 汤粥类产品卡片 */}
@@ -1342,7 +1213,7 @@ function RecordPageContent() {
                         label={item.label}
                         value={item.value}
                         onChange={item.onChange}
-                        disabled={isDayLocked || salesModulesSaved.tang}
+                        disabled={isDayLocked}
                       />
                     ))}
                   </div>
@@ -1356,24 +1227,7 @@ function RecordPageContent() {
                     className="mb-4"
                   />
 
-                  {/* 保存按钮 */}
-                  {!salesModulesSaved.tang && !isDayLocked && (
-                    <Button
-                      type="button"
-                      onClick={() => handleSaveSalesModule("tang")}
-                      accentColor="yellow"
-                      variant="primary"
-                      size="lg"
-                      className="w-full"
-                    >
-                      保存汤/粥类销量
-                    </Button>
-                  )}
-                  {salesModulesSaved.tang && (
-                    <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-lg">
-                      ✓ 已保存
-                    </div>
-                  )}
+                  {/* 保存按钮已移除，统一使用底部全局保存按钮 */}
                 </div>
               );
             })()}
@@ -1386,9 +1240,9 @@ function RecordPageContent() {
               <div className="mb-6">
                 <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">【素】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
-                  <SkuInput label="三鲜" value={skuMixianSuSanxian} onChange={setSkuMixianSuSanxian} disabled={isDayLocked || salesModulesSaved.mixian} />
-                  <SkuInput label="酸菜" value={skuMixianSuSuancai} onChange={setSkuMixianSuSuancai} disabled={isDayLocked || salesModulesSaved.mixian} />
-                  <SkuInput label="麻辣" value={skuMixianSuMala} onChange={setSkuMixianSuMala} disabled={isDayLocked || salesModulesSaved.mixian} />
+                  <SkuInput label="三鲜" value={skuMixianSuSanxian} onChange={setSkuMixianSuSanxian} disabled={isDayLocked || false} />
+                  <SkuInput label="酸菜" value={skuMixianSuSuancai} onChange={setSkuMixianSuSuancai} disabled={isDayLocked || false} />
+                  <SkuInput label="麻辣" value={skuMixianSuMala} onChange={setSkuMixianSuMala} disabled={isDayLocked || false} />
                 </div>
               </div>
 
@@ -1396,9 +1250,9 @@ function RecordPageContent() {
               <div className="mb-6">
                 <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">【肉】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
-                  <SkuInput label="三鲜" value={skuMixianRouSanxian} onChange={setSkuMixianRouSanxian} disabled={isDayLocked || salesModulesSaved.mixian} />
-                  <SkuInput label="酸菜" value={skuMixianRouSuancai} onChange={setSkuMixianRouSuancai} disabled={isDayLocked || salesModulesSaved.mixian} />
-                  <SkuInput label="麻辣" value={skuMixianRouMala} onChange={setSkuMixianRouMala} disabled={isDayLocked || salesModulesSaved.mixian} />
+                  <SkuInput label="三鲜" value={skuMixianRouSanxian} onChange={setSkuMixianRouSanxian} disabled={isDayLocked || false} />
+                  <SkuInput label="酸菜" value={skuMixianRouSuancai} onChange={setSkuMixianRouSuancai} disabled={isDayLocked || false} />
+                  <SkuInput label="麻辣" value={skuMixianRouMala} onChange={setSkuMixianRouMala} disabled={isDayLocked || false} />
                 </div>
               </div>
 
@@ -1406,7 +1260,7 @@ function RecordPageContent() {
               <div className="mb-4">
                 <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">酸辣粉</h4>
                 <div className="grid grid-cols-2 gap-4">
-                  <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} disabled={isDayLocked || salesModulesSaved.mixian} />
+                  <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} disabled={isDayLocked || false} />
                 </div>
               </div>
 
@@ -1419,33 +1273,16 @@ function RecordPageContent() {
                 className="mb-4"
               />
 
-              {/* 保存按钮 */}
-              {!salesModulesSaved.mixian && !isDayLocked && (
-                <Button
-                  type="button"
-                  onClick={() => handleSaveSalesModule("mixian")}
-                  accentColor="yellow"
-                  variant="primary"
-                  size="lg"
-                  className="w-full"
-                >
-                  保存米线/面类销量
-                </Button>
-              )}
-              {salesModulesSaved.mixian && (
-                <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-lg">
-                  ✓ 已保存
-                </div>
-              )}
+              {/* 保存按钮已移除，统一使用底部全局保存按钮 */}
             </div>
 
             {/* 炒面/炒河粉类产品卡片 */}
             <div>
               <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">炒面/炒河粉类</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
-                <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={isDayLocked || salesModulesSaved.chaomian} />
-                <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={isDayLocked || salesModulesSaved.chaomian} />
-                <SkuInput label="【细粉】炒河粉" value={skuChaohufenXi} onChange={setSkuChaohufenXi} disabled={isDayLocked || salesModulesSaved.chaomian} />
+                <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={isDayLocked || false} />
+                <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={isDayLocked || false} />
+                <SkuInput label="【细粉】炒河粉" value={skuChaohufenXi} onChange={setSkuChaohufenXi} disabled={isDayLocked || false} />
               </div>
               
               {/* 汇总显示 - 视觉焦点 */}
@@ -1457,24 +1294,7 @@ function RecordPageContent() {
                 className="mb-4"
               />
 
-              {/* 保存按钮 */}
-              {!salesModulesSaved.chaomian && !isDayLocked && (
-                <Button
-                  type="button"
-                  onClick={() => handleSaveSalesModule("chaomian")}
-                  accentColor="yellow"
-                  variant="primary"
-                  size="lg"
-                  className="w-full"
-                >
-                  保存炒面/炒河粉类销量
-                </Button>
-              )}
-              {salesModulesSaved.chaomian && (
-                <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-lg">
-                  ✓ 已保存
-                </div>
-              )}
+              {/* 保存按钮已移除，统一使用底部全局保存按钮 */}
             </div>
               </div>
             </Card>
