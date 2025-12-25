@@ -341,21 +341,43 @@ function RecordPageContent() {
   const [skuMixianRou, setSkuMixianRou] = useState(0);
   const [skuChaomian, setSkuChaomian] = useState(0);
 
-  // 支出
-  const [expenses, setExpenses] = useState<
-    Array<{
-      expense_type: string;
-      expense_amount: number;
-      expense_item_name: string;
-      usage_duration?: string;
-    }>
-  >([]);
+  // 支出 - 四个模块的状态管理
+  // 原材料支出
+  const [expRawVeg, setExpRawVeg] = useState("");        // 蔬菜
+  const [expRawMeat, setExpRawMeat] = useState("");       // 肉类
+  const [expRawEgg, setExpRawEgg] = useState("");        // 鸡蛋
+  const [expRawNoodle, setExpRawNoodle] = useState("");     // 粉/面
+  const [expRawSpice, setExpRawSpice] = useState("");      // 调味品
+  const [expRawPack, setExpRawPack] = useState("");       // 包装
 
-  // 模态框
-  const [expenseModal, setExpenseModal] = useState<{
+  // 固定费用
+  const [expFixRent, setExpFixRent] = useState("");       // 房租
+  const [expFixUtility, setExpFixUtility] = useState("");    // 水电
+  const [expFixGas, setExpFixGas] = useState("");        // 煤气
+  const [expFixSalary, setExpFixSalary] = useState("");     // 工资
+
+  // 消耗品
+  const [expConsName, setExpConsName] = useState("");       // 消耗品名称
+  const [expConsAmount, setExpConsAmount] = useState("");     // 消耗品金额
+  const [expConsDuration, setExpConsDuration] = useState("");  // 使用时长
+
+  // 其他支出
+  const [expOtherName, setExpOtherName] = useState("");      // 其他支出名称
+  const [expOtherAmount, setExpOtherAmount] = useState("");    // 其他支出金额
+
+  // 支出模块锁定状态
+  const [expenseModulesLocked, setExpenseModulesLocked] = useState({
+    raw: false,      // 原材料
+    fixed: false,    // 固定费用
+    cons: false,     // 消耗品
+    other: false     // 其他
+  });
+
+  // 支出确认Modal
+  const [expenseConfirmModal, setExpenseConfirmModal] = useState<{
     isOpen: boolean;
-    type: "material" | "fixed" | "equipment" | "other";
-  }>({ isOpen: false, type: "material" });
+    module: "raw" | "fixed" | "cons" | "other";
+  }>({ isOpen: false, module: "raw" });
 
   // 成功提示
   const [showSuccess, setShowSuccess] = useState(false);
@@ -375,6 +397,12 @@ function RecordPageContent() {
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
     setTodayDate(`${year}年${month}月${day}日`);
+
+    // 从localStorage恢复支出模块锁定状态
+    const savedExpenseLocks = localStorage.getItem("expense_modules_locked");
+    if (savedExpenseLocks) {
+      setExpenseModulesLocked(JSON.parse(savedExpenseLocks));
+    }
   }, []);
 
   const handleExpenseSubmit = (data: {
@@ -384,6 +412,75 @@ function RecordPageContent() {
     usage_duration?: string;
   }) => {
     setExpenses([...expenses, data]);
+  };
+
+  // 处理支出模块确认提交
+  const handleExpenseModuleSubmit = async (module: "raw" | "fixed" | "cons" | "other") => {
+    if (!user) {
+      alert("请先登录");
+      router.push("/login/");
+      return;
+    }
+
+    try {
+      const expenseData: any = {
+        user_id: user.id,
+        record_date: new Date().toISOString().split('T')[0], // 今天的日期
+      };
+
+      // 根据模块类型设置不同的字段
+      switch (module) {
+        case "raw":
+          expenseData.exp_raw_veg = parseFloat(expRawVeg || "0");
+          expenseData.exp_raw_meat = parseFloat(expRawMeat || "0");
+          expenseData.exp_raw_egg = parseFloat(expRawEgg || "0");
+          expenseData.exp_raw_noodle = parseFloat(expRawNoodle || "0");
+          expenseData.exp_raw_spice = parseFloat(expRawSpice || "0");
+          expenseData.exp_raw_pack = parseFloat(expRawPack || "0");
+          break;
+        case "fixed":
+          expenseData.exp_fix_rent = parseFloat(expFixRent || "0");
+          expenseData.exp_fix_utility = parseFloat(expFixUtility || "0");
+          expenseData.exp_fix_gas = parseFloat(expFixGas || "0");
+          expenseData.exp_fix_salary = parseFloat(expFixSalary || "0");
+          break;
+        case "cons":
+          expenseData.exp_cons_name = expConsName;
+          expenseData.exp_cons_amount = parseFloat(expConsAmount || "0");
+          expenseData.exp_cons_duration = expConsDuration;
+          break;
+        case "other":
+          expenseData.exp_other_name = expOtherName;
+          expenseData.exp_other_amount = parseFloat(expOtherAmount || "0");
+          break;
+      }
+
+      // 插入或更新支出记录
+      const { error } = await supabase
+        .from("daily_records")
+        .upsert(expenseData, {
+          onConflict: 'user_id,record_date',
+          ignoreDuplicates: false
+        });
+
+      if (error) {
+        console.error("Error saving expense:", error);
+        alert("保存支出失败：" + error.message);
+        return;
+      }
+
+      // 更新锁定状态并保存到localStorage
+      const newLocks = { ...expenseModulesLocked, [module]: true };
+      setExpenseModulesLocked(newLocks);
+      localStorage.setItem("expense_modules_locked", JSON.stringify(newLocks));
+
+      // 关闭确认Modal
+      setExpenseConfirmModal({ isOpen: false, module: "raw" });
+
+    } catch (err: any) {
+      console.error("Error:", err);
+      alert("保存失败：" + (err.message || "未知错误"));
+    }
   };
 
   // 保存收入（临时保存到本地存储）
@@ -407,6 +504,27 @@ function RecordPageContent() {
   const handleConfirmTotalIncome = () => {
     setTotalIncomeConfirmed(true);
     setShowTotalIncomeConfirmDialog(false);
+  };
+
+  // 计算今日经营成本 (COGS)
+  const calculateTodayCOGS = () => {
+    // 原材料总和
+    const rawMaterialsTotal =
+      parseFloat(expRawVeg || "0") +
+      parseFloat(expRawMeat || "0") +
+      parseFloat(expRawEgg || "0") +
+      parseFloat(expRawNoodle || "0") +
+      parseFloat(expRawSpice || "0") +
+      parseFloat(expRawPack || "0");
+
+    // 固定费用总和（按日分摊）
+    const fixedCostsTotal =
+      (parseFloat(expFixRent || "0") +
+       parseFloat(expFixUtility || "0") +
+       parseFloat(expFixGas || "0") +
+       parseFloat(expFixSalary || "0")) / 30; // 假设每月30天
+
+    return rawMaterialsTotal + fixedCostsTotal;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -552,6 +670,15 @@ function RecordPageContent() {
       setSkuSuanlafen(0);
       setSkuChaomianXiangcui(0); setSkuChaohufenKuan(0); setSkuChaohufenXi(0);
       setSkuBing(0); setSkuTangSu(0); setSkuMixianSu(0); setSkuMixianRou(0); setSkuChaomian(0);
+      // 清空支出模块
+      setExpRawVeg(""); setExpRawMeat(""); setExpRawEgg(""); setExpRawNoodle(""); setExpRawSpice(""); setExpRawPack("");
+      setExpFixRent(""); setExpFixUtility(""); setExpFixGas(""); setExpFixSalary("");
+      setExpConsName(""); setExpConsAmount(""); setExpConsDuration("");
+      setExpOtherName(""); setExpOtherAmount("");
+      // 重置锁定状态
+      setExpenseModulesLocked({ raw: false, fixed: false, cons: false, other: false });
+      localStorage.removeItem("expense_modules_locked");
+
       setExpenses([]);
       setShowSuccess(true);
 
@@ -812,79 +939,294 @@ function RecordPageContent() {
             </div>
           </div>
 
-          {/* 第三板块：支出按钮 */}
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <h2 className="text-2xl font-bold mb-4 text-blue-600">💸 今日支出</h2>
-            
-            {/* 已添加的支出列表 */}
-            {expenses.length > 0 && (
-              <div className="mb-4 space-y-2">
-                {expenses.map((exp, idx) => (
-                  <div
-                    key={idx}
-                    className="flex justify-between items-center p-3 bg-blue-50 rounded-lg"
-                  >
-                    <span className="text-lg">
-                      {exp.expense_item_name} - ¥{exp.expense_amount}
-                      {exp.usage_duration && (
-                        <span className="text-sm text-gray-600 ml-2">
-                          ({exp.usage_duration === "days" ? "用几天" : exp.usage_duration === "months" ? "用几个月" : "用很久"})
-                        </span>
-                      )}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const newExpenses = [...expenses];
-                        newExpenses.splice(idx, 1);
-                        setExpenses(newExpenses);
-                      }}
-                      className="text-red-500 text-xl"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+          {/* 第三板块：今日支出 */}
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-blue-600">💸 今日支出</h2>
 
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() =>
-                  setExpenseModal({ isOpen: true, type: "material" })
-                }
-                className="p-6 text-xl bg-green-500 text-white rounded-lg hover:bg-green-600 font-bold"
-              >
-                1️⃣ 买原材料
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setExpenseModal({ isOpen: true, type: "fixed" })
-                }
-                className="p-6 text-xl bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-bold"
-              >
-                2️⃣ 交固定钱
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setExpenseModal({ isOpen: true, type: "equipment" })
-                }
-                className="p-6 text-xl bg-purple-500 text-white rounded-lg hover:bg-purple-600 font-bold"
-              >
-                3️⃣ 买店里用的
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setExpenseModal({ isOpen: true, type: "other" })
-                }
-                className="p-6 text-xl bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-bold"
-              >
-                4️⃣ 其他
-              </button>
+            {/* 【购买原材料】模块 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="w-1 h-6 bg-green-400 rounded-full mr-3"></div>
+                <h3 className="text-lg font-bold text-gray-800">【购买原材料】</h3>
+                {expenseModulesLocked.raw && (
+                  <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
+                    已锁定
+                  </span>
+                )}
+              </div>
+
+              {(() => {
+                const rawItems = [
+                  { label: "蔬菜", value: expRawVeg, onChange: setExpRawVeg },
+                  { label: "肉类", value: expRawMeat, onChange: setExpRawMeat },
+                  { label: "鸡蛋", value: expRawEgg, onChange: setExpRawEgg },
+                  { label: "粉/面", value: expRawNoodle, onChange: setExpRawNoodle },
+                  { label: "调味品", value: expRawSpice, onChange: setExpRawSpice },
+                  { label: "包装", value: expRawPack, onChange: setExpRawPack },
+                ];
+
+                return (
+                  <>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      {rawItems.map((item) => (
+                        <div key={item.label} className="flex flex-col">
+                          <label className="block text-base font-medium mb-2 text-gray-700">
+                            {item.label}
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={item.value}
+                            onChange={(e) => item.onChange(e.target.value)}
+                            disabled={expenseModulesLocked.raw}
+                            placeholder="0.00"
+                            className={`w-full text-xl p-3 border-2 rounded-lg focus:outline-none ${
+                              expenseModulesLocked.raw
+                                ? "border-gray-300 bg-gray-100 cursor-not-allowed"
+                                : "border-green-300 focus:border-green-500"
+                            }`}
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    {!expenseModulesLocked.raw && (
+                      <button
+                        type="button"
+                        onClick={() => setExpenseConfirmModal({ isOpen: true, module: "raw" })}
+                        className="w-full p-4 text-xl bg-green-500 text-white rounded-lg hover:bg-green-600 font-bold"
+                      >
+                        🔒 记入支出
+                      </button>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+
+            {/* 【门店固定费用】模块 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="w-1 h-6 bg-blue-400 rounded-full mr-3"></div>
+                <h3 className="text-lg font-bold text-gray-800">【门店固定费用】</h3>
+                {expenseModulesLocked.fixed && (
+                  <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
+                    已锁定
+                  </span>
+                )}
+              </div>
+
+              {(() => {
+                const fixedItems = [
+                  { label: "房租", value: expFixRent, onChange: setExpFixRent },
+                  { label: "水电", value: expFixUtility, onChange: setExpFixUtility },
+                  { label: "煤气", value: expFixGas, onChange: setExpFixGas },
+                  { label: "工资", value: expFixSalary, onChange: setExpFixSalary },
+                ];
+
+                return (
+                  <>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      {fixedItems.map((item) => (
+                        <div key={item.label} className="flex flex-col">
+                          <label className="block text-base font-medium mb-2 text-gray-700">
+                            {item.label}
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={item.value}
+                            onChange={(e) => item.onChange(e.target.value)}
+                            disabled={expenseModulesLocked.fixed}
+                            placeholder="0.00"
+                            className={`w-full text-xl p-3 border-2 rounded-lg focus:outline-none ${
+                              expenseModulesLocked.fixed
+                                ? "border-gray-300 bg-gray-100 cursor-not-allowed"
+                                : "border-blue-300 focus:border-blue-500"
+                            }`}
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    {!expenseModulesLocked.fixed && (
+                      <button
+                        type="button"
+                        onClick={() => setExpenseConfirmModal({ isOpen: true, module: "fixed" })}
+                        className="w-full p-4 text-xl bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-bold"
+                      >
+                        🔒 记入支出
+                      </button>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+
+            {/* 【经营消耗品】模块 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="w-1 h-6 bg-purple-400 rounded-full mr-3"></div>
+                <h3 className="text-lg font-bold text-gray-800">【经营消耗品】</h3>
+                {expenseModulesLocked.cons && (
+                  <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
+                    已锁定
+                  </span>
+                )}
+              </div>
+
+              {!expenseModulesLocked.cons && (
+                <div className="space-y-4 mb-4">
+                  <div>
+                    <label className="block text-base font-medium mb-2 text-gray-700">
+                      消耗品名称
+                    </label>
+                    <input
+                      type="text"
+                      value={expConsName}
+                      onChange={(e) => setExpConsName(e.target.value)}
+                      placeholder="请输入消耗品名称"
+                      className="w-full text-xl p-3 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-base font-medium mb-2 text-gray-700">
+                      金额（元）
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={expConsAmount}
+                      onChange={(e) => setExpConsAmount(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full text-xl p-3 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-base font-medium mb-2 text-gray-700">
+                      能用多久？
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { value: "1个月", label: "1个月" },
+                        { value: "1-3个月", label: "1-3个月" },
+                        { value: "6个月以上", label: "6个月以上" },
+                        { value: "1年以上", label: "1年以上" },
+                      ].map((duration) => (
+                        <button
+                          key={duration.value}
+                          type="button"
+                          onClick={() => setExpConsDuration(duration.value)}
+                          className={`p-3 text-lg rounded-lg border-2 ${
+                            expConsDuration === duration.value
+                              ? "bg-purple-500 text-white border-purple-500"
+                              : "bg-white text-gray-700 border-gray-300 hover:border-purple-400"
+                          }`}
+                        >
+                          {duration.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setExpenseConfirmModal({ isOpen: true, module: "cons" })}
+                    className="w-full p-4 text-xl bg-purple-500 text-white rounded-lg hover:bg-purple-600 font-bold"
+                  >
+                    🔒 记入支出
+                  </button>
+                </div>
+              )}
+
+              {expenseModulesLocked.cons && (
+                <div className="p-4 bg-purple-50 rounded-lg">
+                  <div className="text-lg font-medium text-gray-800">
+                    {expConsName} - ¥{expConsAmount}
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    使用时长：{expConsDuration}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 【其他支出】模块 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="w-1 h-6 bg-gray-400 rounded-full mr-3"></div>
+                <h3 className="text-lg font-bold text-gray-800">【其他支出】</h3>
+                {expenseModulesLocked.other && (
+                  <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
+                    已锁定
+                  </span>
+                )}
+              </div>
+
+              {!expenseModulesLocked.other && (
+                <div className="space-y-4 mb-4">
+                  <div>
+                    <label className="block text-base font-medium mb-2 text-gray-700">
+                      支出项目名称
+                    </label>
+                    <input
+                      type="text"
+                      value={expOtherName}
+                      onChange={(e) => setExpOtherName(e.target.value)}
+                      placeholder="请输入支出项目名称"
+                      className="w-full text-xl p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-base font-medium mb-2 text-gray-700">
+                      金额（元）
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={expOtherAmount}
+                      onChange={(e) => setExpOtherAmount(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full text-xl p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setExpenseConfirmModal({ isOpen: true, module: "other" })}
+                    className="w-full p-4 text-xl bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-bold"
+                  >
+                    🔒 记入支出
+                  </button>
+                </div>
+              )}
+
+              {expenseModulesLocked.other && (
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="text-lg font-medium text-gray-800">
+                    {expOtherName} - ¥{expOtherAmount}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 今日经营概览 */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 shadow-sm">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">📊 今日经营概览</h3>
+              <div className="text-center">
+                <div className="text-2xl font-semibold text-gray-700 mb-2">
+                  今日预估成本
+                </div>
+                <div className="text-4xl font-bold text-blue-600 mb-2">
+                  ¥ {calculateTodayCOGS().toFixed(2)}
+                </div>
+                <div className="text-sm text-gray-600">
+                  已包含每日固定开支分摊
+                </div>
+              </div>
             </div>
           </div>
 
@@ -906,6 +1248,36 @@ function RecordPageContent() {
         type={expenseModal.type}
         onSubmit={handleExpenseSubmit}
       />
+
+      {/* 支出确认Modal */}
+      {expenseConfirmModal.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-8 w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+              确定记入吗？
+            </h2>
+            <p className="text-xl text-center text-red-600 mb-6 font-semibold">
+              提交后今日不可更改
+            </p>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => setExpenseConfirmModal({ isOpen: false, module: "raw" })}
+                className="flex-1 p-4 text-xl bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+              >
+                再想想
+              </button>
+              <button
+                type="button"
+                onClick={() => handleExpenseModuleSubmit(expenseConfirmModal.module)}
+                className="flex-1 p-4 text-xl bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium"
+              >
+                确定
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 提交前确认对话框 */}
       {showConfirmDialog && (
