@@ -82,6 +82,9 @@ export interface DailyRecord {
   estimated_profit?: number;
   cogs_today?: number;
   
+  // 锁定字段
+  is_locked?: boolean;
+  
   // 兼容旧字段
   sku_bing?: number;
   sku_tang_su?: number;
