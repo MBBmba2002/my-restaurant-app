@@ -418,7 +418,7 @@ function RecordPageContent() {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 p-4 text-xl bg-white border border-gray-200 text-gray-700 rounded-full transition-all active:scale-95"
+                className="flex-1 p-4 text-xl bg-white border border-gray-200 text-[#0c0c0c] rounded-full transition-all active:scale-95"
               >
                 取消
               </button>
@@ -886,7 +886,7 @@ function RecordPageContent() {
                   disabled={totalIncomeConfirmed}
                   className={`w-full p-4 text-lg font-bold rounded-full transition-all active:scale-95 ${
                     totalIncomeConfirmed
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      ? "bg-gray-300 text-[#0c0c0c] opacity-50 cursor-not-allowed"
                       : incomeSavedMessage
                       ? "bg-green-500 text-white"
                       : "bg-[#3d3435] text-white"
@@ -1311,7 +1311,7 @@ function RecordPageContent() {
                 <>
                   <div className="space-y-4 mb-4">
                     <div>
-                      <label className="block text-base font-medium mb-2 text-gray-700">
+                      <label className="block text-base font-medium mb-2 text-[#0c0c0c]">
                         支出项目名称
                       </label>
                       <input
@@ -1324,7 +1324,7 @@ function RecordPageContent() {
                     </div>
 
                     <div>
-                      <label className="block text-base font-medium mb-2 text-gray-700">
+                      <label className="block text-base font-medium mb-2 text-[#0c0c0c]">
                         金额（元）
                       </label>
                       <input
@@ -1341,8 +1341,8 @@ function RecordPageContent() {
                   {/* 其他支出汇总显示 */}
                   <div className="mt-4 pt-3 border-t-2 border-gray-200 bg-gray-50 rounded-lg p-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold text-gray-700">本类合计：</span>
-                      <span className="text-xl font-bold text-gray-600">¥ {expenseTotals.otherTotal.toFixed(2)}</span>
+                      <span className="text-lg font-semibold text-[#0c0c0c]">本类合计：</span>
+                      <span className="text-xl font-bold text-[#0c0c0c]">¥ {expenseTotals.otherTotal.toFixed(2)}</span>
                     </div>
                   </div>
 

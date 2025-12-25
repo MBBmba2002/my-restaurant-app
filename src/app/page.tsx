@@ -1,33 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import RecordPage from "./record/page";
 
 export default function HomePage() {
-  const [redirected, setRedirected] = useState(false);
-
-  useEffect(() => {
-    // Use window.location for static export compatibility
-    // This works in both static export and regular Next.js
-    if (typeof window !== "undefined" && !redirected) {
-      setRedirected(true);
-      // Use basePath-aware redirect
-      const basePath = "/my-restaurant-app";
-      window.location.href = `${basePath}/record/`;
-    }
-  }, [redirected]);
-
-  return (
-    <div className="min-h-screen bg-[#f2eada] flex items-center justify-center">
-      <div className="text-center">
-        <div className="text-[#0c0c0c] text-xl mb-4">正在跳转...</div>
-        <Link 
-          href="/record/" 
-          className="text-[#ab322a] underline text-lg hover:text-[#ab322a]/80"
-        >
-          如果未自动跳转，请点击这里
-        </Link>
-      </div>
-    </div>
-  );
+  // 直接返回 RecordPage 组件，避免重定向导致的加载问题
+  return <RecordPage />;
 }

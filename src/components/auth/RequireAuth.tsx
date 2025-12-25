@@ -1,37 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 
 export function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
-  const router = useRouter();
+  const { loading } = useAuth();
   const [timeoutReached, setTimeoutReached] = useState(false);
 
-  // Set a shorter timeout to prevent infinite loading (1.5 seconds)
+  // Set a very short timeout to prevent infinite loading (1 second)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setTimeoutReached(true);
-    }, 1500); // 1.5 second timeout
+    }, 1000); // 1 second timeout
 
     return () => clearTimeout(timeoutId);
   }, []);
 
-  useEffect(() => {
-    // Only redirect if loading is complete, no user, and timeout not reached
-    // After timeout, allow access without redirect
-    if (!loading && !user && !timeoutReached) {
-      // Don't redirect immediately, give user a chance to see the page
-      const redirectTimeout = setTimeout(() => {
-        router.push("/login");
-      }, 2000);
-      
-      return () => clearTimeout(redirectTimeout);
-    }
-  }, [user, loading, router, timeoutReached]);
-
-  // Show loading only for a short time (1.5 seconds max)
+  // Show loading only for a very short time (1 second max)
+  // After timeout, always allow access - no blocking redirects
   if (loading && !timeoutReached) {
     return (
       <div className="min-h-screen bg-[#f2eada] flex items-center justify-center">
@@ -40,7 +26,6 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // After timeout or if not loading, always allow access
-  // This ensures the app works even if auth fails
+  // Always allow access - no authentication blocking for static export
   return <>{children}</>;
 }
