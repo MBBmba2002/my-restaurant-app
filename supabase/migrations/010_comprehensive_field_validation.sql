@@ -69,6 +69,12 @@ ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS total_expense_cons numeric(12
 ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS total_expense_other numeric(12, 2) DEFAULT 0;
 ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS total_daily_expense numeric(12, 2) DEFAULT 0;
 
+-- 销量模块汇总字段
+ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS total_bing_count integer DEFAULT 0;
+ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS total_tang_count integer DEFAULT 0;
+ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS total_mixian_count integer DEFAULT 0;
+ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS total_chaomian_count integer DEFAULT 0;
+
 -- 最终汇总字段
 ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS total_income numeric(12, 2) DEFAULT 0;
 ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS total_sales integer DEFAULT 0;

@@ -221,6 +221,14 @@ function RecordPageContent() {
   const [totalIncomeConfirmed, setTotalIncomeConfirmed] = useState(false);
   const [showTotalIncomeConfirmDialog, setShowTotalIncomeConfirmDialog] = useState(false);
 
+  // 销量模块保存状态
+  const [salesModulesSaved, setSalesModulesSaved] = useState({
+    bing: false,      // 饼类
+    tang: false,      // 汤粥类
+    mixian: false,    // 米线面类
+    chaomian: false,  // 炒面河粉类
+  });
+
   // Toast 通知状态
   const [toast, setToast] = useState<{
     show: boolean;
@@ -442,6 +450,37 @@ function RecordPageContent() {
     setter(filteredValue);
   };
 
+  // 自动计算销量模块汇总
+  const salesTotals = useMemo(() => {
+    // 饼类总计
+    const bingTotal = skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing;
+    
+    // 汤粥类总计
+    const tangTotal = skuFentang + skuHundun + skuXiaomizhou + skuDoujiang + skuJidantang;
+    
+    // 米线面类总计
+    const mixianTotal = skuMixianSuSanxian + skuMixianSuSuancai + skuMixianSuMala +
+                        skuMixianRouSanxian + skuMixianRouSuancai + skuMixianRouMala +
+                        skuSuanlafen;
+    
+    // 炒面河粉类总计
+    const chaomianTotal = skuChaomianXiangcui + skuChaohufenKuan + skuChaohufenXi;
+    
+    return {
+      bingTotal,
+      tangTotal,
+      mixianTotal,
+      chaomianTotal,
+    };
+  }, [
+    skuRoubing, skuShouroubing, skuChangdanbing, skuRoudanbing, skuDanbing, skuChangbing,
+    skuFentang, skuHundun, skuXiaomizhou, skuDoujiang, skuJidantang,
+    skuMixianSuSanxian, skuMixianSuSuancai, skuMixianSuMala,
+    skuMixianRouSanxian, skuMixianRouSuancai, skuMixianRouMala,
+    skuSuanlafen,
+    skuChaomianXiangcui, skuChaohufenKuan, skuChaohufenXi,
+  ]);
+
   // 自动计算支出汇总
   const expenseTotals = useMemo(() => {
     const rawTotal = parseFloat(expRawVeg || "0") +
@@ -589,6 +628,80 @@ function RecordPageContent() {
     }, 3000);
   };
 
+  // 处理销量模块局部保存
+  const handleSaveSalesModule = async (module: "bing" | "tang" | "mixian" | "chaomian") => {
+    if (!user) {
+      showToast("请先登录", "error");
+      return;
+    }
+
+    try {
+      const salesData: any = {
+        user_id: user.id,
+        record_date: new Date().toISOString().split('T')[0],
+      };
+
+      // 根据模块类型设置不同的字段
+      switch (module) {
+        case "bing":
+          salesData.sku_roubing = skuRoubing;
+          salesData.sku_shouroubing = skuShouroubing;
+          salesData.sku_changdanbing = skuChangdanbing;
+          salesData.sku_roudanbing = skuRoudanbing;
+          salesData.sku_danbing = skuDanbing;
+          salesData.sku_changbing = skuChangbing;
+          salesData.total_bing_count = salesTotals.bingTotal;
+          break;
+        case "tang":
+          salesData.sku_fentang = skuFentang;
+          salesData.sku_hundun = skuHundun;
+          salesData.sku_mizhou = skuXiaomizhou;
+          salesData.sku_doujiang = skuDoujiang;
+          salesData.sku_jidantang = skuJidantang;
+          salesData.total_tang_count = salesTotals.tangTotal;
+          break;
+        case "mixian":
+          salesData.sku_mixian_su_sanxian = skuMixianSuSanxian;
+          salesData.sku_mixian_su_suancai = skuMixianSuSuancai;
+          salesData.sku_mixian_su_mala = skuMixianSuMala;
+          salesData.sku_mixian_rou_sanxian = skuMixianRouSanxian;
+          salesData.sku_mixian_rou_suancai = skuMixianRouSuancai;
+          salesData.sku_mixian_rou_mala = skuMixianRouMala;
+          salesData.sku_suanlafen = skuSuanlafen;
+          salesData.total_mixian_count = salesTotals.mixianTotal;
+          break;
+        case "chaomian":
+          salesData.sku_chaomian_xiangcui = skuChaomianXiangcui;
+          salesData.sku_chaohefen_kuan = skuChaohufenKuan;
+          salesData.sku_chaohefen_xi = skuChaohufenXi;
+          salesData.total_chaomian_count = salesTotals.chaomianTotal;
+          break;
+      }
+
+      // 插入或更新销量记录
+      const { error } = await supabase
+        .from("daily_records")
+        .upsert(salesData, {
+          onConflict: 'user_id,record_date',
+          ignoreDuplicates: false
+        });
+
+      if (error) {
+        console.error("Error saving sales:", error);
+        showToast("保存销量失败：" + error.message, "error");
+        return;
+      }
+
+      // 更新保存状态
+      setSalesModulesSaved(prev => ({ ...prev, [module]: true }));
+      showToast(`已保存${module === "bing" ? "饼类" : module === "tang" ? "汤粥类" : module === "mixian" ? "米线面类" : "炒面河粉类"}销量`, "success");
+
+    } catch (err: any) {
+      console.error("Error:", err);
+      showToast("保存失败：" + (err.message || "未知错误"), "error");
+    }
+  };
+
   // 确认提交总收入
   const handleConfirmTotalIncome = () => {
     setTotalIncomeConfirmed(true);
@@ -686,6 +799,11 @@ function RecordPageContent() {
             total_expenses: expenseTotals.grandTotal,
             estimated_profit: estimatedProfit,
             cogs_today: cogsToday,
+            // 销量模块汇总字段
+            total_bing_count: salesTotals.bingTotal,
+            total_tang_count: salesTotals.tangTotal,
+            total_mixian_count: salesTotals.mixianTotal,
+            total_chaomian_count: salesTotals.chaomianTotal,
             // 饼类产品
             sku_roubing: skuRoubing,
             sku_shouroubing: skuShouroubing,
@@ -939,14 +1057,38 @@ function RecordPageContent() {
             {/* 饼类产品卡片 */}
             <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">饼类产品</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={totalIncomeConfirmed} />
-                <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} disabled={totalIncomeConfirmed} />
-                <SkuInput label="肠蛋饼" value={skuChangdanbing} onChange={setSkuChangdanbing} disabled={totalIncomeConfirmed} />
-                <SkuInput label="肉蛋饼" value={skuRoudanbing} onChange={setSkuRoudanbing} disabled={totalIncomeConfirmed} />
-                <SkuInput label="蛋饼" value={skuDanbing} onChange={setSkuDanbing} disabled={totalIncomeConfirmed} />
-                <SkuInput label="肠饼" value={skuChangbing} onChange={setSkuChangbing} disabled={totalIncomeConfirmed} />
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
+                <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
+                <SkuInput label="肠蛋饼" value={skuChangdanbing} onChange={setSkuChangdanbing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
+                <SkuInput label="肉蛋饼" value={skuRoudanbing} onChange={setSkuRoudanbing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
+                <SkuInput label="蛋饼" value={skuDanbing} onChange={setSkuDanbing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
+                <SkuInput label="肠饼" value={skuChangbing} onChange={setSkuChangbing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
               </div>
+              
+              {/* 汇总显示 */}
+              <div className="bg-[#ab322a]/5 rounded-2xl py-3 px-4 mb-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-[#0c0c0c]">饼类总计：</span>
+                  <span className="text-xl font-bold text-[#0c0c0c]">{salesTotals.bingTotal} 个</span>
+                </div>
+              </div>
+
+              {/* 保存按钮 */}
+              {!salesModulesSaved.bing && !totalIncomeConfirmed && (
+                <button
+                  type="button"
+                  onClick={() => handleSaveSalesModule("bing")}
+                  className="w-full p-4 text-lg font-semibold bg-white border border-[#3d3435] text-[#3d3435] rounded-full transition-all active:scale-95 hover:bg-gray-50"
+                >
+                  保存饼类销量
+                </button>
+              )}
+              {salesModulesSaved.bing && (
+                <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-full">
+                  ✓ 已保存
+                </div>
+              )}
             </div>
 
             {/* 汤粥类产品卡片 */}
@@ -962,17 +1104,41 @@ function RecordPageContent() {
               return (
                 <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
                   <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">汤/粥类</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 mb-4">
                     {soupItems.map((item) => (
                       <SkuInput
                         key={item.label}
                         label={item.label}
                         value={item.value}
                         onChange={item.onChange}
-                        disabled={totalIncomeConfirmed}
+                        disabled={totalIncomeConfirmed || salesModulesSaved.tang}
                       />
                     ))}
                   </div>
+                  
+                  {/* 汇总显示 */}
+                  <div className="bg-[#ab322a]/5 rounded-2xl py-3 px-4 mb-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-bold text-[#0c0c0c]">汤/粥类总计：</span>
+                      <span className="text-xl font-bold text-[#0c0c0c]">{salesTotals.tangTotal} 个</span>
+                    </div>
+                  </div>
+
+                  {/* 保存按钮 */}
+                  {!salesModulesSaved.tang && !totalIncomeConfirmed && (
+                    <button
+                      type="button"
+                      onClick={() => handleSaveSalesModule("tang")}
+                      className="w-full p-4 text-lg font-semibold bg-white border border-[#3d3435] text-[#3d3435] rounded-full transition-all active:scale-95 hover:bg-gray-50"
+                    >
+                      保存汤/粥类销量
+                    </button>
+                  )}
+                  {salesModulesSaved.tang && (
+                    <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-full">
+                      ✓ 已保存
+                    </div>
+                  )}
                 </div>
               );
             })()}
@@ -985,9 +1151,9 @@ function RecordPageContent() {
               <div className="mb-6">
                 <h4 className="text-base font-semibold text-[#3d3435] mb-3">【素】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
-                  <SkuInput label="三鲜" value={skuMixianSuSanxian} onChange={setSkuMixianSuSanxian} disabled={totalIncomeConfirmed} />
-                  <SkuInput label="酸菜" value={skuMixianSuSuancai} onChange={setSkuMixianSuSuancai} disabled={totalIncomeConfirmed} />
-                  <SkuInput label="麻辣" value={skuMixianSuMala} onChange={setSkuMixianSuMala} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="三鲜" value={skuMixianSuSanxian} onChange={setSkuMixianSuSanxian} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
+                  <SkuInput label="酸菜" value={skuMixianSuSuancai} onChange={setSkuMixianSuSuancai} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
+                  <SkuInput label="麻辣" value={skuMixianSuMala} onChange={setSkuMixianSuMala} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
                 </div>
               </div>
 
@@ -995,29 +1161,77 @@ function RecordPageContent() {
               <div className="mb-6">
                 <h4 className="text-base font-semibold text-[#3d3435] mb-3">【肉】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
-                  <SkuInput label="三鲜" value={skuMixianRouSanxian} onChange={setSkuMixianRouSanxian} disabled={totalIncomeConfirmed} />
-                  <SkuInput label="酸菜" value={skuMixianRouSuancai} onChange={setSkuMixianRouSuancai} disabled={totalIncomeConfirmed} />
-                  <SkuInput label="麻辣" value={skuMixianRouMala} onChange={setSkuMixianRouMala} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="三鲜" value={skuMixianRouSanxian} onChange={setSkuMixianRouSanxian} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
+                  <SkuInput label="酸菜" value={skuMixianRouSuancai} onChange={setSkuMixianRouSuancai} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
+                  <SkuInput label="麻辣" value={skuMixianRouMala} onChange={setSkuMixianRouMala} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
                 </div>
               </div>
 
               {/* 酸辣粉 */}
-              <div>
+              <div className="mb-4">
                 <h4 className="text-base font-semibold text-[#3d3435] mb-3">酸辣粉</h4>
                 <div className="grid grid-cols-2 gap-4">
-                  <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
                 </div>
               </div>
+
+              {/* 汇总显示 */}
+              <div className="bg-[#ab322a]/5 rounded-2xl py-3 px-4 mb-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-[#0c0c0c]">米线/面类总计：</span>
+                  <span className="text-xl font-bold text-[#0c0c0c]">{salesTotals.mixianTotal} 个</span>
+                </div>
+              </div>
+
+              {/* 保存按钮 */}
+              {!salesModulesSaved.mixian && !totalIncomeConfirmed && (
+                <button
+                  type="button"
+                  onClick={() => handleSaveSalesModule("mixian")}
+                  className="w-full p-4 text-lg font-semibold bg-white border border-[#3d3435] text-[#3d3435] rounded-full transition-all active:scale-95 hover:bg-gray-50"
+                >
+                  保存米线/面类销量
+                </button>
+              )}
+              {salesModulesSaved.mixian && (
+                <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-full">
+                  ✓ 已保存
+                </div>
+              )}
             </div>
 
             {/* 炒面/炒河粉类产品卡片 */}
             <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">炒面/炒河粉类</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed} />
-                <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={totalIncomeConfirmed} />
-                <SkuInput label="【细粉】炒河粉" value={skuChaohufenXi} onChange={setSkuChaohufenXi} disabled={totalIncomeConfirmed} />
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
+                <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
+                <SkuInput label="【细粉】炒河粉" value={skuChaohufenXi} onChange={setSkuChaohufenXi} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
               </div>
+              
+              {/* 汇总显示 */}
+              <div className="bg-[#ab322a]/5 rounded-2xl py-3 px-4 mb-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-[#0c0c0c]">炒面/炒河粉类总计：</span>
+                  <span className="text-xl font-bold text-[#0c0c0c]">{salesTotals.chaomianTotal} 个</span>
+                </div>
+              </div>
+
+              {/* 保存按钮 */}
+              {!salesModulesSaved.chaomian && !totalIncomeConfirmed && (
+                <button
+                  type="button"
+                  onClick={() => handleSaveSalesModule("chaomian")}
+                  className="w-full p-4 text-lg font-semibold bg-white border border-[#3d3435] text-[#3d3435] rounded-full transition-all active:scale-95 hover:bg-gray-50"
+                >
+                  保存炒面/炒河粉类销量
+                </button>
+              )}
+              {salesModulesSaved.chaomian && (
+                <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-full">
+                  ✓ 已保存
+                </div>
+              )}
             </div>
           </div>
 
