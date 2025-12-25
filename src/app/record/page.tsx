@@ -6,202 +6,6 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 
-interface ExpenseModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  type: "material" | "fixed" | "equipment" | "other";
-  onSubmit: (data: {
-    expense_type: string;
-    expense_amount: number;
-    expense_item_name: string;
-    usage_duration?: string;
-  }) => void;
-}
-
-function ExpenseModal({ isOpen, onClose, type, onSubmit }: ExpenseModalProps) {
-  const [amount, setAmount] = useState("");
-  const [itemName, setItemName] = useState("");
-  const [usageDuration, setUsageDuration] = useState<string>("");
-
-  if (!isOpen) return null;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) {
-      showToast("请输入有效的金额", "error");
-      return;
-    }
-
-    onSubmit({
-      expense_type: type,
-      expense_amount: numAmount,
-      expense_item_name: itemName,
-      usage_duration: type === "equipment" ? usageDuration : undefined,
-    });
-
-    // 重置表单
-    setAmount("");
-    setItemName("");
-    setUsageDuration("");
-    onClose();
-  };
-
-  const getTypeConfig = () => {
-    switch (type) {
-      case "material":
-        return {
-          title: "买原材料",
-          items: ["买菜", "肉", "蛋", "粉", "油调料"],
-        };
-      case "fixed":
-        return {
-          title: "交店里的固定钱",
-          items: ["房租", "水电气", "工资", "其他"],
-        };
-      case "equipment":
-        return {
-          title: "买店里用的东西",
-          items: [],
-        };
-      case "other":
-        return {
-          title: "其他支出",
-          items: [],
-        };
-    }
-  };
-
-  const config = getTypeConfig();
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-          {config.title}
-        </h2>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 金额输入 */}
-          <div>
-            <label className="block text-lg font-medium mb-2 text-gray-700">
-              金额（元）
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
-              placeholder="请输入金额"
-              className="w-full text-2xl p-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-            />
-          </div>
-
-          {/* 项目选择/输入 */}
-          {config.items.length > 0 ? (
-            <div>
-              <label className="block text-lg font-medium mb-2 text-gray-700">
-                选择项目
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {config.items.map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => setItemName(item)}
-                    className={`p-4 text-lg rounded-lg border-2 ${
-                      itemName === item
-                        ? "bg-blue-500 text-white border-blue-500"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div>
-              <label className="block text-lg font-medium mb-2 text-gray-700">
-                项目名称
-              </label>
-              <input
-                type="text"
-                value={itemName}
-                onChange={(e) => setItemName(e.target.value)}
-                required
-                placeholder="请输入项目名称"
-                className="w-full text-xl p-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-              />
-            </div>
-          )}
-
-          {/* 使用时长（仅按钮3） */}
-          {type === "equipment" && (
-            <div>
-              <label className="block text-lg font-medium mb-2 text-gray-700">
-                能用多久？
-              </label>
-              <div className="space-y-3">
-                <button
-                  type="button"
-                  onClick={() => setUsageDuration("days")}
-                  className={`w-full p-4 text-xl rounded-lg border-2 ${
-                    usageDuration === "days"
-                      ? "bg-green-500 text-white border-green-500"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-green-400"
-                  }`}
-                >
-                  用几天
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUsageDuration("months")}
-                  className={`w-full p-4 text-xl rounded-lg border-2 ${
-                    usageDuration === "months"
-                      ? "bg-green-500 text-white border-green-500"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-green-400"
-                  }`}
-                >
-                  用几个月
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUsageDuration("long_term")}
-                  className={`w-full p-4 text-xl rounded-lg border-2 ${
-                    usageDuration === "long_term"
-                      ? "bg-green-500 text-white border-green-500"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-green-400"
-                  }`}
-                >
-                  用很久
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* 按钮 */}
-          <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 p-4 text-xl bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-            >
-              取消
-            </button>
-            <button
-              type="submit"
-              className="flex-1 p-4 text-xl bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            >
-              确认
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
 
 // 销量输入组件（可复用）- 极简主义美化版
 interface SkuInputProps {
@@ -209,9 +13,11 @@ interface SkuInputProps {
   value: number;
   onChange: (value: number) => void;
   disabled?: boolean;
+  useStringValue?: boolean; // 是否使用字符串值（用于数值输入校验）
+  onStringChange?: (value: string) => void; // 字符串值变化回调
 }
 
-function SkuInput({ label, value, onChange, disabled = false }: SkuInputProps) {
+function SkuInput({ label, value, onChange, disabled = false, useStringValue = false, onStringChange }: SkuInputProps) {
   const [inputValue, setInputValue] = useState(value.toString());
 
   useEffect(() => {
@@ -221,10 +27,20 @@ function SkuInput({ label, value, onChange, disabled = false }: SkuInputProps) {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (disabled) return;
     const newValue = e.target.value;
-    setInputValue(newValue);
-    const numValue = parseInt(newValue) || 0;
-    if (numValue >= 0) {
-      onChange(numValue);
+
+    if (useStringValue && onStringChange) {
+      // 字符串模式：只允许数字和小数点
+      if (newValue === "" || /^\d*\.?\d*$/.test(newValue)) {
+        setInputValue(newValue);
+        onStringChange(newValue);
+      }
+    } else {
+      // 数字模式：原有逻辑
+      setInputValue(newValue);
+      const numValue = parseInt(newValue) || 0;
+      if (numValue >= 0) {
+        onChange(numValue);
+      }
     }
   };
 
@@ -258,12 +74,12 @@ function SkuInput({ label, value, onChange, disabled = false }: SkuInputProps) {
         </button>
         <div className="flex-1 max-w-[90px]">
           <input
-            type="number"
+            type={useStringValue ? "text" : "number"}
             min="0"
             value={inputValue}
             onChange={handleInputChange}
             onBlur={() => {
-              if (disabled) return;
+              if (disabled || useStringValue) return;
               const numValue = parseInt(inputValue) || 0;
               onChange(Math.max(0, numValue));
             }}
@@ -291,6 +107,201 @@ function SkuInput({ label, value, onChange, disabled = false }: SkuInputProps) {
 }
 
 function RecordPageContent() {
+  // 支出模态框组件
+  function ExpenseModal({ isOpen, onClose, type, onSubmit }: {
+    isOpen: boolean;
+    onClose: () => void;
+    type: "material" | "fixed" | "equipment" | "other";
+    onSubmit: (data: {
+      expense_type: string;
+      expense_amount: number;
+      expense_item_name: string;
+      usage_duration?: string;
+    }) => void;
+  }) {
+    const [amount, setAmount] = useState("");
+    const [itemName, setItemName] = useState("");
+    const [usageDuration, setUsageDuration] = useState<string>("");
+
+    if (!isOpen) return null;
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      const numAmount = parseFloat(amount);
+      if (isNaN(numAmount) || numAmount <= 0) {
+        showToast("请输入有效的金额", "error");
+        return;
+      }
+
+      onSubmit({
+        expense_type: type,
+        expense_amount: numAmount,
+        expense_item_name: itemName,
+        usage_duration: type === "equipment" ? usageDuration : undefined,
+      });
+
+      // 重置表单
+      setAmount("");
+      setItemName("");
+      setUsageDuration("");
+      onClose();
+    };
+
+    const getTypeConfig = () => {
+      switch (type) {
+        case "material":
+          return {
+            title: "买原材料",
+            items: ["买菜", "肉", "蛋", "粉", "油调料"],
+          };
+        case "fixed":
+          return {
+            title: "交店里的固定钱",
+            items: ["房租", "水电气", "工资", "其他"],
+          };
+        case "equipment":
+          return {
+            title: "买店里用的东西",
+            items: [],
+          };
+        case "other":
+          return {
+            title: "其他支出",
+            items: [],
+          };
+      }
+    };
+
+    const config = getTypeConfig();
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+            {config.title}
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* 金额输入 */}
+            <div>
+              <label className="block text-lg font-medium mb-2 text-gray-700">
+                金额（元）
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                required
+                placeholder="请输入金额"
+                className="w-full text-2xl p-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
+            {/* 项目选择/输入 */}
+            {config.items.length > 0 ? (
+              <div>
+                <label className="block text-lg font-medium mb-2 text-gray-700">
+                  选择项目
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {config.items.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setItemName(item)}
+                      className={`p-4 text-lg rounded-lg border-2 ${
+                        itemName === item
+                          ? "bg-blue-500 text-white border-blue-500"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-lg font-medium mb-2 text-gray-700">
+                  项目名称
+                </label>
+                <input
+                  type="text"
+                  value={itemName}
+                  onChange={(e) => setItemName(e.target.value)}
+                  required
+                  placeholder="请输入项目名称"
+                  className="w-full text-xl p-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            )}
+
+            {/* 使用时长（仅按钮3） */}
+            {type === "equipment" && (
+              <div>
+                <label className="block text-lg font-medium mb-2 text-gray-700">
+                  能用多久？
+                </label>
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => setUsageDuration("days")}
+                    className={`w-full p-4 text-xl rounded-lg border-2 ${
+                      usageDuration === "days"
+                        ? "bg-green-500 text-white border-green-500"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-green-400"
+                    }`}
+                  >
+                    用几天
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUsageDuration("months")}
+                    className={`w-full p-4 text-xl rounded-lg border-2 ${
+                      usageDuration === "months"
+                        ? "bg-green-500 text-white border-green-500"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-green-400"
+                    }`}
+                  >
+                    用几个月
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUsageDuration("long_term")}
+                    className={`w-full p-4 text-xl rounded-lg border-2 ${
+                      usageDuration === "long_term"
+                        ? "bg-green-500 text-white border-green-500"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-green-400"
+                    }`}
+                  >
+                    用很久
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* 按钮 */}
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 p-4 text-xl bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              >
+                取消
+              </button>
+              <button
+                type="submit"
+                className="flex-1 p-4 text-xl bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                确认
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
   const { user } = useAuth();
   const router = useRouter();
   const [todayDate, setTodayDate] = useState("");
@@ -413,6 +424,14 @@ function RecordPageContent() {
     setTimeout(() => {
       setToast({ show: false, message: '', type: 'info' });
     }, 4000); // 4秒后自动消失
+  };
+
+  // 数值输入校验函数
+  const handleNumberChange = (value: string, setter: (value: string) => void) => {
+    // 只允许数字、小数点和空字符串
+    if (value === "" || /^\d*\.?\d*$/.test(value)) {
+      setter(value);
+    }
   };
 
   // 自动计算支出汇总
