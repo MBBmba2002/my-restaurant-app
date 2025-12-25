@@ -55,3 +55,7 @@ CREATE POLICY "Users can delete their own records" ON daily_records
 CREATE INDEX idx_records_user_date ON daily_records(user_id, record_date);
 CREATE INDEX idx_records_record_date ON daily_records(record_date);
 
+
+
+
+

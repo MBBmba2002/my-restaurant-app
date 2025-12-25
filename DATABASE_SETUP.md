@@ -95,3 +95,7 @@ ALTER TABLE daily_records ADD COLUMN sku_new_item integer DEFAULT 0;
 **Q: 如何查看表结构？**
 A: 在 Supabase Dashboard 中，进入 **Table Editor** → 选择 `daily_records` 表，可以看到所有字段和类型。
 
+
+
+
+

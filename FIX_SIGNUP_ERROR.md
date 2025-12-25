@@ -56,3 +56,7 @@ SELECT * FROM auth.config;
 - 在 Dashboard 中搜索 "signup" 或 "sign up"
 - 查看 Supabase 文档：https://supabase.com/docs/guides/auth/auth-disabling-sign-ups
 
+
+
+
+

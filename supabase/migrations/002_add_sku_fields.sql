@@ -35,3 +35,7 @@ ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS sku_xiangcuichaomian integer 
 ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS sku_suancaichaohufenkuan integer DEFAULT 0;  -- 酸菜炒河粉[宽]
 ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS sku_malachaohufenxi integer DEFAULT 0;  -- 麻辣炒河粉[细]
 
+
+
+
+

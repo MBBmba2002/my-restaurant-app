@@ -56,25 +56,25 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
 
   return (
     <div className="flex flex-col">
-      <label className="block text-base font-medium mb-3 text-gray-700">
+      <label className="block text-base font-medium mb-3 text-[#3d3435]">
         {label}
       </label>
-      <div className="flex items-center justify-center gap-4 bg-gray-50 rounded-xl p-3 shadow-sm">
+      <div className="flex items-center justify-center gap-3">
         <button
           type="button"
           onClick={handleDecrement}
           disabled={disabled}
-          className={`w-7 h-7 bg-[#ab322a] text-white rounded-full flex items-center justify-center transition-all ${
+          className={`w-6 h-6 bg-red-50 text-[#ab322a] rounded-full flex items-center justify-center transition-all border-none ${
             disabled
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-[#ab322a]/80 active:scale-95 shadow-sm"
+              : "hover:bg-red-100 active:scale-95"
           }`}
         >
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" />
           </svg>
         </button>
-        <div className="flex-1 max-w-[120px]">
+        <div className="flex-1 max-w-[140px]">
           <input
             type={useStringValue ? "text" : "number"}
             inputMode={useStringValue ? "decimal" : undefined}
@@ -87,8 +87,8 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
               onChange(Math.max(0, numValue));
             }}
             disabled={disabled}
-            className={`w-full font-mono text-2xl font-bold text-center py-4 bg-white border border-[#ab322a]/20 focus:outline-none focus:ring-2 focus:ring-[#ab322a] rounded-xl transition-all text-[#0c0c0c] ${
-              disabled ? "opacity-50 cursor-not-allowed bg-[#e1e2e4]" : ""
+            className={`w-full font-mono text-3xl font-bold text-center py-3 bg-white border-none focus:outline-none focus:ring-1 focus:ring-[#ab322a] rounded-3xl transition-all text-[#0c0c0c] ${
+              disabled ? "opacity-50 cursor-not-allowed" : ""
             }`}
           />
         </div>
@@ -96,10 +96,10 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           type="button"
           onClick={handleIncrement}
           disabled={disabled}
-          className={`w-7 h-7 bg-[#ab322a] text-white rounded-full flex items-center justify-center transition-all ${
+          className={`w-6 h-6 bg-red-50 text-[#ab322a] rounded-full flex items-center justify-center transition-all border-none ${
             disabled
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-[#ab322a]/80 active:scale-95 shadow-sm"
+              : "hover:bg-red-100 active:scale-95"
           }`}
         >
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,15 +181,15 @@ function RecordPageContent() {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+        <div className="bg-white rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-[0_8px_30px_rgb(171,50,42,0.05)]">
+          <h2 className="text-2xl font-bold mb-6 text-center text-[#0c0c0c]">
             {config.title}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* 金额输入 */}
             <div>
-              <label className="block text-lg font-medium mb-2 text-gray-700">
+              <label className="block text-lg font-medium mb-2 text-[#3d3435]">
                 金额（元）
               </label>
               <input
@@ -199,14 +199,14 @@ function RecordPageContent() {
                 onChange={(e) => setAmount(e.target.value)}
                 required
                 placeholder="请输入金额"
-                className="w-full text-2xl p-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full font-mono text-2xl p-4 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c]"
               />
             </div>
 
             {/* 项目选择/输入 */}
             {config.items.length > 0 ? (
               <div>
-                <label className="block text-lg font-medium mb-2 text-gray-700">
+                <label className="block text-lg font-medium mb-2 text-[#3d3435]">
                   选择项目
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -215,10 +215,10 @@ function RecordPageContent() {
                       key={item}
                       type="button"
                       onClick={() => setItemName(item)}
-                      className={`p-4 text-lg rounded-lg border-2 ${
+                      className={`p-4 text-lg rounded-full transition-all ${
                         itemName === item
-                          ? "bg-blue-500 text-white border-blue-500"
-                          : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+                          ? "bg-[#ab322a] text-[#f2eada]"
+                          : "bg-white text-[#3d3435] hover:bg-red-50"
                       }`}
                     >
                       {item}
@@ -228,7 +228,7 @@ function RecordPageContent() {
               </div>
             ) : (
               <div>
-                <label className="block text-lg font-medium mb-2 text-gray-700">
+                <label className="block text-lg font-medium mb-2 text-[#3d3435]">
                   项目名称
                 </label>
                 <input
@@ -237,7 +237,7 @@ function RecordPageContent() {
                   onChange={(e) => setItemName(e.target.value)}
                   required
                   placeholder="请输入项目名称"
-                  className="w-full text-xl p-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                  className="w-full font-mono text-xl p-4 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c]"
                 />
               </div>
             )}
@@ -245,17 +245,17 @@ function RecordPageContent() {
             {/* 使用时长（仅按钮3） */}
             {type === "equipment" && (
               <div>
-                <label className="block text-lg font-medium mb-2 text-gray-700">
+                <label className="block text-lg font-medium mb-2 text-[#3d3435]">
                   能用多久？
                 </label>
                 <div className="space-y-3">
                   <button
                     type="button"
                     onClick={() => setUsageDuration("days")}
-                    className={`w-full p-4 text-xl rounded-lg border-2 ${
+                    className={`w-full p-4 text-xl rounded-full transition-all ${
                       usageDuration === "days"
-                        ? "bg-green-500 text-white border-green-500"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-green-400"
+                        ? "bg-[#ab322a] text-[#f2eada]"
+                        : "bg-white text-[#3d3435] hover:bg-red-50"
                     }`}
                   >
                     用几天
@@ -263,10 +263,10 @@ function RecordPageContent() {
                   <button
                     type="button"
                     onClick={() => setUsageDuration("months")}
-                    className={`w-full p-4 text-xl rounded-lg border-2 ${
+                    className={`w-full p-4 text-xl rounded-full transition-all ${
                       usageDuration === "months"
-                        ? "bg-green-500 text-white border-green-500"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-green-400"
+                        ? "bg-[#ab322a] text-[#f2eada]"
+                        : "bg-white text-[#3d3435] hover:bg-red-50"
                     }`}
                   >
                     用几个月
@@ -274,10 +274,10 @@ function RecordPageContent() {
                   <button
                     type="button"
                     onClick={() => setUsageDuration("long_term")}
-                    className={`w-full p-4 text-xl rounded-lg border-2 ${
+                    className={`w-full p-4 text-xl rounded-full transition-all ${
                       usageDuration === "long_term"
-                        ? "bg-green-500 text-white border-green-500"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-green-400"
+                        ? "bg-[#ab322a] text-[#f2eada]"
+                        : "bg-white text-[#3d3435] hover:bg-red-50"
                     }`}
                   >
                     用很久
@@ -291,13 +291,13 @@ function RecordPageContent() {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 p-4 text-xl bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                className="flex-1 p-4 text-xl bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95"
               >
                 取消
               </button>
               <button
                 type="submit"
-                className="flex-1 p-4 text-xl bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                className="flex-1 p-4 text-xl bg-[#ab322a] text-[#f2eada] rounded-full transition-all active:scale-95"
               >
                 确认
               </button>
@@ -796,13 +796,13 @@ function RecordPageContent() {
       <div className="max-w-4xl mx-auto p-4">
         {/* 顶部日期 */}
         <div className="text-center py-6">
-          <h1 className="text-3xl font-bold text-gray-800">{todayDate}</h1>
+          <h1 className="text-3xl font-bold text-[#0c0c0c]">{todayDate}</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 第一板块：今日收入 */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
-            <h2 className="text-2xl font-bold mb-6 tracking-tight text-gray-800">💰 今日收入</h2>
+          <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)] border-none">
+            <h2 className="text-2xl font-bold mb-6 tracking-tight text-[#0c0c0c]">💰 今日收入</h2>
             <div className="space-y-4">
               <div>
                 <label className="block text-xl font-bold mb-3 text-[#0c0c0c]">
@@ -820,9 +820,9 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full font-mono text-xl p-4 bg-white border border-[#ab322a]/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ab322a] focus:shadow-lg transition-all text-[#0c0c0c] ${
+                  className={`w-full font-mono text-xl p-4 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c] ${
                     totalIncomeConfirmed
-                      ? "bg-[#e1e2e4] cursor-not-allowed opacity-60"
+                      ? "bg-gray-100 cursor-not-allowed opacity-60"
                       : ""
                   }`}
                 />
@@ -843,9 +843,9 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full font-mono text-xl p-4 bg-white border border-[#ab322a]/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ab322a] focus:shadow-lg transition-all text-[#0c0c0c] ${
+                  className={`w-full font-mono text-xl p-4 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c] ${
                     totalIncomeConfirmed
-                      ? "bg-[#e1e2e4] cursor-not-allowed opacity-60"
+                      ? "bg-gray-100 cursor-not-allowed opacity-60"
                       : ""
                   }`}
                 />
@@ -866,9 +866,9 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full font-mono text-xl p-4 bg-white border border-[#ab322a]/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ab322a] focus:shadow-lg transition-all text-[#0c0c0c] ${
+                  className={`w-full font-mono text-xl p-4 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c] ${
                     totalIncomeConfirmed
-                      ? "bg-[#e1e2e4] cursor-not-allowed opacity-60"
+                      ? "bg-gray-100 cursor-not-allowed opacity-60"
                       : ""
                   }`}
                 />
@@ -880,12 +880,12 @@ function RecordPageContent() {
                   type="button"
                   onClick={handleSaveIncome}
                   disabled={totalIncomeConfirmed}
-                  className={`w-full p-4 text-lg font-bold rounded-2xl transition-all active:scale-95 ${
+                  className={`w-full p-4 text-lg font-bold rounded-full transition-all active:scale-95 ${
                     totalIncomeConfirmed
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                       : incomeSavedMessage
-                      ? "bg-green-500 text-white shadow-lg"
-                      : "bg-gradient-to-r from-[#ffcc00] via-[#ffd633] to-[#ffcc00] text-[#0c0c0c] shadow-lg hover:shadow-xl"
+                      ? "bg-green-500 text-[#f2eada]"
+                      : "bg-[#3d3435] text-[#f2eada]"
                   }`}
                 >
                   {incomeSavedMessage ? "✅ 已保存" : "💾 保存"}
@@ -893,11 +893,11 @@ function RecordPageContent() {
               </div>
 
               {/* 今日总收入显示 */}
-              <div className="mt-4 pt-4 border-t-2 border-[#ab322a]/20">
-                <div className="bg-gradient-to-r from-[#ab322a]/50 via-[#ab322a]/60 to-[#ab322a]/50 rounded-2xl p-6 shadow-lg backdrop-blur-sm">
+              <div className="mt-6 pt-6">
+                <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(171,50,42,0.05)]">
                   <div className="text-center">
-                    <div className="flex items-center justify-center gap-3 mb-3">
-                      <div className="text-xl font-bold text-[#f2eada]">
+                    <div className="flex items-center justify-center gap-3 mb-4">
+                      <div className="text-xl font-bold text-[#3d3435]">
                         今日总收入
                       </div>
                       {totalIncomeConfirmed && (
@@ -906,7 +906,7 @@ function RecordPageContent() {
                         </span>
                       )}
                     </div>
-                    <div className="text-5xl font-bold text-[#f2eada] mb-4">
+                    <div className="text-5xl font-bold text-[#0c0c0c] mb-6">
                       ¥ {(
                         parseFloat(incomeWechat || "0") +
                         parseFloat(incomeAlipay || "0") +
@@ -917,7 +917,7 @@ function RecordPageContent() {
                       <button
                         type="button"
                         onClick={() => setShowTotalIncomeConfirmDialog(true)}
-                        className="px-8 py-4 bg-[#1661ab] text-[#f2eada] text-lg font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
+                        className="px-8 py-4 bg-[#ab322a] text-[#f2eada] text-lg font-bold rounded-full transition-all active:scale-95"
                       >
                         🔒 确认提交总收入
                       </button>
@@ -930,14 +930,11 @@ function RecordPageContent() {
 
           {/* 第二板块：当日产品销量追踪 */}
           <div className={`space-y-6 ${totalIncomeConfirmed ? "opacity-60" : ""}`}>
-            <h2 className="text-2xl font-bold mb-6 tracking-tight text-gray-800">📊 当日产品销量追踪</h2>
+            <h2 className="text-2xl font-bold mb-6 tracking-tight text-[#0c0c0c]">📊 当日产品销量追踪</h2>
             
             {/* 饼类产品卡片 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
-              <div className="flex items-center mb-6">
-                <div className="w-2 h-8 bg-purple-400 rounded-full mr-4"></div>
-                <h3 className="text-xl font-bold text-gray-800">饼类产品</h3>
-              </div>
+            <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)] border-none">
+              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">饼类产品</h3>
               <div className="grid grid-cols-2 gap-4">
                 <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={totalIncomeConfirmed} />
                 <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} disabled={totalIncomeConfirmed} />
@@ -959,11 +956,8 @@ function RecordPageContent() {
               ];
 
               return (
-                <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
-                  <div className="flex items-center mb-6">
-                    <div className="w-2 h-8 bg-purple-400 rounded-full mr-4"></div>
-                    <h3 className="text-xl font-bold text-gray-800">汤/粥类</h3>
-                  </div>
+                <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)] border-none">
+                  <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">汤/粥类</h3>
                   <div className="grid grid-cols-2 gap-4">
                     {soupItems.map((item) => (
                       <SkuInput
@@ -980,15 +974,12 @@ function RecordPageContent() {
             })()}
 
             {/* 米线/面类产品卡片 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
-              <div className="flex items-center mb-6">
-                <div className="w-2 h-8 bg-purple-400 rounded-full mr-4"></div>
-                <h3 className="text-xl font-bold text-gray-800">米线/面类</h3>
-              </div>
+            <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)] border-none">
+              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">米线/面类</h3>
 
               {/* 【素】米线/面 */}
               <div className="mb-6">
-                <h4 className="text-base font-semibold text-gray-700 mb-3 ml-4">【素】米线/面</h4>
+                <h4 className="text-base font-semibold text-[#3d3435] mb-3">【素】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="三鲜" value={skuMixianSuSanxian} onChange={setSkuMixianSuSanxian} disabled={totalIncomeConfirmed} />
                   <SkuInput label="酸菜" value={skuMixianSuSuancai} onChange={setSkuMixianSuSuancai} disabled={totalIncomeConfirmed} />
@@ -998,7 +989,7 @@ function RecordPageContent() {
 
               {/* 【肉】米线/面 */}
               <div className="mb-6">
-                <h4 className="text-base font-semibold text-gray-700 mb-3 ml-4">【肉】米线/面</h4>
+                <h4 className="text-base font-semibold text-[#3d3435] mb-3">【肉】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="三鲜" value={skuMixianRouSanxian} onChange={setSkuMixianRouSanxian} disabled={totalIncomeConfirmed} />
                   <SkuInput label="酸菜" value={skuMixianRouSuancai} onChange={setSkuMixianRouSuancai} disabled={totalIncomeConfirmed} />
@@ -1008,7 +999,7 @@ function RecordPageContent() {
 
               {/* 酸辣粉 */}
               <div>
-                <h4 className="text-base font-semibold text-gray-700 mb-3 ml-4">酸辣粉</h4>
+                <h4 className="text-base font-semibold text-[#3d3435] mb-3">酸辣粉</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} disabled={totalIncomeConfirmed} />
                 </div>
@@ -1016,11 +1007,8 @@ function RecordPageContent() {
             </div>
 
             {/* 炒面/炒河粉类产品卡片 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
-              <div className="flex items-center mb-6">
-                <div className="w-2 h-8 bg-purple-400 rounded-full mr-4"></div>
-                <h3 className="text-xl font-bold text-gray-800">炒面/炒河粉类</h3>
-              </div>
+            <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)] border-none">
+              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">炒面/炒河粉类</h3>
               <div className="grid grid-cols-2 gap-4">
                 <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed} />
                 <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={totalIncomeConfirmed} />
@@ -1031,19 +1019,16 @@ function RecordPageContent() {
 
           {/* 第三板块：今日支出 */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold mb-6 tracking-tight text-gray-800">💸 今日支出</h2>
+            <h2 className="text-2xl font-bold mb-6 tracking-tight text-[#0c0c0c]">💸 今日支出</h2>
 
             {/* 【购买原材料】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
-              <div className="flex items-center mb-6">
-                <div className="w-2 h-8 bg-pink-400 rounded-full mr-4"></div>
-                <h3 className="text-xl font-bold text-gray-800">【购买原材料】</h3>
+            <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)] border-none">
+              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【购买原材料】</h3>
                 {expenseModulesLocked.raw && (
                   <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
                     已锁定
                   </span>
                 )}
-              </div>
 
               {(() => {
                 const rawItems = [
@@ -1060,7 +1045,7 @@ function RecordPageContent() {
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       {rawItems.map((item) => (
                         <div key={item.label} className="flex flex-col">
-                          <label className="block text-sm font-medium mb-3 text-gray-500">
+                          <label className="block text-sm font-medium mb-3 text-[#3d3435]">
                             {item.label}
                           </label>
                           <input
@@ -1070,10 +1055,10 @@ function RecordPageContent() {
                             onChange={(e) => item.onChange(e.target.value)}
                             disabled={expenseModulesLocked.raw}
                             placeholder="0.00"
-                            className={`w-full text-xl p-3 border-2 rounded-lg focus:outline-none ${
+                            className={`w-full font-mono text-xl p-3 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c] ${
                               expenseModulesLocked.raw
-                                ? "border-gray-300 bg-gray-100 cursor-not-allowed"
-                                : "border-green-300 focus:border-green-500"
+                                ? "bg-gray-100 cursor-not-allowed opacity-60"
+                                : ""
                             }`}
                           />
                         </div>
@@ -1081,10 +1066,10 @@ function RecordPageContent() {
                     </div>
 
                     {/* 原材料汇总显示 */}
-                    <div className="mt-4 pt-3 border-t-2 border-green-200 bg-green-50 rounded-lg p-3">
+                    <div className="mt-6 pt-6">
                       <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold text-gray-700">本类合计：</span>
-                        <span className="text-xl font-bold text-green-600">¥ {expenseTotals.rawTotal.toFixed(2)}</span>
+                        <span className="text-lg font-semibold text-[#3d3435]">本类合计：</span>
+                        <span className="text-xl font-bold text-[#0c0c0c]">¥ {expenseTotals.rawTotal.toFixed(2)}</span>
                       </div>
                     </div>
 
@@ -1092,7 +1077,7 @@ function RecordPageContent() {
                       <button
                         type="button"
                         onClick={() => setExpenseConfirmModal({ isOpen: true, module: "raw" })}
-                        className="w-full p-4 text-lg font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
+                        className="w-full p-4 text-lg font-semibold bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95"
                       >
                         🔒 记入支出
                       </button>
@@ -1103,16 +1088,13 @@ function RecordPageContent() {
             </div>
 
             {/* 【门店固定费用】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
-              <div className="flex items-center mb-6">
-                <div className="w-2 h-8 bg-pink-400 rounded-full mr-4"></div>
-                <h3 className="text-xl font-bold text-gray-800">【门店固定费用】</h3>
-                {expenseModulesLocked.fixed && (
-                  <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
-                    已锁定
-                  </span>
-                )}
-              </div>
+            <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)] border-none">
+              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【门店固定费用】</h3>
+              {expenseModulesLocked.fixed && (
+                <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
+                  已锁定
+                </span>
+              )}
 
               {(() => {
                 const fixedItems = [
@@ -1127,7 +1109,7 @@ function RecordPageContent() {
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       {fixedItems.map((item) => (
                         <div key={item.label} className="flex flex-col">
-                          <label className="block text-sm font-medium mb-3 text-gray-500">
+                          <label className="block text-sm font-medium mb-3 text-[#3d3435]">
                             {item.label}
                           </label>
                           <input
@@ -1137,10 +1119,10 @@ function RecordPageContent() {
                             onChange={(e) => item.onChange(e.target.value)}
                             disabled={expenseModulesLocked.fixed}
                             placeholder="0.00"
-                            className={`w-full text-xl p-3 border-2 rounded-lg focus:outline-none ${
+                            className={`w-full font-mono text-xl p-3 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c] ${
                               expenseModulesLocked.fixed
-                                ? "border-gray-300 bg-gray-100 cursor-not-allowed"
-                                : "border-blue-300 focus:border-blue-500"
+                                ? "bg-gray-100 cursor-not-allowed opacity-60"
+                                : ""
                             }`}
                           />
                         </div>
@@ -1148,10 +1130,10 @@ function RecordPageContent() {
                     </div>
 
                     {/* 固定费用汇总显示 */}
-                    <div className="mt-4 pt-3 border-t-2 border-blue-200 bg-blue-50 rounded-lg p-3">
+                    <div className="mt-6 pt-6">
                       <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold text-gray-700">本类合计：</span>
-                        <span className="text-xl font-bold text-blue-600">¥ {expenseTotals.fixTotal.toFixed(2)}</span>
+                        <span className="text-lg font-semibold text-[#3d3435]">本类合计：</span>
+                        <span className="text-xl font-bold text-[#0c0c0c]">¥ {expenseTotals.fixTotal.toFixed(2)}</span>
                       </div>
                     </div>
 
@@ -1159,7 +1141,7 @@ function RecordPageContent() {
                       <button
                         type="button"
                         onClick={() => setExpenseConfirmModal({ isOpen: true, module: "fixed" })}
-                        className="w-full p-4 text-lg font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
+                        className="w-full p-4 text-lg font-semibold bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95"
                       >
                         🔒 记入支出
                       </button>
@@ -1170,22 +1152,19 @@ function RecordPageContent() {
             </div>
 
             {/* 【经营消耗品】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
-              <div className="flex items-center mb-6">
-                <div className="w-2 h-8 bg-pink-400 rounded-full mr-4"></div>
-                <h3 className="text-xl font-bold text-gray-800">【经营消耗品】</h3>
-                {expenseModulesLocked.cons && (
-                  <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
-                    已锁定
-                  </span>
-                )}
-              </div>
+            <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)] border-none">
+              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【经营消耗品】</h3>
+              {expenseModulesLocked.cons && (
+                <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
+                  已锁定
+                </span>
+              )}
 
               {!expenseModulesLocked.cons && (
                 <>
                   <div className="space-y-4 mb-4">
                     <div>
-                      <label className="block text-base font-medium mb-2 text-gray-700">
+                      <label className="block text-base font-medium mb-2 text-[#3d3435]">
                         消耗品名称
                       </label>
                       <input
@@ -1193,12 +1172,12 @@ function RecordPageContent() {
                         value={expConsName}
                         onChange={(e) => setExpConsName(e.target.value)}
                         placeholder="请输入消耗品名称"
-                        className="w-full text-xl p-3 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
+                        className="w-full font-mono text-xl p-3 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c]"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-base font-medium mb-2 text-gray-700">
+                      <label className="block text-base font-medium mb-2 text-[#3d3435]">
                         金额（元）
                       </label>
                       <input
@@ -1207,12 +1186,12 @@ function RecordPageContent() {
                         value={expConsAmount}
                         onChange={(e) => handleNumberChange(e.target.value, setExpConsAmount)}
                         placeholder="0.00"
-                        className="w-full text-xl p-3 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
+                        className="w-full font-mono text-xl p-3 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c]"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-base font-medium mb-2 text-gray-700">
+                      <label className="block text-base font-medium mb-2 text-[#3d3435]">
                         能用多久？
                       </label>
                       <div className="grid grid-cols-2 gap-3">
@@ -1226,10 +1205,10 @@ function RecordPageContent() {
                             key={duration.value}
                             type="button"
                             onClick={() => setExpConsDuration(duration.value)}
-                            className={`p-3 text-lg rounded-lg border-2 ${
+                            className={`p-3 text-lg rounded-full transition-all ${
                               expConsDuration === duration.value
-                                ? "bg-purple-500 text-white border-purple-500"
-                                : "bg-white text-gray-700 border-gray-300 hover:border-purple-400"
+                                ? "bg-[#ab322a] text-[#f2eada]"
+                                : "bg-white text-[#3d3435] hover:bg-red-50"
                             }`}
                           >
                             {duration.label}
@@ -1240,17 +1219,17 @@ function RecordPageContent() {
                   </div>
 
                   {/* 消耗品汇总显示 */}
-                  <div className="mt-4 pt-3 border-t-2 border-purple-200 bg-purple-50 rounded-lg p-3">
+                  <div className="mt-6 pt-6">
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold text-gray-700">本类合计：</span>
-                      <span className="text-xl font-bold text-purple-600">¥ {expenseTotals.consTotal.toFixed(2)}</span>
+                      <span className="text-lg font-semibold text-[#3d3435]">本类合计：</span>
+                      <span className="text-xl font-bold text-[#0c0c0c]">¥ {expenseTotals.consTotal.toFixed(2)}</span>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "cons" })}
-                    className="w-full p-4 text-lg font-semibold bg-gradient-to-r from-purple-500 to-violet-600 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
+                    className="w-full p-4 text-lg font-semibold bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95"
                   >
                     🔒 记入支出
                   </button>
@@ -1258,18 +1237,18 @@ function RecordPageContent() {
               )}
 
               {expenseModulesLocked.cons && (
-                <div className="p-4 bg-purple-50 rounded-lg">
-                  <div className="text-lg font-medium text-gray-800">
+                <div className="p-4 bg-white rounded-3xl shadow-[0_8px_30px_rgb(171,50,42,0.05)]">
+                  <div className="text-lg font-medium text-[#0c0c0c]">
                     {expConsName} - ¥{expConsAmount}
                   </div>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="text-sm text-[#3d3435] mt-1">
                     使用时长：{expConsDuration}
                   </div>
                   {/* 消耗品汇总显示 */}
-                  <div className="mt-3 pt-2 border-t border-purple-200">
+                  <div className="mt-3 pt-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-gray-600">本类合计：</span>
-                      <span className="text-lg font-bold text-purple-600">¥ {expenseTotals.consTotal.toFixed(2)}</span>
+                      <span className="text-sm font-medium text-[#3d3435]">本类合计：</span>
+                      <span className="text-lg font-bold text-[#0c0c0c]">¥ {expenseTotals.consTotal.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -1277,21 +1256,18 @@ function RecordPageContent() {
             </div>
 
             {/* 【其他支出】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
-              <div className="flex items-center mb-6">
-                <div className="w-2 h-8 bg-pink-400 rounded-full mr-4"></div>
-                <h3 className="text-xl font-bold text-gray-800">【其他支出】</h3>
-                {expenseModulesLocked.other && (
-                  <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
-                    已锁定
-                  </span>
-                )}
-              </div>
+            <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)] border-none">
+              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【其他支出】</h3>
+              {expenseModulesLocked.other && (
+                <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
+                  已锁定
+                </span>
+              )}
 
               {!expenseModulesLocked.other && (
                 <div className="space-y-4 mb-4">
                   <div>
-                    <label className="block text-base font-medium mb-2 text-gray-700">
+                    <label className="block text-base font-medium mb-2 text-[#3d3435]">
                       支出项目名称
                     </label>
                     <input
@@ -1299,12 +1275,12 @@ function RecordPageContent() {
                       value={expOtherName}
                       onChange={(e) => setExpOtherName(e.target.value)}
                       placeholder="请输入支出项目名称"
-                      className="w-full text-xl p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
+                      className="w-full font-mono text-xl p-3 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-base font-medium mb-2 text-gray-700">
+                    <label className="block text-base font-medium mb-2 text-[#3d3435]">
                       金额（元）
                     </label>
                     <input
@@ -1313,14 +1289,14 @@ function RecordPageContent() {
                       value={expOtherAmount}
                       onChange={(e) => handleNumberChange(e.target.value, setExpOtherAmount)}
                       placeholder="0.00"
-                      className="w-full text-xl p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
+                      className="w-full font-mono text-xl p-3 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c]"
                     />
                   </div>
 
                   <button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "other" })}
-                    className="w-full p-4 text-xl bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-bold"
+                    className="w-full p-4 text-xl font-bold bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95"
                   >
                     🔒 记入支出
                   </button>
@@ -1377,15 +1353,15 @@ function RecordPageContent() {
               )}
 
               {expenseModulesLocked.other && (
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <div className="text-lg font-medium text-gray-800">
+                <div className="p-4 bg-white rounded-3xl shadow-[0_8px_30px_rgb(171,50,42,0.05)]">
+                  <div className="text-lg font-medium text-[#0c0c0c]">
                     {expOtherName} - ¥{expOtherAmount}
                   </div>
                   {/* 其他支出汇总显示 */}
-                  <div className="mt-3 pt-2 border-t border-gray-200">
+                  <div className="mt-3 pt-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-gray-600">本类合计：</span>
-                      <span className="text-lg font-bold text-gray-600">¥ {expenseTotals.otherTotal.toFixed(2)}</span>
+                      <span className="text-sm font-medium text-[#3d3435]">本类合计：</span>
+                      <span className="text-lg font-bold text-[#0c0c0c]">¥ {expenseTotals.otherTotal.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -1393,13 +1369,13 @@ function RecordPageContent() {
             </div>
 
             {/* 当日总支出汇总看板 */}
-            <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-3xl p-6 shadow-lg backdrop-blur-sm border border-red-200/30 mb-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">💰 当日总支出</h3>
+            <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(171,50,42,0.05)] border-none mb-6">
+              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">💰 当日总支出</h3>
               <div className="text-center">
-                <div className="text-4xl font-bold text-red-600 mb-2">
+                <div className="text-4xl font-bold text-[#0c0c0c] mb-2">
                   ¥ {expenseTotals.grandTotal.toFixed(2)}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-[#3d3435]">
                   包含所有支出分类汇总
                 </div>
               </div>
@@ -1407,49 +1383,45 @@ function RecordPageContent() {
 
             {/* 今日经营成绩单 - 仅在最终确认后显示 */}
             {totalIncomeConfirmed && (
-              <div className="bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-100 rounded-3xl p-8 shadow-2xl border border-yellow-200/50 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl p-12 shadow-[0_8px_30px_rgb(171,50,42,0.05)] border-none">
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-6">🏆 今日经营成绩单</h3>
+                  <h3 className="text-2xl font-bold text-[#0c0c0c] mb-12">🏆 今日经营成绩单</h3>
 
                   {/* 核心指标 - 净利润 */}
-                  <div className="mb-6">
-                    <div className="text-lg font-medium text-gray-600 mb-2">今日预估净赚</div>
-                    <div className={`text-5xl font-bold mb-2 ${
-                      (parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0") - calculateTodayCOGS()) >= 0
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}>
+                  <div className="mb-12">
+                    <div className="text-lg font-medium text-[#3d3435] mb-4">今日预估净赚</div>
+                    <div className="text-6xl font-bold text-[#ab322a]">
                       ¥ {((parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")) - calculateTodayCOGS()).toFixed(2)}
                     </div>
                   </div>
 
                   {/* 辅助指标列表 */}
-                  <div className="grid grid-cols-2 gap-4 text-left">
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20">
-                      <div className="text-sm font-medium text-gray-600">总收入</div>
-                      <div className="text-xl font-bold text-green-600">
+                  <div className="grid grid-cols-2 gap-6 text-left">
+                    <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)]">
+                      <div className="text-sm font-medium text-[#3d3435] mb-2">总收入</div>
+                      <div className="text-xl font-bold text-[#0c0c0c]">
                         ¥ {(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}
                       </div>
                     </div>
 
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20">
-                      <div className="text-sm font-medium text-gray-600">总支出</div>
-                      <div className="text-xl font-bold text-red-600">
+                    <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)]">
+                      <div className="text-sm font-medium text-[#3d3435] mb-2">总支出</div>
+                      <div className="text-xl font-bold text-[#0c0c0c]">
                         ¥ {expenseTotals.grandTotal.toFixed(2)}
                       </div>
                     </div>
 
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20">
-                      <div className="text-sm font-medium text-gray-600">经营成本</div>
-                      <div className="text-lg font-bold text-blue-600">
+                    <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)]">
+                      <div className="text-sm font-medium text-[#3d3435] mb-2">经营成本</div>
+                      <div className="text-lg font-bold text-[#0c0c0c]">
                         ¥ {calculateTodayCOGS().toFixed(2)}
                       </div>
-                      <div className="text-xs text-gray-500">含固定费摊销</div>
+                      <div className="text-xs text-[#3d3435] mt-1">含固定费摊销</div>
                     </div>
 
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20">
-                      <div className="text-sm font-medium text-gray-600">销量汇总</div>
-                      <div className="text-lg font-bold text-purple-600">
+                    <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(171,50,42,0.05)]">
+                      <div className="text-sm font-medium text-[#3d3435] mb-2">销量汇总</div>
+                      <div className="text-lg font-bold text-[#0c0c0c]">
                         {skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing +
                          skuFentang + skuHundun + skuXiaomizhou + skuDoujiang + skuJidantang +
                          skuMixianSuSanxian + skuMixianSuSuancai + skuMixianSuMala +
@@ -1460,8 +1432,8 @@ function RecordPageContent() {
                   </div>
 
                   {/* 鼓励语 */}
-                  <div className="mt-6 pt-4 border-t border-yellow-200">
-                    <div className="text-sm text-gray-600 italic">
+                  <div className="mt-12 pt-8">
+                    <div className="text-sm text-[#3d3435]">
                       🎊 今日辛苦了！数据已保存，明天继续加油！
                     </div>
                   </div>
@@ -1474,7 +1446,7 @@ function RecordPageContent() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full p-6 text-xl font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-3xl shadow-lg hover:shadow-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+            className="w-full p-6 text-xl font-semibold bg-[#ab322a] text-[#f2eada] rounded-full transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? "保存中..." : "✅ 保存今天的记录"}
           </button>
@@ -1492,25 +1464,25 @@ function RecordPageContent() {
       {/* 支出确认Modal */}
       {expenseConfirmModal.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-8 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-[0_8px_30px_rgb(171,50,42,0.05)]">
+            <h2 className="text-2xl font-bold mb-4 text-center text-[#0c0c0c]">
               确定记入吗？
             </h2>
-            <p className="text-xl text-center text-red-600 mb-6 font-semibold">
+            <p className="text-xl text-center text-[#ab322a] mb-6 font-semibold">
               提交后今日不可更改
             </p>
             <div className="flex gap-4">
               <button
                 type="button"
                 onClick={() => setExpenseConfirmModal({ isOpen: false, module: "raw" })}
-                className="flex-1 p-4 text-xl bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+                className="flex-1 p-4 text-xl bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95 font-medium"
               >
                 再想想
               </button>
               <button
                 type="button"
                 onClick={() => handleExpenseModuleSubmit(expenseConfirmModal.module)}
-                className="flex-1 p-4 text-xl bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium"
+                className="flex-1 p-4 text-xl bg-[#ab322a] text-[#f2eada] rounded-full transition-all active:scale-95 font-medium"
               >
                 确定
               </button>
@@ -1522,10 +1494,10 @@ function RecordPageContent() {
       {/* Toast 通知组件 */}
       {toast.show && (
         <div className="fixed top-4 right-4 z-50">
-          <div className={`px-6 py-3 rounded-lg shadow-lg text-white ${
+          <div className={`px-6 py-3 rounded-full shadow-[0_8px_30px_rgb(171,50,42,0.05)] text-white ${
             toast.type === 'success' ? 'bg-green-500' :
-            toast.type === 'error' ? 'bg-red-500' :
-            'bg-blue-500'
+            toast.type === 'error' ? 'bg-[#ab322a]' :
+            'bg-[#3d3435]'
           }`}>
             {toast.message}
           </div>
@@ -1535,25 +1507,25 @@ function RecordPageContent() {
       {/* 提交前确认对话框 */}
       {showConfirmDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-8 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-[0_8px_30px_rgb(171,50,42,0.05)]">
+            <h2 className="text-2xl font-bold mb-4 text-center text-[#0c0c0c]">
               请再次检查
             </h2>
-            <p className="text-xl text-center text-gray-600 mb-6">
+            <p className="text-xl text-center text-[#3d3435] mb-6">
               请再次检查是否当天数据都准确无误
             </p>
             <div className="flex gap-4">
               <button
                 type="button"
                 onClick={() => setShowConfirmDialog(false)}
-                className="flex-1 p-4 text-xl bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+                className="flex-1 p-4 text-xl bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95 font-medium"
               >
                 我再看看
               </button>
               <button
                 type="button"
                 onClick={handleConfirmSubmit}
-                className="flex-1 p-4 text-xl bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium"
+                className="flex-1 p-4 text-xl bg-[#ab322a] text-[#f2eada] rounded-full transition-all active:scale-95 font-medium"
               >
                 确认提交
               </button>
@@ -1565,15 +1537,15 @@ function RecordPageContent() {
       {/* 确认提交总收入对话框 */}
       {showTotalIncomeConfirmDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-8 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-[0_8px_30px_rgb(171,50,42,0.05)]">
+            <h2 className="text-2xl font-bold mb-4 text-center text-[#0c0c0c]">
               确认提交今日总收入
             </h2>
-            <p className="text-xl text-center text-red-600 mb-6 font-semibold">
+            <p className="text-xl text-center text-[#ab322a] mb-6 font-semibold">
               确认提交今日总收入，无法再修改
             </p>
             <div className="text-center mb-6">
-              <div className="text-3xl font-bold text-red-600">
+              <div className="text-3xl font-bold text-[#ab322a]">
                 ¥ {(
                   parseFloat(incomeWechat || "0") +
                   parseFloat(incomeAlipay || "0") +
@@ -1585,14 +1557,14 @@ function RecordPageContent() {
               <button
                 type="button"
                 onClick={() => setShowTotalIncomeConfirmDialog(false)}
-                className="flex-1 p-4 text-xl bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+                className="flex-1 p-4 text-xl bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95 font-medium"
               >
                 再想想
               </button>
               <button
                 type="button"
                 onClick={handleConfirmTotalIncome}
-                className="flex-1 p-4 text-xl bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium"
+                className="flex-1 p-4 text-xl bg-[#ab322a] text-[#f2eada] rounded-full transition-all active:scale-95 font-medium"
               >
                 确认
               </button>
