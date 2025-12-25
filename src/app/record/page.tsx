@@ -87,7 +87,7 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
               onChange(Math.max(0, numValue));
             }}
             disabled={disabled}
-            className={`w-full font-mono text-2xl font-bold text-center py-4 bg-white border-none focus:outline-none focus:border focus:border-[#ab322a] rounded-3xl transition-all text-[#0c0c0c] ${
+            className={`w-full font-mono text-2xl font-bold text-center py-4 bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 focus:outline-none focus:border-[#ab322a] rounded-2xl transition-all text-white ${
               disabled ? "opacity-50 cursor-not-allowed" : ""
             }`}
           />
@@ -942,9 +942,9 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full font-mono text-xl p-4 bg-white border-none rounded-3xl focus:outline-none focus:border focus:border-[#ab322a] transition-all text-[#0c0c0c] ${
+                  className={`w-full font-mono text-xl p-4 bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl focus:outline-none focus:border-[#ab322a] transition-all text-white ${
                     totalIncomeConfirmed
-                      ? "bg-gray-100 cursor-not-allowed opacity-60"
+                      ? "opacity-50 cursor-not-allowed"
                       : ""
                   }`}
                 />
@@ -965,9 +965,9 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full font-mono text-xl p-4 bg-white border-none rounded-3xl focus:outline-none focus:border focus:border-[#ab322a] transition-all text-[#0c0c0c] ${
+                  className={`w-full font-mono text-xl p-4 bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl focus:outline-none focus:border-[#ab322a] transition-all text-white ${
                     totalIncomeConfirmed
-                      ? "bg-gray-100 cursor-not-allowed opacity-60"
+                      ? "opacity-50 cursor-not-allowed"
                       : ""
                   }`}
                 />
@@ -988,9 +988,9 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full font-mono text-xl p-4 bg-white border-none rounded-3xl focus:outline-none focus:border focus:border-[#ab322a] transition-all text-[#0c0c0c] ${
+                  className={`w-full font-mono text-xl p-4 bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl focus:outline-none focus:border-[#ab322a] transition-all text-white ${
                     totalIncomeConfirmed
-                      ? "bg-gray-100 cursor-not-allowed opacity-60"
+                      ? "opacity-50 cursor-not-allowed"
                       : ""
                   }`}
                 />
@@ -1067,10 +1067,10 @@ function RecordPageContent() {
               </div>
               
               {/* 汇总显示 */}
-              <div className="bg-[#ab322a]/5 rounded-2xl py-3 px-4 mb-4">
+              <div className="bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl py-3 px-4 mb-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-[#0c0c0c]">饼类总计：</span>
-                  <span className="text-xl font-bold text-[#0c0c0c]">{salesTotals.bingTotal} 个</span>
+                  <span className="text-lg font-bold text-white">饼类总计：</span>
+                  <span className="text-xl font-bold text-white">{salesTotals.bingTotal} 个</span>
                 </div>
               </div>
 
@@ -1117,10 +1117,10 @@ function RecordPageContent() {
                   </div>
                   
                   {/* 汇总显示 */}
-                  <div className="bg-[#ab322a]/5 rounded-2xl py-3 px-4 mb-4">
+                  <div className="bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl py-3 px-4 mb-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold text-[#0c0c0c]">汤/粥类总计：</span>
-                      <span className="text-xl font-bold text-[#0c0c0c]">{salesTotals.tangTotal} 个</span>
+                      <span className="text-lg font-bold text-white">汤/粥类总计：</span>
+                      <span className="text-xl font-bold text-white">{salesTotals.tangTotal} 个</span>
                     </div>
                   </div>
 
@@ -1176,10 +1176,10 @@ function RecordPageContent() {
               </div>
 
               {/* 汇总显示 */}
-              <div className="bg-[#ab322a]/5 rounded-2xl py-3 px-4 mb-4">
+              <div className="bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl py-3 px-4 mb-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-[#0c0c0c]">米线/面类总计：</span>
-                  <span className="text-xl font-bold text-[#0c0c0c]">{salesTotals.mixianTotal} 个</span>
+                  <span className="text-lg font-bold text-white">米线/面类总计：</span>
+                  <span className="text-xl font-bold text-white">{salesTotals.mixianTotal} 个</span>
                 </div>
               </div>
 
@@ -1210,10 +1210,10 @@ function RecordPageContent() {
               </div>
               
               {/* 汇总显示 */}
-              <div className="bg-[#ab322a]/5 rounded-2xl py-3 px-4 mb-4">
+              <div className="bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl py-3 px-4 mb-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-[#0c0c0c]">炒面/炒河粉类总计：</span>
-                  <span className="text-xl font-bold text-[#0c0c0c]">{salesTotals.chaomianTotal} 个</span>
+                  <span className="text-lg font-bold text-white">炒面/炒河粉类总计：</span>
+                  <span className="text-xl font-bold text-white">{salesTotals.chaomianTotal} 个</span>
                 </div>
               </div>
 
@@ -1273,9 +1273,9 @@ function RecordPageContent() {
                             onChange={(e) => item.onChange(e.target.value)}
                             disabled={expenseModulesLocked.raw}
                             placeholder="0.00"
-                            className={`w-full font-mono text-xl p-3 bg-white border-none rounded-3xl focus:outline-none focus:border focus:border-[#ab322a] transition-all text-[#0c0c0c] ${
+                            className={`w-full font-mono text-xl p-3 bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl focus:outline-none focus:border-[#ab322a] transition-all text-white ${
                               expenseModulesLocked.raw
-                                ? "bg-gray-100 cursor-not-allowed opacity-60"
+                                ? "opacity-50 cursor-not-allowed"
                                 : ""
                             }`}
                           />
@@ -1285,9 +1285,11 @@ function RecordPageContent() {
 
                     {/* 原材料汇总显示 */}
                     <div className="mt-6 pt-6">
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold text-[#3d3435]">本类合计：</span>
-                        <span className="text-xl font-bold text-[#0c0c0c]">¥ {expenseTotals.rawTotal.toFixed(2)}</span>
+                      <div className="bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl py-3 px-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-lg font-bold text-white">本类合计：</span>
+                          <span className="text-xl font-bold text-white">¥ {expenseTotals.rawTotal.toFixed(2)}</span>
+                        </div>
                       </div>
                     </div>
 
@@ -1337,9 +1339,9 @@ function RecordPageContent() {
                             onChange={(e) => item.onChange(e.target.value)}
                             disabled={expenseModulesLocked.fixed}
                             placeholder="0.00"
-                            className={`w-full font-mono text-xl p-3 bg-white border-none rounded-3xl focus:outline-none focus:border focus:border-[#ab322a] transition-all text-[#0c0c0c] ${
+                            className={`w-full font-mono text-xl p-3 bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl focus:outline-none focus:border-[#ab322a] transition-all text-white ${
                               expenseModulesLocked.fixed
-                                ? "bg-gray-100 cursor-not-allowed opacity-60"
+                                ? "opacity-50 cursor-not-allowed"
                                 : ""
                             }`}
                           />
@@ -1349,9 +1351,11 @@ function RecordPageContent() {
 
                     {/* 固定费用汇总显示 */}
                     <div className="mt-6 pt-6">
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold text-[#3d3435]">本类合计：</span>
-                        <span className="text-xl font-bold text-[#0c0c0c]">¥ {expenseTotals.fixTotal.toFixed(2)}</span>
+                      <div className="bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl py-3 px-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-lg font-bold text-white">本类合计：</span>
+                          <span className="text-xl font-bold text-white">¥ {expenseTotals.fixTotal.toFixed(2)}</span>
+                        </div>
                       </div>
                     </div>
 
@@ -1390,7 +1394,7 @@ function RecordPageContent() {
                         value={expConsName}
                         onChange={(e) => setExpConsName(e.target.value)}
                         placeholder="请输入消耗品名称"
-                        className="w-full font-mono text-xl p-3 bg-white border-none rounded-3xl focus:outline-none focus:border focus:border-[#ab322a] transition-all text-[#0c0c0c]"
+                        className="w-full font-mono text-xl p-3 bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl focus:outline-none focus:border-[#ab322a] transition-all text-white"
                       />
                     </div>
 
@@ -1404,7 +1408,7 @@ function RecordPageContent() {
                         value={expConsAmount}
                         onChange={(e) => handleNumberChange(e.target.value, setExpConsAmount)}
                         placeholder="0.00"
-                        className="w-full font-mono text-xl p-3 bg-white border-none rounded-3xl focus:outline-none focus:border focus:border-[#ab322a] transition-all text-[#0c0c0c]"
+                        className="w-full font-mono text-xl p-3 bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl focus:outline-none focus:border-[#ab322a] transition-all text-white"
                       />
                     </div>
 
@@ -1438,9 +1442,11 @@ function RecordPageContent() {
 
                   {/* 消耗品汇总显示 */}
                   <div className="mt-6 pt-6">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold text-[#3d3435]">本类合计：</span>
-                      <span className="text-xl font-bold text-[#0c0c0c]">¥ {expenseTotals.consTotal.toFixed(2)}</span>
+                    <div className="bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl py-3 px-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-bold text-white">本类合计：</span>
+                        <span className="text-xl font-bold text-white">¥ {expenseTotals.consTotal.toFixed(2)}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -1464,9 +1470,11 @@ function RecordPageContent() {
                   </div>
                   {/* 消耗品汇总显示 */}
                   <div className="mt-3 pt-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-[#3d3435]">本类合计：</span>
-                      <span className="text-lg font-bold text-[#0c0c0c]">¥ {expenseTotals.consTotal.toFixed(2)}</span>
+                    <div className="bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl py-2 px-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-bold text-white">本类合计：</span>
+                        <span className="text-lg font-bold text-white">¥ {expenseTotals.consTotal.toFixed(2)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1533,7 +1541,7 @@ function RecordPageContent() {
                         value={expOtherName}
                         onChange={(e) => setExpOtherName(e.target.value)}
                         placeholder="请输入支出项目名称"
-                        className="w-full text-xl p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
+                        className="w-full font-mono text-xl p-3 bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl focus:outline-none focus:border-[#ab322a] transition-all text-white"
                       />
                     </div>
 
@@ -1547,16 +1555,18 @@ function RecordPageContent() {
                         value={expOtherAmount}
                         onChange={(e) => handleNumberChange(e.target.value, setExpOtherAmount)}
                         placeholder="0.00"
-                        className="w-full text-xl p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
+                        className="w-full font-mono text-xl p-3 bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl focus:outline-none focus:border-[#ab322a] transition-all text-white"
                       />
                     </div>
                   </div>
 
                   {/* 其他支出汇总显示 */}
-                  <div className="mt-4 pt-3 border-t-2 border-gray-200 bg-gray-50 rounded-lg p-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold text-[#0c0c0c]">本类合计：</span>
-                      <span className="text-xl font-bold text-[#0c0c0c]">¥ {expenseTotals.otherTotal.toFixed(2)}</span>
+                  <div className="mt-6 pt-6">
+                    <div className="bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl py-3 px-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-bold text-white">本类合计：</span>
+                        <span className="text-xl font-bold text-white">¥ {expenseTotals.otherTotal.toFixed(2)}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -1577,9 +1587,11 @@ function RecordPageContent() {
                   </div>
                   {/* 其他支出汇总显示 */}
                   <div className="mt-3 pt-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-[#3d3435]">本类合计：</span>
-                      <span className="text-lg font-bold text-[#0c0c0c]">¥ {expenseTotals.otherTotal.toFixed(2)}</span>
+                    <div className="bg-[#ab322a]/40 backdrop-blur-md border border-[#ab322a]/80 rounded-2xl py-2 px-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-bold text-white">本类合计：</span>
+                        <span className="text-lg font-bold text-white">¥ {expenseTotals.otherTotal.toFixed(2)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
