@@ -64,17 +64,17 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           type="button"
           onClick={handleDecrement}
           disabled={disabled}
-          className={`w-6 h-6 bg-red-50 text-[#ab322a] rounded-full flex items-center justify-center transition-all border-none ${
+          className={`w-8 h-8 bg-red-50 text-[#ab322a] rounded-full flex items-center justify-center transition-all border-none ${
             disabled
               ? "opacity-50 cursor-not-allowed"
               : "hover:bg-red-100 active:scale-95"
           }`}
         >
-          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" />
           </svg>
         </button>
-        <div className="flex-1 max-w-[140px]">
+        <div className="flex-1 max-w-[160px]">
           <input
             type={useStringValue ? "text" : "number"}
             inputMode={useStringValue ? "decimal" : undefined}
@@ -87,7 +87,7 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
               onChange(Math.max(0, numValue));
             }}
             disabled={disabled}
-            className={`w-full font-mono text-3xl font-bold text-center py-3 bg-white border-none focus:outline-none focus:ring-1 focus:ring-[#ab322a] rounded-3xl transition-all text-[#0c0c0c] ${
+            className={`w-full font-mono text-2xl font-bold text-center py-4 bg-white border-none focus:outline-none focus:ring-1 focus:ring-[#ab322a] rounded-3xl transition-all text-[#0c0c0c] ${
               disabled ? "opacity-50 cursor-not-allowed" : ""
             }`}
           />
@@ -96,13 +96,13 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           type="button"
           onClick={handleIncrement}
           disabled={disabled}
-          className={`w-6 h-6 bg-red-50 text-[#ab322a] rounded-full flex items-center justify-center transition-all border-none ${
+          className={`w-8 h-8 bg-red-50 text-[#ab322a] rounded-full flex items-center justify-center transition-all border-none ${
             disabled
               ? "opacity-50 cursor-not-allowed"
               : "hover:bg-red-100 active:scale-95"
           }`}
         >
-          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
         </button>
@@ -112,6 +112,130 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
 }
 
 function RecordPageContent() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const [todayDate, setTodayDate] = useState("");
+  
+  // 收入
+  const [incomeWechat, setIncomeWechat] = useState("");
+  const [incomeAlipay, setIncomeAlipay] = useState("");
+  const [incomeCash, setIncomeCash] = useState("");
+
+  // 销量状态 - 按产品分类定义
+  // 饼类产品
+  const [skuRoubing, setSkuRoubing] = useState(0);  // 肉饼
+  const [skuShouroubing, setSkuShouroubing] = useState(0);  // 瘦肉饼
+  const [skuChangdanbing, setSkuChangdanbing] = useState(0);  // 肠蛋饼
+  const [skuRoudanbing, setSkuRoudanbing] = useState(0);  // 肉蛋饼
+  const [skuDanbing, setSkuDanbing] = useState(0);  // 蛋饼
+  const [skuChangbing, setSkuChangbing] = useState(0);  // 肠饼
+
+  // 汤类(素)
+  const [skuFentang, setSkuFentang] = useState(0);  // 粉汤
+  const [skuHundun, setSkuHundun] = useState(0);  // 馄炖
+  const [skuXiaomizhou, setSkuXiaomizhou] = useState(0);  // 小米粥
+  const [skuDoujiang, setSkuDoujiang] = useState(0);  // 豆浆
+  const [skuJidantang, setSkuJidantang] = useState(0);  // 鸡蛋汤
+
+  // 【素】米线/面 - 精确分类
+  const [skuMixianSuSanxian, setSkuMixianSuSanxian] = useState(0);     // 【素】米线三鲜
+  const [skuMixianSuSuancai, setSkuMixianSuSuancai] = useState(0);     // 【素】米线酸菜
+  const [skuMixianSuMala, setSkuMixianSuMala] = useState(0);           // 【素】米线麻辣
+
+  // 【肉】米线/面 - 精确分类
+  const [skuMixianRouSanxian, setSkuMixianRouSanxian] = useState(0);   // 【肉】米线三鲜
+  const [skuMixianRouSuancai, setSkuMixianRouSuancai] = useState(0);   // 【肉】米线酸菜
+  const [skuMixianRouMala, setSkuMixianRouMala] = useState(0);         // 【肉】米线麻辣
+
+  // 酸辣粉
+  const [skuSuanlafen, setSkuSuanlafen] = useState(0);                 // 酸辣粉
+
+  // 炒面/炒河粉 - 精确分类
+  const [skuChaomianXiangcui, setSkuChaomianXiangcui] = useState(0);    // 香脆炒面
+  const [skuChaohufenKuan, setSkuChaohufenKuan] = useState(0);          // 【宽粉】炒河粉
+  const [skuChaohufenXi, setSkuChaohufenXi] = useState(0);              // 【细粉】炒河粉
+
+  // 保留旧字段用于兼容（如果需要）
+  const [skuBing, setSkuBing] = useState(0);
+  const [skuTangSu, setSkuTangSu] = useState(0);
+  const [skuMixianSu, setSkuMixianSu] = useState(0);
+  const [skuMixianRou, setSkuMixianRou] = useState(0);
+  const [skuChaomian, setSkuChaomian] = useState(0);
+
+  // 支出 - 四个模块的状态管理
+  // 原材料支出
+  const [expRawVeg, setExpRawVeg] = useState("");        // 蔬菜
+  const [expRawMeat, setExpRawMeat] = useState("");       // 肉类
+  const [expRawEgg, setExpRawEgg] = useState("");        // 鸡蛋
+  const [expRawNoodle, setExpRawNoodle] = useState("");     // 粉/面
+  const [expRawSpice, setExpRawSpice] = useState("");      // 调味品
+  const [expRawPack, setExpRawPack] = useState("");       // 包装
+
+  // 固定费用
+  const [expFixRent, setExpFixRent] = useState("");       // 房租
+  const [expFixUtility, setExpFixUtility] = useState("");    // 水电
+  const [expFixGas, setExpFixGas] = useState("");        // 煤气
+  const [expFixSalary, setExpFixSalary] = useState("");     // 工资
+
+  // 消耗品
+  const [expConsName, setExpConsName] = useState("");       // 消耗品名称
+  const [expConsAmount, setExpConsAmount] = useState("");     // 消耗品金额
+  const [expConsDuration, setExpConsDuration] = useState("");  // 使用时长
+
+  // 其他支出
+  const [expOtherName, setExpOtherName] = useState("");      // 其他支出名称
+  const [expOtherAmount, setExpOtherAmount] = useState("");    // 其他支出金额
+
+  // 支出
+  const [expenses, setExpenses] = useState<any[]>([]);
+
+  // 支出模态框
+  const [expenseModal, setExpenseModal] = useState<{
+    isOpen: boolean;
+    type: "material" | "fixed" | "equipment" | "other";
+  }>({ isOpen: false, type: "material" });
+
+  // 支出模块锁定状态
+  const [expenseModulesLocked, setExpenseModulesLocked] = useState({
+    raw: false,      // 原材料
+    fixed: false,    // 固定费用
+    cons: false,     // 消耗品
+    other: false     // 其他
+  });
+
+  // 支出确认Modal
+  const [expenseConfirmModal, setExpenseConfirmModal] = useState<{
+    isOpen: boolean;
+    module: "raw" | "fixed" | "cons" | "other";
+  }>({ isOpen: false, module: "raw" });
+
+  // 成功提示
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  // 提交前确认对话框
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  // 收入保存状态
+  const [incomeSaved, setIncomeSaved] = useState(false);
+  const [incomeSavedMessage, setIncomeSavedMessage] = useState(false);
+  // 总收入确认提交状态
+  const [totalIncomeConfirmed, setTotalIncomeConfirmed] = useState(false);
+  const [showTotalIncomeConfirmDialog, setShowTotalIncomeConfirmDialog] = useState(false);
+
+  // Toast 通知状态
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error' | 'info';
+  }>({ show: false, message: '', type: 'info' });
+
+  // 显示 Toast 通知
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => {
+      setToast({ show: false, message: '', type: 'info' });
+    }, 4000); // 4秒后自动消失
+  };
+
   // 支出模态框组件
   function ExpenseModal({ isOpen, onClose, type, onSubmit }: {
     isOpen: boolean;
@@ -307,129 +431,6 @@ function RecordPageContent() {
       </div>
     );
   }
-  const { user } = useAuth();
-  const router = useRouter();
-  const [todayDate, setTodayDate] = useState("");
-  
-  // 收入
-  const [incomeWechat, setIncomeWechat] = useState("");
-  const [incomeAlipay, setIncomeAlipay] = useState("");
-  const [incomeCash, setIncomeCash] = useState("");
-
-  // 销量状态 - 按产品分类定义
-  // 饼类产品
-  const [skuRoubing, setSkuRoubing] = useState(0);  // 肉饼
-  const [skuShouroubing, setSkuShouroubing] = useState(0);  // 瘦肉饼
-  const [skuChangdanbing, setSkuChangdanbing] = useState(0);  // 肠蛋饼
-  const [skuRoudanbing, setSkuRoudanbing] = useState(0);  // 肉蛋饼
-  const [skuDanbing, setSkuDanbing] = useState(0);  // 蛋饼
-  const [skuChangbing, setSkuChangbing] = useState(0);  // 肠饼
-
-  // 汤类(素)
-  const [skuFentang, setSkuFentang] = useState(0);  // 粉汤
-  const [skuHundun, setSkuHundun] = useState(0);  // 馄炖
-  const [skuXiaomizhou, setSkuXiaomizhou] = useState(0);  // 小米粥
-  const [skuDoujiang, setSkuDoujiang] = useState(0);  // 豆浆
-  const [skuJidantang, setSkuJidantang] = useState(0);  // 鸡蛋汤
-
-  // 【素】米线/面 - 精确分类
-  const [skuMixianSuSanxian, setSkuMixianSuSanxian] = useState(0);     // 【素】米线三鲜
-  const [skuMixianSuSuancai, setSkuMixianSuSuancai] = useState(0);     // 【素】米线酸菜
-  const [skuMixianSuMala, setSkuMixianSuMala] = useState(0);           // 【素】米线麻辣
-
-  // 【肉】米线/面 - 精确分类
-  const [skuMixianRouSanxian, setSkuMixianRouSanxian] = useState(0);   // 【肉】米线三鲜
-  const [skuMixianRouSuancai, setSkuMixianRouSuancai] = useState(0);   // 【肉】米线酸菜
-  const [skuMixianRouMala, setSkuMixianRouMala] = useState(0);         // 【肉】米线麻辣
-
-  // 酸辣粉
-  const [skuSuanlafen, setSkuSuanlafen] = useState(0);                 // 酸辣粉
-
-  // 炒面/炒河粉 - 精确分类
-  const [skuChaomianXiangcui, setSkuChaomianXiangcui] = useState(0);    // 香脆炒面
-  const [skuChaohufenKuan, setSkuChaohufenKuan] = useState(0);          // 【宽粉】炒河粉
-  const [skuChaohufenXi, setSkuChaohufenXi] = useState(0);              // 【细粉】炒河粉
-
-  // 保留旧字段用于兼容（如果需要）
-  const [skuBing, setSkuBing] = useState(0);
-  const [skuTangSu, setSkuTangSu] = useState(0);
-  const [skuMixianSu, setSkuMixianSu] = useState(0);
-  const [skuMixianRou, setSkuMixianRou] = useState(0);
-  const [skuChaomian, setSkuChaomian] = useState(0);
-
-  // 支出 - 四个模块的状态管理
-  // 原材料支出
-  const [expRawVeg, setExpRawVeg] = useState("");        // 蔬菜
-  const [expRawMeat, setExpRawMeat] = useState("");       // 肉类
-  const [expRawEgg, setExpRawEgg] = useState("");        // 鸡蛋
-  const [expRawNoodle, setExpRawNoodle] = useState("");     // 粉/面
-  const [expRawSpice, setExpRawSpice] = useState("");      // 调味品
-  const [expRawPack, setExpRawPack] = useState("");       // 包装
-
-  // 固定费用
-  const [expFixRent, setExpFixRent] = useState("");       // 房租
-  const [expFixUtility, setExpFixUtility] = useState("");    // 水电
-  const [expFixGas, setExpFixGas] = useState("");        // 煤气
-  const [expFixSalary, setExpFixSalary] = useState("");     // 工资
-
-  // 消耗品
-  const [expConsName, setExpConsName] = useState("");       // 消耗品名称
-  const [expConsAmount, setExpConsAmount] = useState("");     // 消耗品金额
-  const [expConsDuration, setExpConsDuration] = useState("");  // 使用时长
-
-  // 其他支出
-  const [expOtherName, setExpOtherName] = useState("");      // 其他支出名称
-  const [expOtherAmount, setExpOtherAmount] = useState("");    // 其他支出金额
-
-  // 支出
-  const [expenses, setExpenses] = useState<any[]>([]);
-
-  // 支出模态框
-  const [expenseModal, setExpenseModal] = useState<{
-    isOpen: boolean;
-    type: "material" | "fixed" | "equipment" | "other";
-  }>({ isOpen: false, type: "material" });
-
-  // 支出模块锁定状态
-  const [expenseModulesLocked, setExpenseModulesLocked] = useState({
-    raw: false,      // 原材料
-    fixed: false,    // 固定费用
-    cons: false,     // 消耗品
-    other: false     // 其他
-  });
-
-  // 支出确认Modal
-  const [expenseConfirmModal, setExpenseConfirmModal] = useState<{
-    isOpen: boolean;
-    module: "raw" | "fixed" | "cons" | "other";
-  }>({ isOpen: false, module: "raw" });
-
-  // 成功提示
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  // 提交前确认对话框
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  // 收入保存状态
-  const [incomeSaved, setIncomeSaved] = useState(false);
-  const [incomeSavedMessage, setIncomeSavedMessage] = useState(false);
-  // 总收入确认提交状态
-  const [totalIncomeConfirmed, setTotalIncomeConfirmed] = useState(false);
-  const [showTotalIncomeConfirmDialog, setShowTotalIncomeConfirmDialog] = useState(false);
-
-  // Toast 通知状态
-  const [toast, setToast] = useState<{
-    show: boolean;
-    message: string;
-    type: 'success' | 'error' | 'info';
-  }>({ show: false, message: '', type: 'info' });
-
-  // 显示 Toast 通知
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
-    setToast({ show: true, message, type });
-    setTimeout(() => {
-      setToast({ show: false, message: '', type: 'info' });
-    }, 4000); // 4秒后自动消失
-  };
 
   // 数值输入校验函数
   const handleNumberChange = (value: string, setter: (value: string) => void) => {
