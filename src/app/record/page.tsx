@@ -315,7 +315,6 @@ function RecordPageContent() {
   const [skuXiaomizhou, setSkuXiaomizhou] = useState(0);  // 小米粥
   const [skuDoujiang, setSkuDoujiang] = useState(0);  // 豆浆
   const [skuJidantang, setSkuJidantang] = useState(0);  // 鸡蛋汤
-  const [skuSanxiantang, setSkuSanxiantang] = useState(0);  // 三鲜汤
 
   // 【素】米线/面 - 精确分类
   const [skuMixianSuSanxian, setSkuMixianSuSanxian] = useState(0);     // 【素】米线三鲜
@@ -427,7 +426,7 @@ function RecordPageContent() {
     // 检查是否有销量数据
     const hasSalesData =
       skuRoubing > 0 || skuShouroubing > 0 || skuChangdanbing > 0 || skuRoudanbing > 0 || skuDanbing > 0 || skuChangbing > 0 ||
-      skuFentang > 0 || skuHundun > 0 || skuXiaomizhou > 0 || skuDoujiang > 0 || skuJidantang > 0 || skuSanxiantang > 0 ||
+      skuFentang > 0 || skuHundun > 0 || skuXiaomizhou > 0 || skuDoujiang > 0 || skuJidantang > 0 ||
       skuMixianSuSanxian > 0 || skuMixianSuSuancai > 0 || skuMixianSuMala > 0 ||
       skuMixianRouSanxian > 0 || skuMixianRouSuancai > 0 || skuMixianRouMala > 0 ||
       skuSuanlafen > 0 ||
@@ -463,7 +462,7 @@ function RecordPageContent() {
       // 检查是否有销量数据
       const hasSalesData =
         skuRoubing > 0 || skuShouroubing > 0 || skuChangdanbing > 0 || skuRoudanbing > 0 || skuDanbing > 0 || skuChangbing > 0 ||
-        skuFentang > 0 || skuHundun > 0 || skuXiaomizhou > 0 || skuDoujiang > 0 || skuJidantang > 0 || skuSanxiantang > 0 ||
+        skuFentang > 0 || skuHundun > 0 || skuXiaomizhou > 0 || skuDoujiang > 0 || skuJidantang > 0 ||
         skuMixianSuSanxian > 0 || skuMixianSuSuancai > 0 || skuMixianSuMala > 0 ||
         skuMixianRouSanxian > 0 || skuMixianRouSuancai > 0 || skuMixianRouMala > 0 ||
         skuSuanlafen > 0 ||
@@ -488,10 +487,9 @@ function RecordPageContent() {
             // 汤类(素)
             sku_fentang: skuFentang,
             sku_hundun: skuHundun,
-            sku_xiaomizhou: skuXiaomizhou,
+            sku_mizhou: skuXiaomizhou,  // 小米粥
             sku_doujiang: skuDoujiang,
             sku_jidantang: skuJidantang,
-            sku_sanxiantang: skuSanxiantang,
             // 【素】米线/面 - 精确分类
             sku_mixian_su_sanxian: skuMixianSuSanxian,
             sku_mixian_su_suancai: skuMixianSuSuancai,
@@ -548,7 +546,7 @@ function RecordPageContent() {
       setIncomeCash("");
       // 清空所有销量
       setSkuRoubing(0); setSkuShouroubing(0); setSkuChangdanbing(0); setSkuRoudanbing(0); setSkuDanbing(0); setSkuChangbing(0);
-      setSkuFentang(0); setSkuHundun(0); setSkuXiaomizhou(0); setSkuDoujiang(0); setSkuJidantang(0); setSkuSanxiantang(0);
+      setSkuFentang(0); setSkuHundun(0); setSkuXiaomizhou(0); setSkuDoujiang(0); setSkuJidantang(0);
       setSkuMixianSuSanxian(0); setSkuMixianSuSuancai(0); setSkuMixianSuMala(0);
       setSkuMixianRouSanxian(0); setSkuMixianRouSuancai(0); setSkuMixianRouMala(0);
       setSkuSuanlafen(0);
@@ -733,6 +731,37 @@ function RecordPageContent() {
               </div>
             </div>
 
+            {/* 汤粥类产品卡片 */}
+            {(() => {
+              const soupItems = [
+                { label: "粉汤", value: skuFentang, onChange: setSkuFentang },
+                { label: "馄炖", value: skuHundun, onChange: setSkuHundun },
+                { label: "小米粥", value: skuXiaomizhou, onChange: setSkuXiaomizhou },
+                { label: "豆浆", value: skuDoujiang, onChange: setSkuDoujiang },
+                { label: "鸡蛋汤", value: skuJidantang, onChange: setSkuJidantang },
+              ];
+
+              return (
+                <div className="bg-white rounded-xl p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <div className="w-1 h-6 bg-green-400 rounded-full mr-3"></div>
+                    <h3 className="text-lg font-bold text-gray-800">汤/粥类</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    {soupItems.map((item) => (
+                      <SkuInput
+                        key={item.label}
+                        label={item.label}
+                        value={item.value}
+                        onChange={item.onChange}
+                        disabled={totalIncomeConfirmed}
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* 米线/面类产品卡片 */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center mb-4">
@@ -779,22 +808,6 @@ function RecordPageContent() {
                 <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed} />
                 <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={totalIncomeConfirmed} />
                 <SkuInput label="【细粉】炒河粉" value={skuChaohufenXi} onChange={setSkuChaohufenXi} disabled={totalIncomeConfirmed} />
-              </div>
-            </div>
-
-            {/* 汤粥类产品卡片 */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="w-1 h-6 bg-green-400 rounded-full mr-3"></div>
-                <h3 className="text-lg font-bold text-gray-800">汤粥类</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <SkuInput label="粉汤" value={skuFentang} onChange={setSkuFentang} disabled={totalIncomeConfirmed} />
-                <SkuInput label="馄炖" value={skuHundun} onChange={setSkuHundun} disabled={totalIncomeConfirmed} />
-                <SkuInput label="小米粥" value={skuXiaomizhou} onChange={setSkuXiaomizhou} disabled={totalIncomeConfirmed} />
-                <SkuInput label="豆浆" value={skuDoujiang} onChange={setSkuDoujiang} disabled={totalIncomeConfirmed} />
-                <SkuInput label="鸡蛋汤" value={skuJidantang} onChange={setSkuJidantang} disabled={totalIncomeConfirmed} />
-                <SkuInput label="三鲜汤" value={skuSanxiantang} onChange={setSkuSanxiantang} disabled={totalIncomeConfirmed} />
               </div>
             </div>
           </div>
