@@ -100,7 +100,6 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
             min="0"
             value={inputValue}
             onChange={handleInputChange}
-            onBlur={handleBlur}
             disabled={disabled}
             className="w-full font-mono text-xl font-bold text-center py-3 rounded-lg transition-all text-[#1a1a1a] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none border"
             style={{
