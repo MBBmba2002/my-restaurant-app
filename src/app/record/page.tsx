@@ -590,39 +590,40 @@ function RecordPageContent() {
       // 根据模块类型设置不同的字段
       switch (module) {
         case "raw":
-          expenseData.exp_raw_veg = parseFloat(expRawVeg || "0");
-          expenseData.exp_raw_meat = parseFloat(expRawMeat || "0");
-          expenseData.exp_raw_egg = parseFloat(expRawEgg || "0");
-          expenseData.exp_raw_noodle = parseFloat(expRawNoodle || "0");
-          expenseData.exp_raw_spice = parseFloat(expRawSpice || "0");
-          expenseData.exp_raw_pack = parseFloat(expRawPack || "0");
-          expenseData.total_expense_raw = expenseTotals.rawTotal;
+          expenseData.exp_raw_veg = Number(expRawVeg) || 0;
+          expenseData.exp_raw_meat = Number(expRawMeat) || 0;
+          expenseData.exp_raw_egg = Number(expRawEgg) || 0;
+          expenseData.exp_raw_noodle = Number(expRawNoodle) || 0;
+          expenseData.exp_raw_spice = Number(expRawSpice) || 0;
+          expenseData.exp_raw_pack = Number(expRawPack) || 0;
+          expenseData.total_expense_raw = Number(expenseTotals.rawTotal) || 0;
           break;
         case "fixed":
-          expenseData.exp_fix_rent = parseFloat(expFixRent || "0");
-          expenseData.exp_fix_utility = parseFloat(expFixUtility || "0");
-          expenseData.exp_fix_gas = parseFloat(expFixGas || "0");
-          expenseData.exp_fix_salary = parseFloat(expFixSalary || "0");
-          expenseData.total_expense_fix = expenseTotals.fixTotal;
+          expenseData.exp_fix_rent = Number(expFixRent) || 0;
+          expenseData.exp_fix_utility = Number(expFixUtility) || 0;
+          expenseData.exp_fix_gas = Number(expFixGas) || 0;
+          expenseData.exp_fix_salary = Number(expFixSalary) || 0;
+          expenseData.total_expense_fix = Number(expenseTotals.fixTotal) || 0;
           break;
         case "cons":
-          expenseData.exp_cons_name = expConsName;
-          expenseData.exp_cons_amount = parseFloat(expConsAmount || "0");
-          expenseData.exp_cons_duration = expConsDuration;
-          expenseData.total_expense_cons = expenseTotals.consTotal;
+          expenseData.exp_cons_name = expConsName || null;
+          expenseData.exp_cons_amount = Number(expConsAmount) || 0;
+          expenseData.exp_cons_duration = expConsDuration || null;
+          expenseData.total_expense_cons = Number(expenseTotals.consTotal) || 0;
           break;
         case "other":
-          expenseData.exp_other_name = expOtherName;
-          expenseData.exp_other_amount = parseFloat(expOtherAmount || "0");
-          expenseData.total_expense_other = expenseTotals.otherTotal;
+          expenseData.exp_other_name = expOtherName || null;
+          expenseData.exp_other_amount = Number(expOtherAmount) || 0;
+          expenseData.total_expense_other = Number(expenseTotals.otherTotal) || 0;
           break;
       }
 
       // 更新当日总支出
-      expenseData.total_daily_expense = expenseTotals.grandTotal;
+      expenseData.total_daily_expense = Number(expenseTotals.grandTotal) || 0;
 
       // 插入或更新支出记录
-      console.log('[save expense] payload keys', Object.keys(expenseData), expenseData);
+      console.log('[save] table=daily_records payload', expenseData);
+      console.log('[save] table=daily_records payload keys', Object.keys(expenseData));
       const { error, data } = await supabase
         .from("daily_records")
         .upsert(expenseData, {
@@ -631,19 +632,19 @@ function RecordPageContent() {
         });
 
       if (error) {
-        console.error('[save expense] error', error);
-        console.error('[save expense] error.message', error.message);
-        console.error('[save expense] error.details', error.details);
-        console.error('[save expense] error.hint', error.hint);
-        console.error('[save expense] error.code', error.code);
-        const errorMsg = `保存支出失败：${error.message}${error.details ? ` | ${JSON.stringify(error.details)}` : ''}${error.hint ? ` | ${error.hint}` : ''}${error.code ? ` | Code: ${error.code}` : ''}`;
+        console.error('[save] table=daily_records error', error);
+        console.error('[save] error.message', error.message);
+        console.error('[save] error.code', error.code);
+        console.error('[save] error.details', error.details);
+        console.error('[save] error.hint', error.hint);
+        const errorMsg = `保存支出失败：${error.message}${error.code ? ` (Code: ${error.code})` : ''}${error.details ? ` | Details: ${JSON.stringify(error.details)}` : ''}${error.hint ? ` | Hint: ${error.hint}` : ''}`;
         showToast(errorMsg, "error");
         // 失败时重置保存状态，保持弹窗打开
         setExpenseModulesSaving(prev => ({ ...prev, [module]: false }));
         return;
       }
       
-      console.log('[save expense] success', data);
+      console.log('[save] table=daily_records success', data);
 
       // 更新锁定状态并保存到localStorage
       const newLocks = { ...expenseModulesLocked, [module]: true };
@@ -700,42 +701,43 @@ function RecordPageContent() {
       // 根据模块类型设置不同的字段
       switch (module) {
         case "bing":
-          salesData.sku_roubing = skuRoubing;
-          salesData.sku_shouroubing = skuShouroubing;
-          salesData.sku_changdanbing = skuChangdanbing;
-          salesData.sku_roudanbing = skuRoudanbing;
-          salesData.sku_danbing = skuDanbing;
-          salesData.sku_changbing = skuChangbing;
+          salesData.sku_roubing = Number(skuRoubing) || 0;
+          salesData.sku_shouroubing = Number(skuShouroubing) || 0;
+          salesData.sku_changdanbing = Number(skuChangdanbing) || 0;
+          salesData.sku_roudanbing = Number(skuRoudanbing) || 0;
+          salesData.sku_danbing = Number(skuDanbing) || 0;
+          salesData.sku_changbing = Number(skuChangbing) || 0;
           // Removed total_bing_count - column doesn't exist in database
           break;
         case "tang":
-          salesData.sku_fentang = skuFentang;
-          salesData.sku_hundun = skuHundun;
-          salesData.sku_mizhou = skuXiaomizhou;
-          salesData.sku_doujiang = skuDoujiang;
-          salesData.sku_jidantang = skuJidantang;
-          salesData.total_tang_count = salesTotals.tangTotal;
+          salesData.sku_fentang = Number(skuFentang) || 0;
+          salesData.sku_hundun = Number(skuHundun) || 0;
+          salesData.sku_mizhou = Number(skuXiaomizhou) || 0;
+          salesData.sku_doujiang = Number(skuDoujiang) || 0;
+          salesData.sku_jidantang = Number(skuJidantang) || 0;
+          salesData.total_tang_count = Number(salesTotals.tangTotal) || 0;
           break;
         case "mixian":
-          salesData.sku_mixian_su_sanxian = skuMixianSuSanxian;
-          salesData.sku_mixian_su_suancai = skuMixianSuSuancai;
-          salesData.sku_mixian_su_mala = skuMixianSuMala;
-          salesData.sku_mixian_rou_sanxian = skuMixianRouSanxian;
-          salesData.sku_mixian_rou_suancai = skuMixianRouSuancai;
-          salesData.sku_mixian_rou_mala = skuMixianRouMala;
-          salesData.sku_suanlafen = skuSuanlafen;
-          salesData.total_mixian_count = salesTotals.mixianTotal;
+          salesData.sku_mixian_su_sanxian = Number(skuMixianSuSanxian) || 0;
+          salesData.sku_mixian_su_suancai = Number(skuMixianSuSuancai) || 0;
+          salesData.sku_mixian_su_mala = Number(skuMixianSuMala) || 0;
+          salesData.sku_mixian_rou_sanxian = Number(skuMixianRouSanxian) || 0;
+          salesData.sku_mixian_rou_suancai = Number(skuMixianRouSuancai) || 0;
+          salesData.sku_mixian_rou_mala = Number(skuMixianRouMala) || 0;
+          salesData.sku_suanlafen = Number(skuSuanlafen) || 0;
+          salesData.total_mixian_count = Number(salesTotals.mixianTotal) || 0;
           break;
         case "chaomian":
-          salesData.sku_chaomian_xiangcui = skuChaomianXiangcui;
-          salesData.sku_chaohefen_kuan = skuChaohufenKuan;
-          salesData.sku_chaohefen_xi = skuChaohufenXi;
-          salesData.total_chaomian_count = salesTotals.chaomianTotal;
+          salesData.sku_chaomian_xiangcui = Number(skuChaomianXiangcui) || 0;
+          salesData.sku_chaohefen_kuan = Number(skuChaohufenKuan) || 0;
+          salesData.sku_chaohefen_xi = Number(skuChaohufenXi) || 0;
+          salesData.total_chaomian_count = Number(salesTotals.chaomianTotal) || 0;
           break;
       }
 
       // 插入或更新销量记录
-      console.log('[save sales] payload keys', Object.keys(salesData), salesData);
+      console.log('[save] table=daily_records payload', salesData);
+      console.log('[save] table=daily_records payload keys', Object.keys(salesData));
       const { error, data } = await supabase
         .from("daily_records")
         .upsert(salesData, {
@@ -744,17 +746,17 @@ function RecordPageContent() {
         });
 
       if (error) {
-        console.error('[save sales] error', error);
-        console.error('[save sales] error.message', error.message);
-        console.error('[save sales] error.details', error.details);
-        console.error('[save sales] error.hint', error.hint);
-        console.error('[save sales] error.code', error.code);
-        const errorMsg = `保存销量失败：${error.message}${error.details ? ` | ${JSON.stringify(error.details)}` : ''}${error.hint ? ` | ${error.hint}` : ''}${error.code ? ` | Code: ${error.code}` : ''}`;
+        console.error('[save] table=daily_records error', error);
+        console.error('[save] error.message', error.message);
+        console.error('[save] error.code', error.code);
+        console.error('[save] error.details', error.details);
+        console.error('[save] error.hint', error.hint);
+        const errorMsg = `保存销量失败：${error.message}${error.code ? ` (Code: ${error.code})` : ''}${error.details ? ` | Details: ${JSON.stringify(error.details)}` : ''}${error.hint ? ` | Hint: ${error.hint}` : ''}`;
         showToast(errorMsg, "error");
         return;
       }
       
-      console.log('[save sales] success', data);
+      console.log('[save] table=daily_records success', data);
 
       // 更新保存状态
       setSalesModulesSaved(prev => ({ ...prev, [module]: true }));
@@ -902,24 +904,25 @@ function RecordPageContent() {
             sku_chaomian: skuChaomian,
           };
         
-        console.log('[save record] payload keys', Object.keys(recordData), recordData);
+        console.log('[save] table=daily_records payload', recordData);
+        console.log('[save] table=daily_records payload keys', Object.keys(recordData));
         const { error: recordError, data: recordDataResult } = await supabase
           .from("daily_records")
           .insert(recordData);
 
         if (recordError) {
-          console.error('[save record] error', recordError);
-          console.error('[save record] error.message', recordError.message);
-          console.error('[save record] error.details', recordError.details);
-          console.error('[save record] error.hint', recordError.hint);
-          console.error('[save record] error.code', recordError.code);
-          const errorMsg = `保存失败：${recordError.message}${recordError.details ? ` | ${JSON.stringify(recordError.details)}` : ''}${recordError.hint ? ` | ${recordError.hint}` : ''}${recordError.code ? ` | Code: ${recordError.code}` : ''}`;
+          console.error('[save] table=daily_records error', recordError);
+          console.error('[save] error.message', recordError.message);
+          console.error('[save] error.code', recordError.code);
+          console.error('[save] error.details', recordError.details);
+          console.error('[save] error.hint', recordError.hint);
+          const errorMsg = `保存失败：${recordError.message}${recordError.code ? ` (Code: ${recordError.code})` : ''}${recordError.details ? ` | Details: ${JSON.stringify(recordError.details)}` : ''}${recordError.hint ? ` | Hint: ${recordError.hint}` : ''}`;
           showToast(errorMsg, "error");
           setSubmitting(false);
           return;
         }
         
-        console.log('[save record] success', recordDataResult);
+        console.log('[save] table=daily_records success', recordDataResult);
       }
 
       // 为每条支出创建记录
@@ -933,24 +936,25 @@ function RecordPageContent() {
           usage_duration: expense.usage_duration || null,
         };
         
-        console.log('[save expense record] payload keys', Object.keys(expenseRecordData), expenseRecordData);
+        console.log('[save] table=daily_records payload', expenseRecordData);
+        console.log('[save] table=daily_records payload keys', Object.keys(expenseRecordData));
         const { error: expenseError, data: expenseRecordResult } = await supabase
           .from("daily_records")
           .insert(expenseRecordData);
 
         if (expenseError) {
-          console.error('[save expense record] error', expenseError);
-          console.error('[save expense record] error.message', expenseError.message);
-          console.error('[save expense record] error.details', expenseError.details);
-          console.error('[save expense record] error.hint', expenseError.hint);
-          console.error('[save expense record] error.code', expenseError.code);
-          const errorMsg = `保存支出失败：${expenseError.message}${expenseError.details ? ` | ${JSON.stringify(expenseError.details)}` : ''}${expenseError.hint ? ` | ${expenseError.hint}` : ''}${expenseError.code ? ` | Code: ${expenseError.code}` : ''}`;
+          console.error('[save] table=daily_records error', expenseError);
+          console.error('[save] error.message', expenseError.message);
+          console.error('[save] error.code', expenseError.code);
+          console.error('[save] error.details', expenseError.details);
+          console.error('[save] error.hint', expenseError.hint);
+          const errorMsg = `保存支出失败：${expenseError.message}${expenseError.code ? ` (Code: ${expenseError.code})` : ''}${expenseError.details ? ` | Details: ${JSON.stringify(expenseError.details)}` : ''}${expenseError.hint ? ` | Hint: ${expenseError.hint}` : ''}`;
           showToast(errorMsg, "error");
           setSubmitting(false);
           return;
         }
         
-        console.log('[save expense record] success', expenseRecordResult);
+        console.log('[save] table=daily_records success', expenseRecordResult);
       }
 
       // 成功，清空表单
