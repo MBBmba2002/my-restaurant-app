@@ -10,14 +10,14 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace("/login/");
+      router.push("/login");
     }
   }, [user, loading, router]);
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-zinc-600 dark:text-zinc-400">加载中...</div>
+      <div className="min-h-screen bg-[#f2eada] flex items-center justify-center">
+        <div className="text-[#0c0c0c] text-xl">加载中...</div>
       </div>
     );
   }
@@ -28,4 +28,3 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>;
 }
-

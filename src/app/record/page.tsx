@@ -805,7 +805,7 @@ function RecordPageContent() {
             <h2 className="text-2xl font-bold mb-6 tracking-tight text-gray-800">💰 今日收入</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-3 text-gray-500">
+                <label className="block text-xl font-bold mb-3 text-[#0c0c0c]">
                   微信
                 </label>
                 <input
@@ -828,7 +828,7 @@ function RecordPageContent() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-3 text-gray-500">
+                <label className="block text-xl font-bold mb-3 text-[#0c0c0c]">
                   支付宝
                 </label>
                 <input
@@ -851,7 +851,7 @@ function RecordPageContent() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-3 text-gray-500">
+                <label className="block text-xl font-bold mb-3 text-[#0c0c0c]">
                   现金
                 </label>
                 <input
@@ -880,12 +880,12 @@ function RecordPageContent() {
                   type="button"
                   onClick={handleSaveIncome}
                   disabled={totalIncomeConfirmed}
-                  className={`w-full p-4 text-lg font-semibold rounded-2xl transition-all active:scale-95 ${
+                  className={`w-full p-4 text-lg font-bold rounded-2xl transition-all active:scale-95 ${
                     totalIncomeConfirmed
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                       : incomeSavedMessage
                       ? "bg-green-500 text-white shadow-lg"
-                      : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg hover:shadow-xl"
+                      : "bg-gradient-to-r from-[#ffcc00] via-[#ffd633] to-[#ffcc00] text-[#0c0c0c] shadow-lg hover:shadow-xl"
                   }`}
                 >
                   {incomeSavedMessage ? "✅ 已保存" : "💾 保存"}
@@ -893,11 +893,11 @@ function RecordPageContent() {
               </div>
 
               {/* 今日总收入显示 */}
-              <div className="mt-4 pt-4 border-t-2 border-red-200">
-                <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg p-5 shadow-sm">
+              <div className="mt-4 pt-4 border-t-2 border-[#ab322a]/20">
+                <div className="bg-gradient-to-r from-[#ab322a]/50 via-[#ab322a]/60 to-[#ab322a]/50 rounded-2xl p-6 shadow-lg backdrop-blur-sm">
                   <div className="text-center">
-                    <div className="flex items-center justify-center gap-3 mb-2">
-                      <div className="text-xl font-semibold text-gray-700">
+                    <div className="flex items-center justify-center gap-3 mb-3">
+                      <div className="text-xl font-bold text-[#f2eada]">
                         今日总收入
                       </div>
                       {totalIncomeConfirmed && (
@@ -906,7 +906,7 @@ function RecordPageContent() {
                         </span>
                       )}
                     </div>
-                    <div className="text-4xl font-bold text-red-600 mb-3">
+                    <div className="text-5xl font-bold text-[#f2eada] mb-4">
                       ¥ {(
                         parseFloat(incomeWechat || "0") +
                         parseFloat(incomeAlipay || "0") +
@@ -917,7 +917,7 @@ function RecordPageContent() {
                       <button
                         type="button"
                         onClick={() => setShowTotalIncomeConfirmDialog(true)}
-                        className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
+                        className="px-8 py-4 bg-[#1661ab] text-[#f2eada] text-lg font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
                       >
                         🔒 确认提交总收入
                       </button>
