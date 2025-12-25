@@ -11,10 +11,9 @@ export default function HomePage() {
     // This works in both static export and regular Next.js
     if (typeof window !== "undefined" && !redirected) {
       setRedirected(true);
-      // Use absolute path to ensure it works on GitHub Pages
-      const basePath = window.location.pathname.split('/').slice(0, -1).join('/') || '';
-      const targetPath = `${basePath}/record/`;
-      window.location.href = targetPath;
+      // Use basePath-aware redirect
+      const basePath = "/my-restaurant-app";
+      window.location.href = `${basePath}/record/`;
     }
   }, [redirected]);
 
