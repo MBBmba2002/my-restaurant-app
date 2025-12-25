@@ -64,13 +64,15 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           type="button"
           onClick={handleDecrement}
           disabled={disabled}
-          className={`w-12 h-12 text-2xl font-bold bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition-all ${
+          className={`w-10 h-10 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center transition-all ${
             disabled
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-gray-300 active:scale-95 active:bg-gray-400"
+              : "hover:bg-gray-300 active:scale-95 shadow-sm"
           }`}
         >
-          -
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+          </svg>
         </button>
         <div className="flex-1 max-w-[90px]">
           <input
@@ -85,7 +87,7 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
               onChange(Math.max(0, numValue));
             }}
             disabled={disabled}
-            className={`w-full text-xl font-bold text-center py-3 bg-transparent border-0 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-lg transition-all ${
+            className={`w-full font-mono text-xl text-center py-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-xl transition-all ${
               disabled ? "opacity-50 cursor-not-allowed bg-gray-100" : ""
             }`}
           />
@@ -94,13 +96,15 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           type="button"
           onClick={handleIncrement}
           disabled={disabled}
-          className={`w-12 h-12 text-2xl font-bold bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition-all ${
+          className={`w-10 h-10 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center transition-all ${
             disabled
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-gray-300 active:scale-95 active:bg-gray-400"
+              : "hover:bg-gray-300 active:scale-95 shadow-sm"
           }`}
         >
-          +
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
         </button>
       </div>
     </div>
@@ -797,11 +801,11 @@ function RecordPageContent() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 第一板块：今日收入 */}
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <h2 className="text-2xl font-bold mb-4 text-red-600">💰 今日收入</h2>
+          <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-green-400">
+            <h2 className="text-2xl font-bold mb-6 tracking-tight text-gray-800">💰 今日收入</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-xl font-medium mb-2 text-gray-700">
+                <label className="block text-sm font-medium mb-3 text-gray-500">
                   微信
                 </label>
                 <input
@@ -816,15 +820,15 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full text-2xl p-4 border-2 rounded-lg focus:outline-none ${
+                  className={`w-full font-mono text-xl p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:shadow-lg transition-all ${
                     totalIncomeConfirmed
-                      ? "border-gray-300 bg-gray-100 cursor-not-allowed"
-                      : "border-red-300 focus:border-red-500"
+                      ? "bg-gray-100 cursor-not-allowed opacity-60"
+                      : ""
                   }`}
                 />
               </div>
               <div>
-                <label className="block text-xl font-medium mb-2 text-gray-700">
+                <label className="block text-sm font-medium mb-3 text-gray-500">
                   支付宝
                 </label>
                 <input
@@ -839,15 +843,15 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full text-2xl p-4 border-2 rounded-lg focus:outline-none ${
+                  className={`w-full font-mono text-xl p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:shadow-lg transition-all ${
                     totalIncomeConfirmed
-                      ? "border-gray-300 bg-gray-100 cursor-not-allowed"
-                      : "border-red-300 focus:border-red-500"
+                      ? "bg-gray-100 cursor-not-allowed opacity-60"
+                      : ""
                   }`}
                 />
               </div>
               <div>
-                <label className="block text-xl font-medium mb-2 text-gray-700">
+                <label className="block text-sm font-medium mb-3 text-gray-500">
                   现金
                 </label>
                 <input
@@ -862,10 +866,10 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full text-2xl p-4 border-2 rounded-lg focus:outline-none ${
+                  className={`w-full font-mono text-xl p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:shadow-lg transition-all ${
                     totalIncomeConfirmed
-                      ? "border-gray-300 bg-gray-100 cursor-not-allowed"
-                      : "border-red-300 focus:border-red-500"
+                      ? "bg-gray-100 cursor-not-allowed opacity-60"
+                      : ""
                   }`}
                 />
               </div>
@@ -876,12 +880,12 @@ function RecordPageContent() {
                   type="button"
                   onClick={handleSaveIncome}
                   disabled={totalIncomeConfirmed}
-                  className={`w-full p-4 text-xl font-bold rounded-lg ${
+                  className={`w-full p-4 text-lg font-semibold rounded-2xl transition-all active:scale-95 ${
                     totalIncomeConfirmed
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                       : incomeSavedMessage
-                      ? "bg-green-500 text-white"
-                      : "bg-blue-500 text-white hover:bg-blue-600"
+                      ? "bg-green-500 text-white shadow-lg"
+                      : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg hover:shadow-xl"
                   }`}
                 >
                   {incomeSavedMessage ? "✅ 已保存" : "💾 保存"}
@@ -913,7 +917,7 @@ function RecordPageContent() {
                       <button
                         type="button"
                         onClick={() => setShowTotalIncomeConfirmDialog(true)}
-                        className="px-6 py-3 bg-red-600 text-white text-lg font-bold rounded-lg hover:bg-red-700"
+                        className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
                       >
                         🔒 确认提交总收入
                       </button>
@@ -925,14 +929,14 @@ function RecordPageContent() {
           </div>
 
           {/* 第二板块：当日产品销量追踪 */}
-          <div className={`space-y-4 ${totalIncomeConfirmed ? "opacity-60" : ""}`}>
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">📊 当日产品销量追踪</h2>
+          <div className={`space-y-6 ${totalIncomeConfirmed ? "opacity-60" : ""}`}>
+            <h2 className="text-2xl font-bold mb-6 tracking-tight text-gray-800">📊 当日产品销量追踪</h2>
             
             {/* 饼类产品卡片 */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="w-1 h-6 bg-amber-400 rounded-full mr-3"></div>
-                <h3 className="text-lg font-bold text-gray-800">饼类产品</h3>
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-purple-400">
+              <div className="flex items-center mb-6">
+                <div className="w-2 h-8 bg-purple-400 rounded-full mr-4"></div>
+                <h3 className="text-xl font-bold text-gray-800">饼类产品</h3>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={totalIncomeConfirmed} />
@@ -955,10 +959,10 @@ function RecordPageContent() {
               ];
 
               return (
-                <div className="bg-white rounded-xl p-6 shadow-sm">
-                  <div className="flex items-center mb-4">
-                    <div className="w-1 h-6 bg-green-400 rounded-full mr-3"></div>
-                    <h3 className="text-lg font-bold text-gray-800">汤/粥类</h3>
+                <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-purple-400">
+                  <div className="flex items-center mb-6">
+                    <div className="w-2 h-8 bg-purple-400 rounded-full mr-4"></div>
+                    <h3 className="text-xl font-bold text-gray-800">汤/粥类</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     {soupItems.map((item) => (
@@ -976,10 +980,10 @@ function RecordPageContent() {
             })()}
 
             {/* 米线/面类产品卡片 */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="w-1 h-6 bg-blue-400 rounded-full mr-3"></div>
-                <h3 className="text-lg font-bold text-gray-800">米线/面类</h3>
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-purple-400">
+              <div className="flex items-center mb-6">
+                <div className="w-2 h-8 bg-purple-400 rounded-full mr-4"></div>
+                <h3 className="text-xl font-bold text-gray-800">米线/面类</h3>
               </div>
 
               {/* 【素】米线/面 */}
@@ -1012,10 +1016,10 @@ function RecordPageContent() {
             </div>
 
             {/* 炒面/炒河粉类产品卡片 */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="w-1 h-6 bg-green-400 rounded-full mr-3"></div>
-                <h3 className="text-lg font-bold text-gray-800">炒面/炒河粉类</h3>
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-purple-400">
+              <div className="flex items-center mb-6">
+                <div className="w-2 h-8 bg-purple-400 rounded-full mr-4"></div>
+                <h3 className="text-xl font-bold text-gray-800">炒面/炒河粉类</h3>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed} />
@@ -1027,13 +1031,13 @@ function RecordPageContent() {
 
           {/* 第三板块：今日支出 */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-blue-600">💸 今日支出</h2>
+            <h2 className="text-2xl font-bold mb-6 tracking-tight text-gray-800">💸 今日支出</h2>
 
             {/* 【购买原材料】模块 */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="w-1 h-6 bg-green-400 rounded-full mr-3"></div>
-                <h3 className="text-lg font-bold text-gray-800">【购买原材料】</h3>
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-pink-400">
+              <div className="flex items-center mb-6">
+                <div className="w-2 h-8 bg-pink-400 rounded-full mr-4"></div>
+                <h3 className="text-xl font-bold text-gray-800">【购买原材料】</h3>
                 {expenseModulesLocked.raw && (
                   <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
                     已锁定
@@ -1056,7 +1060,7 @@ function RecordPageContent() {
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       {rawItems.map((item) => (
                         <div key={item.label} className="flex flex-col">
-                          <label className="block text-base font-medium mb-2 text-gray-700">
+                          <label className="block text-sm font-medium mb-3 text-gray-500">
                             {item.label}
                           </label>
                           <input
@@ -1088,7 +1092,7 @@ function RecordPageContent() {
                       <button
                         type="button"
                         onClick={() => setExpenseConfirmModal({ isOpen: true, module: "raw" })}
-                        className="w-full p-4 text-xl bg-green-500 text-white rounded-lg hover:bg-green-600 font-bold"
+                        className="w-full p-4 text-lg font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
                       >
                         🔒 记入支出
                       </button>
@@ -1099,10 +1103,10 @@ function RecordPageContent() {
             </div>
 
             {/* 【门店固定费用】模块 */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="w-1 h-6 bg-blue-400 rounded-full mr-3"></div>
-                <h3 className="text-lg font-bold text-gray-800">【门店固定费用】</h3>
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-pink-400">
+              <div className="flex items-center mb-6">
+                <div className="w-2 h-8 bg-pink-400 rounded-full mr-4"></div>
+                <h3 className="text-xl font-bold text-gray-800">【门店固定费用】</h3>
                 {expenseModulesLocked.fixed && (
                   <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
                     已锁定
@@ -1123,7 +1127,7 @@ function RecordPageContent() {
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       {fixedItems.map((item) => (
                         <div key={item.label} className="flex flex-col">
-                          <label className="block text-base font-medium mb-2 text-gray-700">
+                          <label className="block text-sm font-medium mb-3 text-gray-500">
                             {item.label}
                           </label>
                           <input
@@ -1155,7 +1159,7 @@ function RecordPageContent() {
                       <button
                         type="button"
                         onClick={() => setExpenseConfirmModal({ isOpen: true, module: "fixed" })}
-                        className="w-full p-4 text-xl bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-bold"
+                        className="w-full p-4 text-lg font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
                       >
                         🔒 记入支出
                       </button>
@@ -1166,10 +1170,10 @@ function RecordPageContent() {
             </div>
 
             {/* 【经营消耗品】模块 */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="w-1 h-6 bg-purple-400 rounded-full mr-3"></div>
-                <h3 className="text-lg font-bold text-gray-800">【经营消耗品】</h3>
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-pink-400">
+              <div className="flex items-center mb-6">
+                <div className="w-2 h-8 bg-pink-400 rounded-full mr-4"></div>
+                <h3 className="text-xl font-bold text-gray-800">【经营消耗品】</h3>
                 {expenseModulesLocked.cons && (
                   <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
                     已锁定
@@ -1246,7 +1250,7 @@ function RecordPageContent() {
                   <button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "cons" })}
-                    className="w-full p-4 text-xl bg-purple-500 text-white rounded-lg hover:bg-purple-600 font-bold"
+                    className="w-full p-4 text-lg font-semibold bg-gradient-to-r from-purple-500 to-violet-600 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
                   >
                     🔒 记入支出
                   </button>
@@ -1273,10 +1277,10 @@ function RecordPageContent() {
             </div>
 
             {/* 【其他支出】模块 */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="w-1 h-6 bg-gray-400 rounded-full mr-3"></div>
-                <h3 className="text-lg font-bold text-gray-800">【其他支出】</h3>
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-pink-400">
+              <div className="flex items-center mb-6">
+                <div className="w-2 h-8 bg-pink-400 rounded-full mr-4"></div>
+                <h3 className="text-xl font-bold text-gray-800">【其他支出】</h3>
                 {expenseModulesLocked.other && (
                   <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
                     已锁定
@@ -1389,7 +1393,7 @@ function RecordPageContent() {
             </div>
 
             {/* 当日总支出汇总看板 */}
-            <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-6 shadow-sm mb-6">
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-3xl p-6 shadow-lg backdrop-blur-sm border border-red-200/30 mb-6">
               <h3 className="text-xl font-bold text-gray-800 mb-4">💰 当日总支出</h3>
               <div className="text-center">
                 <div className="text-4xl font-bold text-red-600 mb-2">
@@ -1403,7 +1407,7 @@ function RecordPageContent() {
 
             {/* 今日经营成绩单 - 仅在最终确认后显示 */}
             {totalIncomeConfirmed && (
-              <div className="bg-gradient-to-r from-yellow-50 via-orange-50 to-yellow-100 rounded-xl p-8 shadow-lg border-2 border-yellow-200">
+              <div className="bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-100 rounded-3xl p-8 shadow-2xl border border-yellow-200/50 backdrop-blur-sm">
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-gray-800 mb-6">🏆 今日经营成绩单</h3>
 
@@ -1421,21 +1425,21 @@ function RecordPageContent() {
 
                   {/* 辅助指标列表 */}
                   <div className="grid grid-cols-2 gap-4 text-left">
-                    <div className="bg-white/60 rounded-lg p-4">
+                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20">
                       <div className="text-sm font-medium text-gray-600">总收入</div>
                       <div className="text-xl font-bold text-green-600">
                         ¥ {(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}
                       </div>
                     </div>
 
-                    <div className="bg-white/60 rounded-lg p-4">
+                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20">
                       <div className="text-sm font-medium text-gray-600">总支出</div>
                       <div className="text-xl font-bold text-red-600">
                         ¥ {expenseTotals.grandTotal.toFixed(2)}
                       </div>
                     </div>
 
-                    <div className="bg-white/60 rounded-lg p-4">
+                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20">
                       <div className="text-sm font-medium text-gray-600">经营成本</div>
                       <div className="text-lg font-bold text-blue-600">
                         ¥ {calculateTodayCOGS().toFixed(2)}
@@ -1443,7 +1447,7 @@ function RecordPageContent() {
                       <div className="text-xs text-gray-500">含固定费摊销</div>
                     </div>
 
-                    <div className="bg-white/60 rounded-lg p-4">
+                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20">
                       <div className="text-sm font-medium text-gray-600">销量汇总</div>
                       <div className="text-lg font-bold text-purple-600">
                         {skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing +
@@ -1470,7 +1474,7 @@ function RecordPageContent() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full p-6 text-2xl bg-green-500 text-white rounded-lg hover:bg-green-600 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full p-6 text-xl font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-3xl shadow-lg hover:shadow-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
           >
             {submitting ? "保存中..." : "✅ 保存今天的记录"}
           </button>
