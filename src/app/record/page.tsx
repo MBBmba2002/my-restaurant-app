@@ -924,8 +924,8 @@ function RecordPageContent() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 第一板块：今日收入 */}
           <div className="bg-white rounded-3xl p-6 border-none">
-            <h2 className="text-2xl font-bold mb-6 tracking-tight text-[#0c0c0c]">💰 今日收入</h2>
-            <div className="space-y-4">
+            <h2 className="text-3xl font-black text-center mb-8 text-[#0c0c0c]">💰 今日收入</h2>
+            <div className="max-w-md mx-auto space-y-4">
               <div>
                 <label className="block text-xl font-bold mb-3 text-[#0c0c0c]">
                   微信
@@ -1014,50 +1014,43 @@ function RecordPageContent() {
                 </button>
               </div>
 
-              {/* 今日总收入显示 */}
-              <div className="mt-6 pt-6">
-                <div className="bg-white rounded-3xl p-8 shadow-sm">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-3 mb-4">
-                      <div className="text-xl font-bold text-[#3d3435]">
-                        今日总收入
-                      </div>
-                      {totalIncomeConfirmed && (
-                        <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full">
-                          已确认
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-5xl font-bold text-[#0c0c0c] mb-6">
-                      ¥ {(
-                        parseFloat(incomeWechat || "0") +
-                        parseFloat(incomeAlipay || "0") +
-                        parseFloat(incomeCash || "0")
-                      ).toFixed(2)}
-                    </div>
-                    {!totalIncomeConfirmed && (
-                      <button
-                        type="button"
-                        onClick={() => setShowTotalIncomeConfirmDialog(true)}
-                        className="px-8 py-4 bg-[#ab322a] text-white text-lg font-bold rounded-full shadow-lg transition-all active:scale-95"
-                      >
-                        🔒 确认提交总收入
-                      </button>
+              {/* 今日总收入显示 - 视觉焦点 */}
+              <div className="mt-8 pt-8 border-t border-gray-100">
+                <div className="text-center">
+                  <div className="text-sm font-medium text-[#3d3435] mb-3">
+                    今日总收入
+                    {totalIncomeConfirmed && (
+                      <span className="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded-full">
+                        已确认
+                      </span>
                     )}
                   </div>
+                  <div className="text-4xl font-black text-[#ab322a] font-mono">
+                    ¥ {(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}
+                  </div>
+                  {!totalIncomeConfirmed && (
+                    <button
+                      type="button"
+                      onClick={() => setShowTotalIncomeConfirmDialog(true)}
+                      className="mt-6 px-8 py-4 bg-[#ab322a] text-white text-lg font-semibold rounded-full transition-all active:scale-95 hover:bg-[#ab322a]/90"
+                    >
+                      🔒 确认提交总收入
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* 第二板块：当日产品销量追踪 */}
+          {/* 第二板块：销量追踪 */}
           <div className={`${totalIncomeConfirmed ? "opacity-60" : ""}`}>
             <div className="bg-white rounded-3xl p-6 border-none">
-              <h2 className="text-2xl font-bold mb-6 tracking-tight text-[#0c0c0c]">📊 当日产品销量追踪</h2>
+              <h2 className="text-3xl font-black text-center mb-8 text-[#0c0c0c]">📊 销量追踪</h2>
+              <div className="max-w-md mx-auto space-y-6">
             
             {/* 饼类产品卡片 */}
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">饼类产品</h3>
+            <div>
+              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">饼类产品</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
                 <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
@@ -1067,11 +1060,12 @@ function RecordPageContent() {
                 <SkuInput label="肠饼" value={skuChangbing} onChange={setSkuChangbing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
               </div>
               
-              {/* 汇总显示 */}
-              <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/20 rounded-2xl py-3 px-4 mb-4 backdrop-blur-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-[#0c0c0c]">饼类总计：</span>
-                  <span className="text-xl font-bold text-[#0c0c0c]">{salesTotals.bingTotal} 个</span>
+              {/* 汇总显示 - 视觉焦点 */}
+              <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/20 rounded-2xl py-4 px-6 mb-4 backdrop-blur-sm">
+                <div className="text-center">
+                  <div className="text-sm font-medium text-[#3d3435] mb-2">饼类总计</div>
+                  <div className="text-4xl font-black text-[#ffcc00] font-mono">{salesTotals.bingTotal}</div>
+                  <div className="text-sm text-[#3d3435] mt-1">个</div>
                 </div>
               </div>
 
@@ -1080,7 +1074,7 @@ function RecordPageContent() {
                 <button
                   type="button"
                   onClick={() => handleSaveSalesModule("bing")}
-                  className="w-full p-4 text-lg font-semibold bg-[#ffcc00]/10 border border-[#ffcc00]/30 text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/20"
+                  className="w-full p-4 text-lg font-semibold bg-[#ffcc00] text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/90"
                 >
                   保存饼类销量
                 </button>
@@ -1103,8 +1097,8 @@ function RecordPageContent() {
               ];
 
               return (
-                <div className="mb-6">
-                  <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">汤/粥类</h3>
+                <div>
+                  <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">汤/粥类</h3>
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     {soupItems.map((item) => (
                       <SkuInput
@@ -1117,11 +1111,12 @@ function RecordPageContent() {
                     ))}
                   </div>
                   
-                  {/* 汇总显示 */}
-                  <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/20 rounded-2xl py-3 px-4 mb-4 backdrop-blur-sm">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold text-[#0c0c0c]">汤/粥类总计：</span>
-                      <span className="text-xl font-bold text-[#0c0c0c]">{salesTotals.tangTotal} 个</span>
+                  {/* 汇总显示 - 视觉焦点 */}
+                  <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/20 rounded-2xl py-4 px-6 mb-4 backdrop-blur-sm">
+                    <div className="text-center">
+                      <div className="text-sm font-medium text-[#3d3435] mb-2">汤/粥类总计</div>
+                      <div className="text-4xl font-black text-[#ffcc00] font-mono">{salesTotals.tangTotal}</div>
+                      <div className="text-sm text-[#3d3435] mt-1">个</div>
                     </div>
                   </div>
 
@@ -1130,7 +1125,7 @@ function RecordPageContent() {
                     <button
                       type="button"
                       onClick={() => handleSaveSalesModule("tang")}
-                      className="w-full p-4 text-lg font-semibold bg-[#ffcc00]/10 border border-[#ffcc00]/30 text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/20"
+                      className="w-full p-4 text-lg font-semibold bg-[#ffcc00] text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/90"
                     >
                       保存汤/粥类销量
                     </button>
@@ -1145,8 +1140,8 @@ function RecordPageContent() {
             })()}
 
             {/* 米线/面类产品卡片 */}
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">米线/面类</h3>
+            <div>
+              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">米线/面类</h3>
 
               {/* 【素】米线/面 */}
               <div className="mb-6">
@@ -1176,11 +1171,12 @@ function RecordPageContent() {
                 </div>
               </div>
 
-              {/* 汇总显示 */}
-              <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/20 rounded-2xl py-3 px-4 mb-4 backdrop-blur-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-[#0c0c0c]">米线/面类总计：</span>
-                  <span className="text-xl font-bold text-[#0c0c0c]">{salesTotals.mixianTotal} 个</span>
+              {/* 汇总显示 - 视觉焦点 */}
+              <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/20 rounded-2xl py-4 px-6 mb-4 backdrop-blur-sm">
+                <div className="text-center">
+                  <div className="text-sm font-medium text-[#3d3435] mb-2">米线/面类总计</div>
+                  <div className="text-4xl font-black text-[#ffcc00] font-mono">{salesTotals.mixianTotal}</div>
+                  <div className="text-sm text-[#3d3435] mt-1">个</div>
                 </div>
               </div>
 
@@ -1189,7 +1185,7 @@ function RecordPageContent() {
                 <button
                   type="button"
                   onClick={() => handleSaveSalesModule("mixian")}
-                  className="w-full p-4 text-lg font-semibold bg-[#ffcc00]/10 border border-[#ffcc00]/30 text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/20"
+                  className="w-full p-4 text-lg font-semibold bg-[#ffcc00] text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/90"
                 >
                   保存米线/面类销量
                 </button>
@@ -1202,19 +1198,20 @@ function RecordPageContent() {
             </div>
 
             {/* 炒面/炒河粉类产品卡片 */}
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">炒面/炒河粉类</h3>
+            <div>
+              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">炒面/炒河粉类</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
                 <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
                 <SkuInput label="【细粉】炒河粉" value={skuChaohufenXi} onChange={setSkuChaohufenXi} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
               </div>
               
-              {/* 汇总显示 */}
-              <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/20 rounded-2xl py-3 px-4 mb-4 backdrop-blur-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-[#0c0c0c]">炒面/炒河粉类总计：</span>
-                  <span className="text-xl font-bold text-[#0c0c0c]">{salesTotals.chaomianTotal} 个</span>
+              {/* 汇总显示 - 视觉焦点 */}
+              <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/20 rounded-2xl py-4 px-6 mb-4 backdrop-blur-sm">
+                <div className="text-center">
+                  <div className="text-sm font-medium text-[#3d3435] mb-2">炒面/炒河粉类总计</div>
+                  <div className="text-4xl font-black text-[#ffcc00] font-mono">{salesTotals.chaomianTotal}</div>
+                  <div className="text-sm text-[#3d3435] mt-1">个</div>
                 </div>
               </div>
 
@@ -1223,7 +1220,7 @@ function RecordPageContent() {
                 <button
                   type="button"
                   onClick={() => handleSaveSalesModule("chaomian")}
-                  className="w-full p-4 text-lg font-semibold bg-[#ffcc00]/10 border border-[#ffcc00]/30 text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/20"
+                  className="w-full p-4 text-lg font-semibold bg-[#ffcc00] text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/90"
                 >
                   保存炒面/炒河粉类销量
                 </button>
@@ -1240,11 +1237,12 @@ function RecordPageContent() {
           {/* 第三板块：今日支出 */}
           <div>
             <div className="bg-white rounded-3xl p-6 border-none">
-              <h2 className="text-2xl font-bold mb-6 tracking-tight text-[#0c0c0c]">💸 今日支出</h2>
+              <h2 className="text-3xl font-black text-center mb-8 text-[#0c0c0c]">💸 支出</h2>
+              <div className="max-w-md mx-auto space-y-6">
 
             {/* 【购买原材料】模块 */}
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【购买原材料】</h3>
+            <div>
+              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">【购买原材料】</h3>
                 {expenseModulesLocked.raw && (
                   <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
                     已锁定
@@ -1286,11 +1284,11 @@ function RecordPageContent() {
                       ))}
                     </div>
 
-                    {/* 原材料汇总显示 */}
-                    <div className="mt-6 pt-6">
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold text-[#3d3435]">本类合计：</span>
-                        <span className="text-xl font-bold text-[#0c0c0c]">¥ {expenseTotals.rawTotal.toFixed(2)}</span>
+                    {/* 原材料汇总显示 - 视觉焦点 */}
+                    <div className="mt-6 pt-6 border-t border-gray-100">
+                      <div className="text-center">
+                        <div className="text-sm font-medium text-[#3d3435] mb-2">本类合计</div>
+                        <div className="text-4xl font-black text-[#1661ab] font-mono">¥ {expenseTotals.rawTotal.toFixed(2)}</div>
                       </div>
                     </div>
 
@@ -1298,7 +1296,7 @@ function RecordPageContent() {
                       <button
                         type="button"
                         onClick={() => setExpenseConfirmModal({ isOpen: true, module: "raw" })}
-                        className="w-full p-4 text-lg font-semibold bg-[#1661ab]/10 border border-[#1661ab]/30 text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/20"
+                        className="w-full p-4 text-lg font-semibold bg-[#1661ab] text-white rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/90"
                       >
                         🔒 记入支出
                       </button>
@@ -1310,7 +1308,7 @@ function RecordPageContent() {
 
             {/* 【门店固定费用】模块 */}
             <div className="mb-6">
-              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【门店固定费用】</h3>
+              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">【门店固定费用】</h3>
               {expenseModulesLocked.fixed && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
                   已锁定
@@ -1350,11 +1348,11 @@ function RecordPageContent() {
                       ))}
                     </div>
 
-                    {/* 固定费用汇总显示 */}
-                    <div className="mt-6 pt-6">
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold text-[#3d3435]">本类合计：</span>
-                        <span className="text-xl font-bold text-[#0c0c0c]">¥ {expenseTotals.fixTotal.toFixed(2)}</span>
+                    {/* 固定费用汇总显示 - 视觉焦点 */}
+                    <div className="mt-6 pt-6 border-t border-gray-100">
+                      <div className="text-center">
+                        <div className="text-sm font-medium text-[#3d3435] mb-2">本类合计</div>
+                        <div className="text-4xl font-black text-[#1661ab] font-mono">¥ {expenseTotals.fixTotal.toFixed(2)}</div>
                       </div>
                     </div>
 
@@ -1362,7 +1360,7 @@ function RecordPageContent() {
                       <button
                         type="button"
                         onClick={() => setExpenseConfirmModal({ isOpen: true, module: "fixed" })}
-                        className="w-full p-4 text-lg font-semibold bg-[#1661ab]/10 border border-[#1661ab]/30 text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/20"
+                        className="w-full p-4 text-lg font-semibold bg-[#1661ab] text-white rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/90"
                       >
                         🔒 记入支出
                       </button>
@@ -1373,8 +1371,8 @@ function RecordPageContent() {
             </div>
 
             {/* 【经营消耗品】模块 */}
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【经营消耗品】</h3>
+            <div>
+              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">【经营消耗品】</h3>
               {expenseModulesLocked.cons && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
                   已锁定
@@ -1439,18 +1437,18 @@ function RecordPageContent() {
                     </div>
                   </div>
 
-                  {/* 消耗品汇总显示 */}
-                  <div className="mt-6 pt-6">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold text-[#3d3435]">本类合计：</span>
-                      <span className="text-xl font-bold text-[#0c0c0c]">¥ {expenseTotals.consTotal.toFixed(2)}</span>
+                  {/* 消耗品汇总显示 - 视觉焦点 */}
+                  <div className="mt-6 pt-6 border-t border-gray-100">
+                    <div className="text-center">
+                      <div className="text-sm font-medium text-[#3d3435] mb-2">本类合计</div>
+                      <div className="text-4xl font-black text-[#1661ab] font-mono">¥ {expenseTotals.consTotal.toFixed(2)}</div>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "cons" })}
-                    className="w-full p-4 text-lg font-semibold bg-white border border-gray-200 text-gray-700 rounded-full transition-all active:scale-95"
+                    className="w-full p-4 text-lg font-semibold bg-[#1661ab] text-white rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/90"
                   >
                     🔒 记入支出
                   </button>
@@ -1477,8 +1475,8 @@ function RecordPageContent() {
             </div>
 
             {/* 【其他支出】模块 */}
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【其他支出】</h3>
+            <div>
+              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">【其他支出】</h3>
               {expenseModulesLocked.other && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
                   已锁定
@@ -1555,18 +1553,18 @@ function RecordPageContent() {
                     </div>
                   </div>
 
-                  {/* 其他支出汇总显示 */}
-                  <div className="mt-4 pt-3 border-t-2 border-gray-200 bg-gray-50 rounded-lg p-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold text-[#0c0c0c]">本类合计：</span>
-                      <span className="text-xl font-bold text-[#0c0c0c]">¥ {expenseTotals.otherTotal.toFixed(2)}</span>
+                  {/* 其他支出汇总显示 - 视觉焦点 */}
+                  <div className="mt-6 pt-6 border-t border-gray-100">
+                    <div className="text-center">
+                      <div className="text-sm font-medium text-[#3d3435] mb-2">本类合计</div>
+                      <div className="text-4xl font-black text-[#1661ab] font-mono">¥ {expenseTotals.otherTotal.toFixed(2)}</div>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "other" })}
-                    className="w-full p-4 text-xl font-bold bg-[#1661ab]/10 border border-[#1661ab]/30 text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/20"
+                    className="w-full p-4 text-lg font-semibold bg-[#1661ab] text-white rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/90"
                   >
                     🔒 记入支出
                   </button>
@@ -1589,11 +1587,11 @@ function RecordPageContent() {
               )}
             </div>
 
-            {/* 当日总支出汇总看板 */}
-            <div className="bg-[#1661ab]/10 border border-[#1661ab]/20 rounded-2xl py-4 px-6 mb-6 backdrop-blur-sm">
-              <h3 className="text-xl font-bold text-[#0c0c0c] mb-4">💰 当日总支出</h3>
+            {/* 当日总支出汇总看板 - 视觉焦点 */}
+            <div className="bg-[#1661ab]/10 border border-[#1661ab]/20 rounded-2xl py-6 px-6 mb-6 backdrop-blur-sm">
               <div className="text-center">
-                <div className="text-4xl font-bold text-[#0c0c0c] mb-2">
+                <div className="text-sm font-medium text-[#3d3435] mb-3">💰 当日总支出</div>
+                <div className="text-4xl font-black text-[#1661ab] font-mono mb-2">
                   ¥ {expenseTotals.grandTotal.toFixed(2)}
                 </div>
                 <div className="text-sm text-[#3d3435]">
@@ -1607,62 +1605,62 @@ function RecordPageContent() {
           {/* 今日经营成绩单 - 仅在最终确认后显示 */}
           {totalIncomeConfirmed && (
             <div className="bg-white rounded-3xl p-12 shadow-sm border-none">
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-[#0c0c0c] mb-12">🏆 今日经营成绩单</h3>
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-[#0c0c0c] mb-12">🏆 今日经营成绩单</h3>
 
-                  {/* 核心指标 - 净利润 */}
-                  <div className="mb-12">
-                    <div className="text-lg font-medium text-[#3d3435] mb-4">今日预估净赚</div>
-                    <div className="text-6xl font-bold text-[#ab322a]">
-                      ¥ {((parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")) - calculateTodayCOGS()).toFixed(2)}
+                {/* 核心指标 - 净利润 */}
+                <div className="mb-12">
+                  <div className="text-lg font-medium text-[#3d3435] mb-4">今日预估净赚</div>
+                  <div className="text-6xl font-bold text-[#ab322a]">
+                    ¥ {((parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")) - calculateTodayCOGS()).toFixed(2)}
+                  </div>
+                </div>
+
+                {/* 辅助指标列表 */}
+                <div className="grid grid-cols-2 gap-6 text-left">
+                  <div className="bg-white rounded-3xl p-6 shadow-sm">
+                    <div className="text-sm font-medium text-[#3d3435] mb-2">总收入</div>
+                    <div className="text-xl font-bold text-[#0c0c0c]">
+                      ¥ {(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}
                     </div>
                   </div>
 
-                  {/* 辅助指标列表 */}
-                  <div className="grid grid-cols-2 gap-6 text-left">
-                    <div className="bg-white rounded-3xl p-6 shadow-sm">
-                      <div className="text-sm font-medium text-[#3d3435] mb-2">总收入</div>
-                      <div className="text-xl font-bold text-[#0c0c0c]">
-                        ¥ {(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-3xl p-6 shadow-sm">
-                      <div className="text-sm font-medium text-[#3d3435] mb-2">总支出</div>
-                      <div className="text-xl font-bold text-[#0c0c0c]">
-                        ¥ {expenseTotals.grandTotal.toFixed(2)}
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-3xl p-6 shadow-sm">
-                      <div className="text-sm font-medium text-[#3d3435] mb-2">经营成本</div>
-                      <div className="text-lg font-bold text-[#0c0c0c]">
-                        ¥ {calculateTodayCOGS().toFixed(2)}
-                      </div>
-                      <div className="text-xs text-[#3d3435] mt-1">含固定费摊销</div>
-                    </div>
-
-                    <div className="bg-white rounded-3xl p-6 shadow-sm">
-                      <div className="text-sm font-medium text-[#3d3435] mb-2">销量汇总</div>
-                      <div className="text-lg font-bold text-[#0c0c0c]">
-                        {skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing +
-                         skuFentang + skuHundun + skuXiaomizhou + skuDoujiang + skuJidantang +
-                         skuMixianSuSanxian + skuMixianSuSuancai + skuMixianSuMala +
-                         skuMixianRouSanxian + skuMixianRouSuancai + skuMixianRouMala +
-                         skuSuanlafen + skuChaomianXiangcui + skuChaohufenKuan + skuChaohufenXi} 个
-                      </div>
+                  <div className="bg-white rounded-3xl p-6 shadow-sm">
+                    <div className="text-sm font-medium text-[#3d3435] mb-2">总支出</div>
+                    <div className="text-xl font-bold text-[#0c0c0c]">
+                      ¥ {expenseTotals.grandTotal.toFixed(2)}
                     </div>
                   </div>
 
-                  {/* 鼓励语 */}
-                  <div className="mt-12 pt-8">
-                    <div className="text-sm text-[#3d3435]">
-                      🎊 今日辛苦了！数据已保存，明天继续加油！
+                  <div className="bg-white rounded-3xl p-6 shadow-sm">
+                    <div className="text-sm font-medium text-[#3d3435] mb-2">经营成本</div>
+                    <div className="text-lg font-bold text-[#0c0c0c]">
+                      ¥ {calculateTodayCOGS().toFixed(2)}
+                    </div>
+                    <div className="text-xs text-[#3d3435] mt-1">含固定费摊销</div>
+                  </div>
+
+                  <div className="bg-white rounded-3xl p-6 shadow-sm">
+                    <div className="text-sm font-medium text-[#3d3435] mb-2">销量汇总</div>
+                    <div className="text-lg font-bold text-[#0c0c0c]">
+                      {skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing +
+                       skuFentang + skuHundun + skuXiaomizhou + skuDoujiang + skuJidantang +
+                       skuMixianSuSanxian + skuMixianSuSuancai + skuMixianSuMala +
+                       skuMixianRouSanxian + skuMixianRouSuancai + skuMixianRouMala +
+                       skuSuanlafen + skuChaomianXiangcui + skuChaohufenKuan + skuChaohufenXi} 个
                     </div>
                   </div>
                 </div>
+
+                {/* 鼓励语 */}
+                <div className="mt-12 pt-8">
+                  <div className="text-sm text-[#3d3435]">
+                    🎊 今日辛苦了！数据已保存，明天继续加油！
+                  </div>
+                </div>
               </div>
-            )}
+            </div>
+          )}
 
           {/* 提交按钮 */}
           <button
