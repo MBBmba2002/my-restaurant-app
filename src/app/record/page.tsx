@@ -246,7 +246,7 @@ function RecordPageContent() {
   const [incomeSaved, setIncomeSaved] = useState(false);
   const [incomeSavedMessage, setIncomeSavedMessage] = useState(false);
   // 总收入确认提交状态
-  const [totalIncomeConfirmed, setTotalIncomeConfirmed] = useState(false);
+  const [isDayLocked, setIsDayLocked] = useState(false);
   const [showTotalIncomeConfirmDialog, setShowTotalIncomeConfirmDialog] = useState(false);
 
   // 销量模块保存状态
@@ -561,6 +561,11 @@ function RecordPageContent() {
       expFixRent, expFixUtility, expFixGas, expFixSalary,
       expConsAmount, expOtherAmount]);
 
+  // 全局锁定状态
+  const [isDayLocked, setIsDayLocked] = useState(false);
+  const [showGlobalSummaryModal, setShowGlobalSummaryModal] = useState(false);
+  const [globalSubmitting, setGlobalSubmitting] = useState(false);
+
   useEffect(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -573,7 +578,31 @@ function RecordPageContent() {
     if (savedExpenseLocks) {
       setExpenseModulesLocked(JSON.parse(savedExpenseLocks));
     }
-  }, []);
+
+    // 检查当日是否已锁定
+    checkDayLockStatus();
+  }, [user]);
+
+  // 检查当日锁定状态
+  const checkDayLockStatus = async () => {
+    if (!user) return;
+    
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from("daily_records")
+        .select("is_locked")
+        .eq("user_id", user.id)
+        .eq("record_date", today)
+        .single();
+
+      if (!error && data) {
+        setIsDayLocked(data.is_locked === true);
+      }
+    } catch (err) {
+      console.error("Error checking lock status:", err);
+    }
+  };
 
   const handleExpenseSubmit = (data: {
     expense_type: string;
@@ -753,10 +782,135 @@ function RecordPageContent() {
     }
   };
 
-  // 确认提交总收入
+  // 确认提交总收入（已废弃，使用handleGlobalSave代替）
   const handleConfirmTotalIncome = () => {
-    setTotalIncomeConfirmed(true);
+    setIsDayLocked(true);
     setShowTotalIncomeConfirmDialog(false);
+  };
+
+  // 全局保存与锁定函数
+  const handleGlobalSave = async () => {
+    if (!user) {
+      showToast("请先登录", "error");
+      router.push("/login/");
+      return;
+    }
+
+    setGlobalSubmitting(true);
+    setShowGlobalSummaryModal(false);
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const totalIncome = globalSummary.income.total;
+      const totalSales = globalSummary.sales.total;
+      const totalExpenses = globalSummary.expenses.total;
+      const cogsToday = calculateTodayCOGS();
+      const estimatedProfit = totalIncome - cogsToday;
+
+      // 统一upsert所有数据到daily_records表
+      const recordData: Partial<DailyRecord> = {
+        user_id: user.id,
+        record_date: today,
+        // 收入字段
+        income_wechat: globalSummary.income.wechat,
+        income_alipay: globalSummary.income.alipay,
+        income_cash: globalSummary.income.cash,
+        total_income: totalIncome,
+        // 销量字段 - 饼类
+        sku_roubing: skuRoubing,
+        sku_shouroubing: skuShouroubing,
+        sku_changdanbing: skuChangdanbing,
+        sku_roudanbing: skuRoudanbing,
+        sku_danbing: skuDanbing,
+        sku_changbing: skuChangbing,
+        total_bing_count: salesTotals.bingTotal,
+        // 销量字段 - 汤粥类
+        sku_fentang: skuFentang,
+        sku_hundun: skuHundun,
+        sku_mizhou: skuXiaomizhou,
+        sku_doujiang: skuDoujiang,
+        sku_jidantang: skuJidantang,
+        total_tang_count: salesTotals.tangTotal,
+        // 销量字段 - 米线面类
+        sku_mixian_su_sanxian: skuMixianSuSanxian,
+        sku_mixian_su_suancai: skuMixianSuSuancai,
+        sku_mixian_su_mala: skuMixianSuMala,
+        sku_mixian_rou_sanxian: skuMixianRouSanxian,
+        sku_mixian_rou_suancai: skuMixianRouSuancai,
+        sku_mixian_rou_mala: skuMixianRouMala,
+        sku_suanlafen: skuSuanlafen,
+        total_mixian_count: salesTotals.mixianTotal,
+        // 销量字段 - 炒面河粉类
+        sku_chaomian_xiangcui: skuChaomianXiangcui,
+        sku_chaohefen_kuan: skuChaohufenKuan,
+        sku_chaohefen_xi: skuChaohufenXi,
+        total_chaomian_count: salesTotals.chaomianTotal,
+        total_sales: totalSales,
+        // 支出字段 - 原材料
+        exp_raw_veg: parseNonNegativeNumber(expRawVeg),
+        exp_raw_meat: parseNonNegativeNumber(expRawMeat),
+        exp_raw_egg: parseNonNegativeNumber(expRawEgg),
+        exp_raw_noodle: parseNonNegativeNumber(expRawNoodle),
+        exp_raw_spice: parseNonNegativeNumber(expRawSpice),
+        exp_raw_pack: parseNonNegativeNumber(expRawPack),
+        total_expense_raw: expenseTotals.rawTotal,
+        // 支出字段 - 固定费用
+        exp_fix_rent: parseNonNegativeNumber(expFixRent),
+        exp_fix_utility: parseNonNegativeNumber(expFixUtility),
+        exp_fix_gas: parseNonNegativeNumber(expFixGas),
+        exp_fix_salary: parseNonNegativeNumber(expFixSalary),
+        total_expense_fix: expenseTotals.fixTotal,
+        // 支出字段 - 消耗品
+        exp_cons_name: expConsName,
+        exp_cons_amount: parseNonNegativeNumber(expConsAmount),
+        exp_cons_duration: expConsDuration,
+        total_expense_cons: expenseTotals.consTotal,
+        // 支出字段 - 其他
+        exp_other_name: expOtherName,
+        exp_other_amount: parseNonNegativeNumber(expOtherAmount),
+        total_expense_other: expenseTotals.otherTotal,
+        // 支出汇总
+        total_daily_expense: totalExpenses,
+        total_expenses: totalExpenses,
+        // 计算字段
+        estimated_profit: estimatedProfit,
+        cogs_today: cogsToday,
+        // 锁定标志
+        is_locked: true,
+      };
+
+      // 使用upsert一次性保存所有数据并锁定
+      const { error: recordError } = await supabase
+        .from("daily_records")
+        .upsert(recordData, {
+          onConflict: 'user_id,record_date',
+          ignoreDuplicates: false
+        });
+
+      if (recordError) {
+        console.error("Error saving global record:", recordError);
+        showToast("保存失败：" + recordError.message, "error");
+        setGlobalSubmitting(false);
+        return;
+      }
+
+      // 更新锁定状态
+      setIsDayLocked(true);
+      
+      // 显示成功提示
+      showToast("✅ 今日数据已提交并锁定！", "success");
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 5000);
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "未知错误";
+      console.error("Error:", err);
+      showToast("保存失败：" + errorMessage, "error");
+    } finally {
+      setGlobalSubmitting(false);
+    }
   };
 
   // 计算今日经营成本 (COGS)
@@ -950,7 +1104,7 @@ function RecordPageContent() {
       setShowSuccess(true);
 
       // 设置最终确认状态，显示经营成绩单
-      setTotalIncomeConfirmed(true);
+      setIsDayLocked(true);
 
       // 3秒后隐藏成功提示
       setTimeout(() => {
@@ -997,13 +1151,13 @@ function RecordPageContent() {
                   inputMode="decimal"
                   value={incomeWechat}
                   onChange={(e) => {
-                    if (!totalIncomeConfirmed) {
+                    if (!isDayLocked) {
                       handleNumberChange(e.target.value, setIncomeWechat);
                       setIncomeSaved(false);
                     }
                   }}
                   placeholder="0.00"
-                  disabled={totalIncomeConfirmed}
+                  disabled={isDayLocked}
                   accentColor="red"
                 />
               </FormRow>
@@ -1013,13 +1167,13 @@ function RecordPageContent() {
                   inputMode="decimal"
                   value={incomeAlipay}
                   onChange={(e) => {
-                    if (!totalIncomeConfirmed) {
+                    if (!isDayLocked) {
                       handleNumberChange(e.target.value, setIncomeAlipay);
                       setIncomeSaved(false);
                     }
                   }}
                   placeholder="0.00"
-                  disabled={totalIncomeConfirmed}
+                  disabled={isDayLocked}
                   accentColor="red"
                 />
               </FormRow>
@@ -1029,13 +1183,13 @@ function RecordPageContent() {
                   inputMode="decimal"
                   value={incomeCash}
                   onChange={(e) => {
-                    if (!totalIncomeConfirmed) {
+                    if (!isDayLocked) {
                       handleNumberChange(e.target.value, setIncomeCash);
                       setIncomeSaved(false);
                     }
                   }}
                   placeholder="0.00"
-                  disabled={totalIncomeConfirmed}
+                  disabled={isDayLocked}
                   accentColor="red"
                 />
               </FormRow>
@@ -1045,7 +1199,7 @@ function RecordPageContent() {
                 <Button
                   type="button"
                   onClick={handleSaveIncome}
-                  disabled={totalIncomeConfirmed}
+                  disabled={isDayLocked}
                   accentColor="red"
                   variant={incomeSavedMessage ? "primary" : "secondary"}
                   size="lg"
@@ -1060,7 +1214,7 @@ function RecordPageContent() {
                 <div className="text-center">
                   <div className="text-sm font-medium text-[#4a4a4a] mb-3">
                     今日总收入
-                    {totalIncomeConfirmed && (
+                    {isDayLocked && (
                       <span className="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded-full">
                         已确认
                       </span>
@@ -1072,7 +1226,7 @@ function RecordPageContent() {
                     accentColor="red"
                     className="mt-4"
                   />
-                  {!totalIncomeConfirmed && (
+                  {!isDayLocked && (
                     <Button
                       type="button"
                       onClick={() => setShowTotalIncomeConfirmDialog(true)}
@@ -1090,7 +1244,7 @@ function RecordPageContent() {
           </Card>
 
           {/* 第二板块：当日产品销量追踪 */}
-          <div className={`${totalIncomeConfirmed ? "opacity-60" : ""}`}>
+          <div className={`${isDayLocked ? "opacity-60" : ""}`}>
             <Card accentColor="yellow">
               <SectionHeader title="📊 当日产品销量追踪" accentColor="yellow" className="text-center mb-6" isPageTitle={false} />
               <div className="max-w-md mx-auto space-y-6">
@@ -1099,12 +1253,12 @@ function RecordPageContent() {
             <div>
               <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">饼类产品</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
-                <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
-                <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
-                <SkuInput label="肠蛋饼" value={skuChangdanbing} onChange={setSkuChangdanbing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
-                <SkuInput label="肉蛋饼" value={skuRoudanbing} onChange={setSkuRoudanbing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
-                <SkuInput label="蛋饼" value={skuDanbing} onChange={setSkuDanbing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
-                <SkuInput label="肠饼" value={skuChangbing} onChange={setSkuChangbing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
+                <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={isDayLocked || salesModulesSaved.bing} />
+                <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} disabled={isDayLocked || salesModulesSaved.bing} />
+                <SkuInput label="肠蛋饼" value={skuChangdanbing} onChange={setSkuChangdanbing} disabled={isDayLocked || salesModulesSaved.bing} />
+                <SkuInput label="肉蛋饼" value={skuRoudanbing} onChange={setSkuRoudanbing} disabled={isDayLocked || salesModulesSaved.bing} />
+                <SkuInput label="蛋饼" value={skuDanbing} onChange={setSkuDanbing} disabled={isDayLocked || salesModulesSaved.bing} />
+                <SkuInput label="肠饼" value={skuChangbing} onChange={setSkuChangbing} disabled={isDayLocked || salesModulesSaved.bing} />
               </div>
               
               {/* 汇总显示 - 视觉焦点 */}
@@ -1117,7 +1271,7 @@ function RecordPageContent() {
               />
 
               {/* 保存按钮 */}
-              {!salesModulesSaved.bing && !totalIncomeConfirmed && (
+              {!salesModulesSaved.bing && !isDayLocked && (
                 <Button
                   type="button"
                   onClick={() => handleSaveSalesModule("bing")}
@@ -1156,7 +1310,7 @@ function RecordPageContent() {
                         label={item.label}
                         value={item.value}
                         onChange={item.onChange}
-                        disabled={totalIncomeConfirmed || salesModulesSaved.tang}
+                        disabled={isDayLocked || salesModulesSaved.tang}
                       />
                     ))}
                   </div>
@@ -1171,7 +1325,7 @@ function RecordPageContent() {
                   />
 
                   {/* 保存按钮 */}
-                  {!salesModulesSaved.tang && !totalIncomeConfirmed && (
+                  {!salesModulesSaved.tang && !isDayLocked && (
                     <Button
                       type="button"
                       onClick={() => handleSaveSalesModule("tang")}
@@ -1200,9 +1354,9 @@ function RecordPageContent() {
               <div className="mb-6">
                 <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">【素】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
-                  <SkuInput label="三鲜" value={skuMixianSuSanxian} onChange={setSkuMixianSuSanxian} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
-                  <SkuInput label="酸菜" value={skuMixianSuSuancai} onChange={setSkuMixianSuSuancai} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
-                  <SkuInput label="麻辣" value={skuMixianSuMala} onChange={setSkuMixianSuMala} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
+                  <SkuInput label="三鲜" value={skuMixianSuSanxian} onChange={setSkuMixianSuSanxian} disabled={isDayLocked || salesModulesSaved.mixian} />
+                  <SkuInput label="酸菜" value={skuMixianSuSuancai} onChange={setSkuMixianSuSuancai} disabled={isDayLocked || salesModulesSaved.mixian} />
+                  <SkuInput label="麻辣" value={skuMixianSuMala} onChange={setSkuMixianSuMala} disabled={isDayLocked || salesModulesSaved.mixian} />
                 </div>
               </div>
 
@@ -1210,9 +1364,9 @@ function RecordPageContent() {
               <div className="mb-6">
                 <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">【肉】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
-                  <SkuInput label="三鲜" value={skuMixianRouSanxian} onChange={setSkuMixianRouSanxian} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
-                  <SkuInput label="酸菜" value={skuMixianRouSuancai} onChange={setSkuMixianRouSuancai} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
-                  <SkuInput label="麻辣" value={skuMixianRouMala} onChange={setSkuMixianRouMala} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
+                  <SkuInput label="三鲜" value={skuMixianRouSanxian} onChange={setSkuMixianRouSanxian} disabled={isDayLocked || salesModulesSaved.mixian} />
+                  <SkuInput label="酸菜" value={skuMixianRouSuancai} onChange={setSkuMixianRouSuancai} disabled={isDayLocked || salesModulesSaved.mixian} />
+                  <SkuInput label="麻辣" value={skuMixianRouMala} onChange={setSkuMixianRouMala} disabled={isDayLocked || salesModulesSaved.mixian} />
                 </div>
               </div>
 
@@ -1220,7 +1374,7 @@ function RecordPageContent() {
               <div className="mb-4">
                 <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">酸辣粉</h4>
                 <div className="grid grid-cols-2 gap-4">
-                  <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
+                  <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} disabled={isDayLocked || salesModulesSaved.mixian} />
                 </div>
               </div>
 
@@ -1234,7 +1388,7 @@ function RecordPageContent() {
               />
 
               {/* 保存按钮 */}
-              {!salesModulesSaved.mixian && !totalIncomeConfirmed && (
+              {!salesModulesSaved.mixian && !isDayLocked && (
                 <Button
                   type="button"
                   onClick={() => handleSaveSalesModule("mixian")}
@@ -1257,9 +1411,9 @@ function RecordPageContent() {
             <div>
               <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">炒面/炒河粉类</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
-                <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
-                <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
-                <SkuInput label="【细粉】炒河粉" value={skuChaohufenXi} onChange={setSkuChaohufenXi} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
+                <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={isDayLocked || salesModulesSaved.chaomian} />
+                <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={isDayLocked || salesModulesSaved.chaomian} />
+                <SkuInput label="【细粉】炒河粉" value={skuChaohufenXi} onChange={setSkuChaohufenXi} disabled={isDayLocked || salesModulesSaved.chaomian} />
               </div>
               
               {/* 汇总显示 - 视觉焦点 */}
@@ -1272,7 +1426,7 @@ function RecordPageContent() {
               />
 
               {/* 保存按钮 */}
-              {!salesModulesSaved.chaomian && !totalIncomeConfirmed && (
+              {!salesModulesSaved.chaomian && !isDayLocked && (
                 <Button
                   type="button"
                   onClick={() => handleSaveSalesModule("chaomian")}
@@ -1600,7 +1754,7 @@ function RecordPageContent() {
           </Card>
 
           {/* 今日经营成绩单 - 仅在最终确认后显示 */}
-          {totalIncomeConfirmed && (
+          {isDayLocked && (
             <Card accentColor="red" className="p-12">
               <div className="text-center">
                 <h3 className="text-2xl font-semibold text-[#1a1a1a] mb-12">🏆 今日经营成绩单</h3>
@@ -1659,17 +1813,55 @@ function RecordPageContent() {
             </Card>
           )}
 
-          {/* 提交按钮 */}
-          <Button
-            type="submit"
-            disabled={submitting}
-            accentColor="red"
-            variant="primary"
-            size="lg"
-            className="w-full"
-          >
-            {submitting ? "保存中..." : "✅ 保存今天的记录"}
-          </Button>
+          {/* 全局保存与锁定按钮 */}
+          {!isDayLocked && (
+            <Card accentColor="red" className="mt-6">
+              <div className="text-center">
+                <Button
+                  type="button"
+                  onClick={() => setShowGlobalSummaryModal(true)}
+                  disabled={globalSubmitting || submitting}
+                  accentColor="red"
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
+                >
+                  {globalSubmitting ? "提交中..." : "🔒 确认提交今日录入并锁定"}
+                </Button>
+                <p className="text-xs mt-2" style={{ color: theme.text.tertiary }}>
+                  提交后将锁定今日所有数据，无法再修改
+                </p>
+              </div>
+            </Card>
+          )}
+
+          {/* 锁定提示 */}
+          {isDayLocked && (
+            <Card accentColor="red" className="mt-6">
+              <div className="text-center py-4">
+                <div className="text-lg font-semibold mb-2" style={{ color: theme.accent.red.base }}>
+                  🔒 今日账目已锁定
+                </div>
+                <p className="text-sm" style={{ color: theme.text.secondary }}>
+                  今日数据已提交并锁定，无法修改
+                </p>
+              </div>
+            </Card>
+          )}
+
+          {/* 旧提交按钮（保留作为备用） */}
+          {!isDayLocked && (
+            <Button
+              type="submit"
+              disabled={submitting}
+              accentColor="red"
+              variant="secondary"
+              size="md"
+              className="w-full mt-4"
+            >
+              {submitting ? "保存中..." : "💾 临时保存（不锁定）"}
+            </Button>
+          )}
         </form>
       </div>
 
@@ -1796,6 +1988,138 @@ function RecordPageContent() {
           >
             确认
           </Button>
+        </div>
+      </Modal>
+
+      {/* 全局汇总总览弹窗 */}
+      <Modal
+        isOpen={showGlobalSummaryModal}
+        onClose={() => setShowGlobalSummaryModal(false)}
+        title="📊 今日录入总览"
+        accentColor="red"
+        showCloseButton={true}
+      >
+        <div className="space-y-4">
+          {/* 收入汇总 */}
+          <Card accentColor="red">
+            <div className="text-sm font-medium mb-3" style={{ color: theme.accent.red.base }}>
+              收入汇总
+            </div>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>微信：</span>
+                <span className="font-mono font-semibold">¥ {globalSummary.income.wechat.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>支付宝：</span>
+                <span className="font-mono font-semibold">¥ {globalSummary.income.alipay.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>现金：</span>
+                <span className="font-mono font-semibold">¥ {globalSummary.income.cash.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t" style={{ borderColor: theme.accent.red.border }}>
+                <span className="font-medium">总收入：</span>
+                <span className="font-mono font-bold text-lg" style={{ color: theme.accent.red.base }}>
+                  ¥ {globalSummary.income.total.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </Card>
+
+          {/* 销量汇总 */}
+          <Card accentColor="yellow">
+            <div className="text-sm font-medium mb-3" style={{ color: theme.accent.yellow.base }}>
+              销量汇总
+            </div>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>饼类：</span>
+                <span className="font-mono font-semibold">{globalSummary.sales.bing} 个</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>汤粥类：</span>
+                <span className="font-mono font-semibold">{globalSummary.sales.tang} 个</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>米线面类：</span>
+                <span className="font-mono font-semibold">{globalSummary.sales.mixian} 个</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>炒面河粉类：</span>
+                <span className="font-mono font-semibold">{globalSummary.sales.chaomian} 个</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t" style={{ borderColor: theme.accent.yellow.border }}>
+                <span className="font-medium">总销量：</span>
+                <span className="font-mono font-bold text-lg" style={{ color: theme.accent.yellow.base }}>
+                  {globalSummary.sales.total} 个
+                </span>
+              </div>
+            </div>
+          </Card>
+
+          {/* 支出汇总 */}
+          <Card accentColor="blue">
+            <div className="text-sm font-medium mb-3" style={{ color: theme.accent.blue.base }}>
+              支出汇总
+            </div>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>原材料：</span>
+                <span className="font-mono font-semibold">¥ {globalSummary.expenses.raw.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>固定费用：</span>
+                <span className="font-mono font-semibold">¥ {globalSummary.expenses.fixed.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>消耗品：</span>
+                <span className="font-mono font-semibold">¥ {globalSummary.expenses.cons.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>其他：</span>
+                <span className="font-mono font-semibold">¥ {globalSummary.expenses.other.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t" style={{ borderColor: theme.accent.blue.border }}>
+                <span className="font-medium">总支出：</span>
+                <span className="font-mono font-bold text-lg" style={{ color: theme.accent.blue.base }}>
+                  ¥ {globalSummary.expenses.total.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </Card>
+
+          {/* 警告提示 */}
+          <div className="p-3 rounded-lg" style={{ backgroundColor: theme.accent.red.hover }}>
+            <p className="text-sm text-center" style={{ color: theme.accent.red.base }}>
+              ⚠️ 提交后将锁定今日所有数据，无法再修改
+            </p>
+          </div>
+
+          {/* 操作按钮 */}
+          <div className="flex gap-4 pt-2">
+            <Button
+              type="button"
+              onClick={() => setShowGlobalSummaryModal(false)}
+              accentColor="red"
+              variant="secondary"
+              size="lg"
+              className="flex-1"
+            >
+              再检查
+            </Button>
+            <Button
+              type="button"
+              onClick={handleGlobalSave}
+              disabled={globalSubmitting}
+              accentColor="red"
+              variant="primary"
+              size="lg"
+              className="flex-1"
+            >
+              {globalSubmitting ? "提交中..." : "确认提交并锁定"}
+            </Button>
+          </div>
         </div>
       </Modal>
     </div>
