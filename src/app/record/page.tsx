@@ -618,6 +618,17 @@ function RecordPageContent() {
         skuSuanlafen > 0 ||
         skuChaomianXiangcui > 0 || skuChaohufenKuan > 0 || skuChaohufenXi > 0;
 
+      // 计算汇总数据
+      const totalSalesCount =
+        skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing +
+        skuFentang + skuHundun + skuXiaomizhou + skuDoujiang + skuJidantang +
+        skuMixianSuSanxian + skuMixianSuSuancai + skuMixianSuMala +
+        skuMixianRouSanxian + skuMixianRouSuancai + skuMixianRouMala +
+        skuSuanlafen + skuChaomianXiangcui + skuChaohufenKuan + skuChaohufenXi;
+
+      const cogsToday = calculateTodayCOGS();
+      const estimatedProfit = totalIncome - cogsToday;
+
       // 如果有收入或销量，创建一条记录
       if (totalIncome > 0 || hasSalesData) {
         const { error: recordError } = await supabase
@@ -627,6 +638,12 @@ function RecordPageContent() {
             income_wechat: parseFloat(incomeWechat || "0"),
             income_alipay: parseFloat(incomeAlipay || "0"),
             income_cash: parseFloat(incomeCash || "0"),
+            // 汇总字段
+            total_income: totalIncome,
+            total_sales: totalSalesCount,
+            total_expenses: expenseTotals.grandTotal,
+            estimated_profit: estimatedProfit,
+            cogs_today: cogsToday,
             // 饼类产品
             sku_roubing: skuRoubing,
             sku_shouroubing: skuShouroubing,
@@ -713,6 +730,9 @@ function RecordPageContent() {
 
       setExpenses([]);
       setShowSuccess(true);
+
+      // 设置最终确认状态，显示经营成绩单
+      setTotalIncomeConfirmed(true);
 
       // 3秒后隐藏成功提示
       setTimeout(() => {
@@ -1347,21 +1367,69 @@ function RecordPageContent() {
               </div>
             </div>
 
-            {/* 今日经营概览 */}
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 shadow-sm">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">📊 今日经营概览</h3>
-              <div className="text-center">
-                <div className="text-2xl font-semibold text-gray-700 mb-2">
-                  今日预估成本
-                </div>
-                <div className="text-4xl font-bold text-blue-600 mb-2">
-                  ¥ {calculateTodayCOGS().toFixed(2)}
-                </div>
-                <div className="text-sm text-gray-600">
-                  已包含每日固定开支分摊
+            {/* 今日经营成绩单 - 仅在最终确认后显示 */}
+            {totalIncomeConfirmed && (
+              <div className="bg-gradient-to-r from-yellow-50 via-orange-50 to-yellow-100 rounded-xl p-8 shadow-lg border-2 border-yellow-200">
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-6">🏆 今日经营成绩单</h3>
+
+                  {/* 核心指标 - 净利润 */}
+                  <div className="mb-6">
+                    <div className="text-lg font-medium text-gray-600 mb-2">今日预估净赚</div>
+                    <div className={`text-5xl font-bold mb-2 ${
+                      (parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0") - calculateTodayCOGS()) >= 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}>
+                      ¥ {((parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")) - calculateTodayCOGS()).toFixed(2)}
+                    </div>
+                  </div>
+
+                  {/* 辅助指标列表 */}
+                  <div className="grid grid-cols-2 gap-4 text-left">
+                    <div className="bg-white/60 rounded-lg p-4">
+                      <div className="text-sm font-medium text-gray-600">总收入</div>
+                      <div className="text-xl font-bold text-green-600">
+                        ¥ {(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}
+                      </div>
+                    </div>
+
+                    <div className="bg-white/60 rounded-lg p-4">
+                      <div className="text-sm font-medium text-gray-600">总支出</div>
+                      <div className="text-xl font-bold text-red-600">
+                        ¥ {expenseTotals.grandTotal.toFixed(2)}
+                      </div>
+                    </div>
+
+                    <div className="bg-white/60 rounded-lg p-4">
+                      <div className="text-sm font-medium text-gray-600">经营成本</div>
+                      <div className="text-lg font-bold text-blue-600">
+                        ¥ {calculateTodayCOGS().toFixed(2)}
+                      </div>
+                      <div className="text-xs text-gray-500">含固定费摊销</div>
+                    </div>
+
+                    <div className="bg-white/60 rounded-lg p-4">
+                      <div className="text-sm font-medium text-gray-600">销量汇总</div>
+                      <div className="text-lg font-bold text-purple-600">
+                        {skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing +
+                         skuFentang + skuHundun + skuXiaomizhou + skuDoujiang + skuJidantang +
+                         skuMixianSuSanxian + skuMixianSuSuancai + skuMixianSuMala +
+                         skuMixianRouSanxian + skuMixianRouSuancai + skuMixianRouMala +
+                         skuSuanlafen + skuChaomianXiangcui + skuChaohufenKuan + skuChaohufenXi} 个
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 鼓励语 */}
+                  <div className="mt-6 pt-4 border-t border-yellow-200">
+                    <div className="text-sm text-gray-600 italic">
+                      🎊 今日辛苦了！数据已保存，明天继续加油！
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* 提交按钮 */}
