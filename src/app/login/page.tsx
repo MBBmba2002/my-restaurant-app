@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { Card } from "@/components/ui/Card";
+import { FormRow } from "@/components/ui/FormRow";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -37,53 +41,57 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f2eada] flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-[0_8px_30px_rgb(171,50,42,0.05)]">
-        <h1 className="text-3xl font-bold text-[#0c0c0c] mb-8 text-center">
-          登录
-        </h1>
+    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <Card accentColor="red" className="p-8">
+          <h1 className="text-3xl font-semibold text-[#1a1a1a] mb-8 text-center">
+            登录
+          </h1>
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label className="block text-base font-medium mb-2 text-[#3d3435]">
-              邮箱
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="请输入邮箱"
-              className="w-full font-mono text-xl p-4 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c]"
-            />
-          </div>
+          <form onSubmit={handleLogin} className="space-y-6">
+            <FormRow label="邮箱" accentColor="red">
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="请输入邮箱"
+                accentColor="red"
+              />
+            </FormRow>
 
-          <div>
-            <label className="block text-base font-medium mb-2 text-[#3d3435]">
-              密码
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="请输入密码"
-              className="w-full font-mono text-xl p-4 bg-white border-none rounded-3xl focus:outline-none focus:ring-1 focus:ring-[#ab322a] transition-all text-[#0c0c0c]"
-            />
-          </div>
+            <FormRow label="密码" accentColor="red">
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="请输入密码"
+                accentColor="red"
+              />
+            </FormRow>
 
-          {error && (
-            <div className="text-[#ab322a] text-sm text-center">{error}</div>
-          )}
+            {error && (
+              <div className="text-sm text-center p-3 rounded-lg" style={{ 
+                backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                color: '#dc2626'
+              }}>
+                {error}
+              </div>
+            )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full p-4 text-xl font-bold bg-[#ab322a] text-[#f2eada] rounded-full transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? "登录中..." : "登录"}
-          </button>
-        </form>
+            <Button
+              type="submit"
+              disabled={loading}
+              accentColor="red"
+              variant="primary"
+              size="lg"
+              className="w-full"
+            >
+              {loading ? "登录中..." : "登录"}
+            </Button>
+          </form>
+        </Card>
       </div>
     </div>
   );

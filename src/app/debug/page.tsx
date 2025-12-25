@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Card } from "@/components/ui/Card";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Button } from "@/components/ui/Button";
 
 export default function DebugPage() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -44,42 +47,48 @@ export default function DebugPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black p-8">
-      <main className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6 text-black dark:text-zinc-50">
-          环境变量调试页面
-        </h1>
+    <div className="min-h-screen bg-[#fafafa] p-8">
+      <main className="max-w-3xl mx-auto">
+        <SectionHeader 
+          title="环境变量调试页面" 
+          accentColor="blue"
+          className="mb-6"
+        />
         
-        <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 shadow-lg mb-4">
-          <pre className="text-sm text-zinc-800 dark:text-zinc-200 font-mono whitespace-pre-wrap">
+        <Card accentColor="blue" className="mb-6">
+          <pre className="text-sm text-[#1a1a1a] font-mono whitespace-pre-wrap">
 {`hasSupabaseUrl: ${hasSupabaseUrl}
 hasSupabaseAnonKey: ${hasSupabaseAnonKey}
 supabaseUrlHost: ${supabaseUrlHost}
 currentLocation: ${currentLocation}
 `}
           </pre>
-        </div>
+        </Card>
 
-        <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 shadow-lg mb-4">
-          <h2 className="text-lg font-semibold mb-4 text-black dark:text-zinc-50">Health Check</h2>
-          <button
+        <Card accentColor="blue" className="mb-6">
+          <SectionHeader title="Health Check" accentColor="blue" className="mb-4" />
+          <Button
             onClick={handleHealthCheck}
             disabled={!hasSupabaseUrl || healthCheckLoading}
-            className="rounded-md bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            accentColor="blue"
+            variant="primary"
+            size="md"
           >
             {healthCheckLoading ? "检查中..." : "Health Check"}
-          </button>
+          </Button>
           {healthCheckResult && (
-            <pre className="mt-4 p-3 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-800 dark:text-zinc-200 font-mono whitespace-pre-wrap">
+            <pre className="mt-4 p-4 bg-[#fafafa] rounded-lg text-sm text-[#1a1a1a] font-mono whitespace-pre-wrap border border-gray-200">
               {healthCheckResult}
             </pre>
           )}
-        </div>
+        </Card>
         
-        <div className="text-sm text-zinc-600 dark:text-zinc-400">
-          <p>✓ 如果 hasSupabaseUrl 和 hasSupabaseAnonKey 都是 true，说明环境变量已正确配置</p>
-          <p>⚠️ 如果都是 false，需要在 GitHub Secrets 中设置 NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY</p>
-        </div>
+        <Card>
+          <div className="text-sm text-[#4a4a4a] space-y-2">
+            <p>✓ 如果 hasSupabaseUrl 和 hasSupabaseAnonKey 都是 true，说明环境变量已正确配置</p>
+            <p>⚠️ 如果都是 false，需要在 GitHub Secrets 中设置 NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY</p>
+          </div>
+        </Card>
       </main>
     </div>
   );

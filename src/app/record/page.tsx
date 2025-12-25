@@ -5,6 +5,15 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { RequireAuth } from "@/components/auth/RequireAuth";
+import { Card } from "@/components/ui/Card";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { FormRow } from "@/components/ui/FormRow";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { StatCard } from "@/components/ui/StatCard";
+import { Modal } from "@/components/ui/Modal";
+import { Toast } from "@/components/ui/Toast";
+import { theme } from "@/lib/theme";
 
 
 // 销量输入组件（可复用）- 极简主义美化版
@@ -54,9 +63,17 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
     onChange(value + 1);
   };
 
+  const yellow = theme.accent.yellow;
+  
+  const handleBlur = () => {
+    if (disabled || useStringValue) return;
+    const numValue = parseInt(inputValue) || 0;
+    onChange(Math.max(0, numValue));
+  };
+  
   return (
     <div className="flex flex-col">
-      <label className="block text-base font-medium mb-3 text-[#3d3435]">
+      <label className="block text-sm font-medium mb-2 text-[#4a4a4a]">
         {label}
       </label>
       <div className="flex items-center justify-center gap-3">
@@ -64,11 +81,12 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           type="button"
           onClick={handleDecrement}
           disabled={disabled}
-          className={`w-8 h-8 bg-[#ffcc00]/20 text-[#ffcc00] rounded-full flex items-center justify-center transition-all border border-[#ffcc00]/30 ${
-            disabled
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-[#ffcc00]/30 active:scale-95"
-          }`}
+          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all border disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80 active:scale-95"
+          style={{
+            backgroundColor: yellow.light,
+            color: yellow.base,
+            borderColor: yellow.border,
+          }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" />
@@ -81,26 +99,36 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
             min="0"
             value={inputValue}
             onChange={handleInputChange}
-            onBlur={() => {
-              if (disabled || useStringValue) return;
-              const numValue = parseInt(inputValue) || 0;
-              onChange(Math.max(0, numValue));
-            }}
+            onBlur={handleBlur}
             disabled={disabled}
-            className={`w-full font-mono text-2xl font-bold text-center py-4 bg-[#ffcc00]/10 backdrop-blur-md border border-[#ffcc00]/20 focus:outline-none focus:border-[#ffcc00]/50 focus:shadow-[inset_0_0_0_1px_rgba(255,204,0,0.3)] rounded-3xl transition-all text-[#0c0c0c] ${
-              disabled ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className="w-full font-mono text-xl font-bold text-center py-3 rounded-lg transition-all text-[#1a1a1a] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none border"
+            style={{
+              backgroundColor: yellow.light,
+              borderColor: yellow.border,
+            }}
+            onFocus={(e) => {
+              if (!disabled) {
+                e.target.style.borderColor = yellow.base;
+                e.target.style.boxShadow = `0 0 0 3px ${yellow.focus}`;
+              }
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = yellow.border;
+              e.target.style.boxShadow = 'none';
+              handleBlur();
+            }}
           />
         </div>
         <button
           type="button"
           onClick={handleIncrement}
           disabled={disabled}
-          className={`w-8 h-8 bg-[#ffcc00]/20 text-[#ffcc00] rounded-full flex items-center justify-center transition-all border border-[#ffcc00]/30 ${
-            disabled
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-[#ffcc00]/30 active:scale-95"
-          }`}
+          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all border disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80 active:scale-95"
+          style={{
+            backgroundColor: yellow.light,
+            color: yellow.base,
+            borderColor: yellow.border,
+          }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -907,7 +935,7 @@ function RecordPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f2eada] pb-20">
+    <div className="min-h-screen bg-[#fafafa] pb-20">
       {/* 成功提示 */}
       {showSuccess && (
         <div className="fixed top-0 left-0 right-0 bg-green-500 text-white text-center py-4 text-xl z-50">
@@ -915,22 +943,19 @@ function RecordPageContent() {
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto p-4">
+      <div className="max-w-5xl mx-auto p-6">
         {/* 顶部日期 */}
-        <div className="text-center py-6">
-          <h1 className="text-3xl font-bold text-[#0c0c0c]">{todayDate}</h1>
+        <div className="text-center py-8 mb-6">
+          <h1 className="text-3xl font-semibold text-[#1a1a1a]">{todayDate}</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 第一板块：今日收入 */}
-          <div className="bg-white rounded-3xl p-6 border-none">
-            <h2 className="text-3xl font-black text-center mb-8 text-[#0c0c0c]">💰 今日收入</h2>
+          <Card accentColor="red">
+            <SectionHeader title="💰 今日收入" accentColor="red" className="text-center mb-6" />
             <div className="max-w-md mx-auto space-y-4">
-              <div>
-                <label className="block text-xl font-bold mb-3 text-[#0c0c0c]">
-                  微信
-                </label>
-                <input
+              <FormRow label="微信" accentColor="red">
+                <Input
                   type="text"
                   inputMode="decimal"
                   value={incomeWechat}
@@ -942,18 +967,11 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full font-mono text-xl p-4 bg-[#ab322a]/10 backdrop-blur-md border border-[#ab322a]/20 focus:outline-none focus:border-[#ab322a]/50 focus:shadow-[inset_0_0_0_1px_rgba(171,50,42,0.3)] rounded-3xl transition-all text-[#0c0c0c] ${
-                    totalIncomeConfirmed
-                      ? "bg-gray-100 cursor-not-allowed opacity-60"
-                      : ""
-                  }`}
+                  accentColor="red"
                 />
-              </div>
-              <div>
-                <label className="block text-xl font-bold mb-3 text-[#0c0c0c]">
-                  支付宝
-                </label>
-                <input
+              </FormRow>
+              <FormRow label="支付宝" accentColor="red">
+                <Input
                   type="text"
                   inputMode="decimal"
                   value={incomeAlipay}
@@ -965,18 +983,11 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full font-mono text-xl p-4 bg-[#ab322a]/10 backdrop-blur-md border border-[#ab322a]/20 focus:outline-none focus:border-[#ab322a]/50 focus:shadow-[inset_0_0_0_1px_rgba(171,50,42,0.3)] rounded-3xl transition-all text-[#0c0c0c] ${
-                    totalIncomeConfirmed
-                      ? "bg-gray-100 cursor-not-allowed opacity-60"
-                      : ""
-                  }`}
+                  accentColor="red"
                 />
-              </div>
-              <div>
-                <label className="block text-xl font-bold mb-3 text-[#0c0c0c]">
-                  现金
-                </label>
-                <input
+              </FormRow>
+              <FormRow label="现金" accentColor="red">
+                <Input
                   type="text"
                   inputMode="decimal"
                   value={incomeCash}
@@ -988,36 +999,29 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full font-mono text-xl p-4 bg-[#ab322a]/10 backdrop-blur-md border border-[#ab322a]/20 focus:outline-none focus:border-[#ab322a]/50 focus:shadow-[inset_0_0_0_1px_rgba(171,50,42,0.3)] rounded-3xl transition-all text-[#0c0c0c] ${
-                    totalIncomeConfirmed
-                      ? "bg-gray-100 cursor-not-allowed opacity-60"
-                      : ""
-                  }`}
+                  accentColor="red"
                 />
-              </div>
+              </FormRow>
 
               {/* 保存收入按钮 */}
               <div className="mt-4">
-                <button
+                <Button
                   type="button"
                   onClick={handleSaveIncome}
                   disabled={totalIncomeConfirmed}
-                  className={`w-full p-4 text-lg font-bold rounded-full transition-all active:scale-95 ${
-                    totalIncomeConfirmed
-                      ? "bg-gray-300 text-[#0c0c0c] opacity-50 cursor-not-allowed"
-                      : incomeSavedMessage
-                      ? "bg-green-500 text-white"
-                      : "bg-[#3d3435] text-white"
-                  }`}
+                  accentColor="red"
+                  variant={incomeSavedMessage ? "primary" : "secondary"}
+                  size="lg"
+                  className="w-full"
                 >
                   {incomeSavedMessage ? "✅ 已保存" : "💾 保存"}
-                </button>
+                </Button>
               </div>
 
               {/* 今日总收入显示 - 视觉焦点 */}
-              <div className="mt-8 pt-8 border-t border-gray-100">
+              <div className="mt-8 pt-8 border-t border-gray-200">
                 <div className="text-center">
-                  <div className="text-sm font-medium text-[#3d3435] mb-3">
+                  <div className="text-sm font-medium text-[#4a4a4a] mb-3">
                     今日总收入
                     {totalIncomeConfirmed && (
                       <span className="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded-full">
@@ -1025,32 +1029,38 @@ function RecordPageContent() {
                       </span>
                     )}
                   </div>
-                  <div className="text-4xl font-black text-[#ab322a] font-mono">
-                    ¥ {(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}
-                  </div>
+                  <StatCard
+                    label=""
+                    value={`¥ ${(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}`}
+                    accentColor="red"
+                    className="mt-4"
+                  />
                   {!totalIncomeConfirmed && (
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setShowTotalIncomeConfirmDialog(true)}
-                      className="mt-6 px-8 py-4 bg-[#ab322a] text-white text-lg font-semibold rounded-full transition-all active:scale-95 hover:bg-[#ab322a]/90"
+                      accentColor="red"
+                      variant="primary"
+                      size="lg"
+                      className="mt-6 w-full"
                     >
                       🔒 确认提交总收入
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
-          {/* 第二板块：销量追踪 */}
+          {/* 第二板块：当日产品销量追踪 */}
           <div className={`${totalIncomeConfirmed ? "opacity-60" : ""}`}>
-            <div className="bg-white rounded-3xl p-6 border-none">
-              <h2 className="text-3xl font-black text-center mb-8 text-[#0c0c0c]">📊 销量追踪</h2>
+            <Card accentColor="yellow">
+              <SectionHeader title="📊 当日产品销量追踪" accentColor="yellow" className="text-center mb-6" />
               <div className="max-w-md mx-auto space-y-6">
             
             {/* 饼类产品卡片 */}
             <div>
-              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">饼类产品</h3>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">饼类产品</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
                 <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
@@ -1061,26 +1071,29 @@ function RecordPageContent() {
               </div>
               
               {/* 汇总显示 - 视觉焦点 */}
-              <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/20 rounded-2xl py-4 px-6 mb-4 backdrop-blur-sm">
-                <div className="text-center">
-                  <div className="text-sm font-medium text-[#3d3435] mb-2">饼类总计</div>
-                  <div className="text-4xl font-black text-[#ffcc00] font-mono">{salesTotals.bingTotal}</div>
-                  <div className="text-sm text-[#3d3435] mt-1">个</div>
-                </div>
-              </div>
+              <StatCard
+                label="饼类总计"
+                value={salesTotals.bingTotal}
+                unit="个"
+                accentColor="yellow"
+                className="mb-4"
+              />
 
               {/* 保存按钮 */}
               {!salesModulesSaved.bing && !totalIncomeConfirmed && (
-                <button
+                <Button
                   type="button"
                   onClick={() => handleSaveSalesModule("bing")}
-                  className="w-full p-4 text-lg font-semibold bg-[#ffcc00] text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/90"
+                  accentColor="yellow"
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
                 >
                   保存饼类销量
-                </button>
+                </Button>
               )}
               {salesModulesSaved.bing && (
-                <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-full">
+                <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-lg">
                   ✓ 已保存
                 </div>
               )}
@@ -1098,7 +1111,7 @@ function RecordPageContent() {
 
               return (
                 <div>
-                  <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">汤/粥类</h3>
+                  <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">汤/粥类</h3>
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     {soupItems.map((item) => (
                       <SkuInput
@@ -1112,26 +1125,29 @@ function RecordPageContent() {
                   </div>
                   
                   {/* 汇总显示 - 视觉焦点 */}
-                  <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/20 rounded-2xl py-4 px-6 mb-4 backdrop-blur-sm">
-                    <div className="text-center">
-                      <div className="text-sm font-medium text-[#3d3435] mb-2">汤/粥类总计</div>
-                      <div className="text-4xl font-black text-[#ffcc00] font-mono">{salesTotals.tangTotal}</div>
-                      <div className="text-sm text-[#3d3435] mt-1">个</div>
-                    </div>
-                  </div>
+                  <StatCard
+                    label="汤/粥类总计"
+                    value={salesTotals.tangTotal}
+                    unit="个"
+                    accentColor="yellow"
+                    className="mb-4"
+                  />
 
                   {/* 保存按钮 */}
                   {!salesModulesSaved.tang && !totalIncomeConfirmed && (
-                    <button
+                    <Button
                       type="button"
                       onClick={() => handleSaveSalesModule("tang")}
-                      className="w-full p-4 text-lg font-semibold bg-[#ffcc00] text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/90"
+                      accentColor="yellow"
+                      variant="primary"
+                      size="lg"
+                      className="w-full"
                     >
                       保存汤/粥类销量
-                    </button>
+                    </Button>
                   )}
                   {salesModulesSaved.tang && (
-                    <div className="w-full p-4 text-center text-sm bg-[#ffcc00]/10 text-[#0c0c0c] rounded-full border border-[#ffcc00]/20">
+                    <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-lg">
                       ✓ 已保存
                     </div>
                   )}
@@ -1141,11 +1157,11 @@ function RecordPageContent() {
 
             {/* 米线/面类产品卡片 */}
             <div>
-              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">米线/面类</h3>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">米线/面类</h3>
 
               {/* 【素】米线/面 */}
               <div className="mb-6">
-                <h4 className="text-base font-semibold text-[#3d3435] mb-3">【素】米线/面</h4>
+                <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">【素】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="三鲜" value={skuMixianSuSanxian} onChange={setSkuMixianSuSanxian} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
                   <SkuInput label="酸菜" value={skuMixianSuSuancai} onChange={setSkuMixianSuSuancai} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
@@ -1155,7 +1171,7 @@ function RecordPageContent() {
 
               {/* 【肉】米线/面 */}
               <div className="mb-6">
-                <h4 className="text-base font-semibold text-[#3d3435] mb-3">【肉】米线/面</h4>
+                <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">【肉】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="三鲜" value={skuMixianRouSanxian} onChange={setSkuMixianRouSanxian} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
                   <SkuInput label="酸菜" value={skuMixianRouSuancai} onChange={setSkuMixianRouSuancai} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
@@ -1165,33 +1181,36 @@ function RecordPageContent() {
 
               {/* 酸辣粉 */}
               <div className="mb-4">
-                <h4 className="text-base font-semibold text-[#3d3435] mb-3">酸辣粉</h4>
+                <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">酸辣粉</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
                 </div>
               </div>
 
               {/* 汇总显示 - 视觉焦点 */}
-              <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/20 rounded-2xl py-4 px-6 mb-4 backdrop-blur-sm">
-                <div className="text-center">
-                  <div className="text-sm font-medium text-[#3d3435] mb-2">米线/面类总计</div>
-                  <div className="text-4xl font-black text-[#ffcc00] font-mono">{salesTotals.mixianTotal}</div>
-                  <div className="text-sm text-[#3d3435] mt-1">个</div>
-                </div>
-              </div>
+              <StatCard
+                label="米线/面类总计"
+                value={salesTotals.mixianTotal}
+                unit="个"
+                accentColor="yellow"
+                className="mb-4"
+              />
 
               {/* 保存按钮 */}
               {!salesModulesSaved.mixian && !totalIncomeConfirmed && (
-                <button
+                <Button
                   type="button"
                   onClick={() => handleSaveSalesModule("mixian")}
-                  className="w-full p-4 text-lg font-semibold bg-[#ffcc00] text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/90"
+                  accentColor="yellow"
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
                 >
                   保存米线/面类销量
-                </button>
+                </Button>
               )}
               {salesModulesSaved.mixian && (
-                <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-full">
+                <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-lg">
                   ✓ 已保存
                 </div>
               )}
@@ -1199,7 +1218,7 @@ function RecordPageContent() {
 
             {/* 炒面/炒河粉类产品卡片 */}
             <div>
-              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">炒面/炒河粉类</h3>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">炒面/炒河粉类</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
                 <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
@@ -1207,42 +1226,45 @@ function RecordPageContent() {
               </div>
               
               {/* 汇总显示 - 视觉焦点 */}
-              <div className="bg-[#ffcc00]/10 border border-[#ffcc00]/20 rounded-2xl py-4 px-6 mb-4 backdrop-blur-sm">
-                <div className="text-center">
-                  <div className="text-sm font-medium text-[#3d3435] mb-2">炒面/炒河粉类总计</div>
-                  <div className="text-4xl font-black text-[#ffcc00] font-mono">{salesTotals.chaomianTotal}</div>
-                  <div className="text-sm text-[#3d3435] mt-1">个</div>
-                </div>
-              </div>
+              <StatCard
+                label="炒面/炒河粉类总计"
+                value={salesTotals.chaomianTotal}
+                unit="个"
+                accentColor="yellow"
+                className="mb-4"
+              />
 
               {/* 保存按钮 */}
               {!salesModulesSaved.chaomian && !totalIncomeConfirmed && (
-                <button
+                <Button
                   type="button"
                   onClick={() => handleSaveSalesModule("chaomian")}
-                  className="w-full p-4 text-lg font-semibold bg-[#ffcc00] text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/90"
+                  accentColor="yellow"
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
                 >
                   保存炒面/炒河粉类销量
-                </button>
+                </Button>
               )}
               {salesModulesSaved.chaomian && (
-                <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-full">
+                <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-lg">
                   ✓ 已保存
                 </div>
               )}
             </div>
-            </div>
+              </div>
+            </Card>
           </div>
 
           {/* 第三板块：今日支出 */}
-          <div>
-            <div className="bg-white rounded-3xl p-6 border-none">
-              <h2 className="text-3xl font-black text-center mb-8 text-[#0c0c0c]">💸 支出</h2>
-              <div className="max-w-md mx-auto space-y-6">
+          <Card accentColor="blue">
+            <SectionHeader title="💸 今日支出" accentColor="blue" className="text-center mb-6" />
+            <div className="max-w-md mx-auto space-y-6">
 
             {/* 【购买原材料】模块 */}
             <div>
-              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">【购买原材料】</h3>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">【购买原材料】</h3>
                 {expenseModulesLocked.raw && (
                   <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
                     已锁定
@@ -1263,43 +1285,39 @@ function RecordPageContent() {
                   <>
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       {rawItems.map((item) => (
-                        <div key={item.label} className="flex flex-col">
-                          <label className="block text-sm font-medium mb-3 text-[#3d3435]">
-                            {item.label}
-                          </label>
-                          <input
+                        <FormRow key={item.label} label={item.label} accentColor="blue">
+                          <Input
                             type="number"
                             step="0.01"
                             value={item.value}
                             onChange={(e) => item.onChange(e.target.value)}
                             disabled={expenseModulesLocked.raw}
                             placeholder="0.00"
-                            className={`w-full font-mono text-xl p-3 bg-[#1661ab]/10 backdrop-blur-md border border-[#1661ab]/20 focus:outline-none focus:border-[#1661ab]/50 focus:shadow-[inset_0_0_0_1px_rgba(22,97,171,0.3)] rounded-3xl transition-all text-[#0c0c0c] ${
-                              expenseModulesLocked.raw
-                                ? "bg-gray-100 cursor-not-allowed opacity-60"
-                                : ""
-                            }`}
+                            accentColor="blue"
                           />
-                        </div>
+                        </FormRow>
                       ))}
                     </div>
 
                     {/* 原材料汇总显示 - 视觉焦点 */}
-                    <div className="mt-6 pt-6 border-t border-gray-100">
-                      <div className="text-center">
-                        <div className="text-sm font-medium text-[#3d3435] mb-2">本类合计</div>
-                        <div className="text-4xl font-black text-[#1661ab] font-mono">¥ {expenseTotals.rawTotal.toFixed(2)}</div>
-                      </div>
-                    </div>
+                    <StatCard
+                      label="本类合计"
+                      value={`¥ ${expenseTotals.rawTotal.toFixed(2)}`}
+                      accentColor="blue"
+                      className="mt-6"
+                    />
 
                     {!expenseModulesLocked.raw && (
-                      <button
+                      <Button
                         type="button"
                         onClick={() => setExpenseConfirmModal({ isOpen: true, module: "raw" })}
-                        className="w-full p-4 text-lg font-semibold bg-[#1661ab] text-white rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/90"
+                        accentColor="blue"
+                        variant="primary"
+                        size="lg"
+                        className="w-full mt-4"
                       >
                         🔒 记入支出
-                      </button>
+                      </Button>
                     )}
                   </>
                 );
@@ -1308,7 +1326,7 @@ function RecordPageContent() {
 
             {/* 【门店固定费用】模块 */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">【门店固定费用】</h3>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">【门店固定费用】</h3>
               {expenseModulesLocked.fixed && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
                   已锁定
@@ -1327,43 +1345,39 @@ function RecordPageContent() {
                   <>
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       {fixedItems.map((item) => (
-                        <div key={item.label} className="flex flex-col">
-                          <label className="block text-sm font-medium mb-3 text-[#3d3435]">
-                            {item.label}
-                          </label>
-                          <input
+                        <FormRow key={item.label} label={item.label} accentColor="blue">
+                          <Input
                             type="number"
                             step="0.01"
                             value={item.value}
                             onChange={(e) => item.onChange(e.target.value)}
                             disabled={expenseModulesLocked.fixed}
                             placeholder="0.00"
-                            className={`w-full font-mono text-xl p-3 bg-[#1661ab]/10 backdrop-blur-md border border-[#1661ab]/20 focus:outline-none focus:border-[#1661ab]/50 focus:shadow-[inset_0_0_0_1px_rgba(22,97,171,0.3)] rounded-3xl transition-all text-[#0c0c0c] ${
-                              expenseModulesLocked.fixed
-                                ? "bg-gray-100 cursor-not-allowed opacity-60"
-                                : ""
-                            }`}
+                            accentColor="blue"
                           />
-                        </div>
+                        </FormRow>
                       ))}
                     </div>
 
                     {/* 固定费用汇总显示 - 视觉焦点 */}
-                    <div className="mt-6 pt-6 border-t border-gray-100">
-                      <div className="text-center">
-                        <div className="text-sm font-medium text-[#3d3435] mb-2">本类合计</div>
-                        <div className="text-4xl font-black text-[#1661ab] font-mono">¥ {expenseTotals.fixTotal.toFixed(2)}</div>
-                      </div>
-                    </div>
+                    <StatCard
+                      label="本类合计"
+                      value={`¥ ${expenseTotals.fixTotal.toFixed(2)}`}
+                      accentColor="blue"
+                      className="mt-6"
+                    />
 
                     {!expenseModulesLocked.fixed && (
-                      <button
+                      <Button
                         type="button"
                         onClick={() => setExpenseConfirmModal({ isOpen: true, module: "fixed" })}
-                        className="w-full p-4 text-lg font-semibold bg-[#1661ab] text-white rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/90"
+                        accentColor="blue"
+                        variant="primary"
+                        size="lg"
+                        className="w-full mt-4"
                       >
                         🔒 记入支出
-                      </button>
+                      </Button>
                     )}
                   </>
                 );
@@ -1372,7 +1386,7 @@ function RecordPageContent() {
 
             {/* 【经营消耗品】模块 */}
             <div>
-              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">【经营消耗品】</h3>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">【经营消耗品】</h3>
               {expenseModulesLocked.cons && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
                   已锁定
@@ -1382,37 +1396,28 @@ function RecordPageContent() {
               {!expenseModulesLocked.cons && (
                 <>
                   <div className="space-y-4 mb-4">
-                    <div>
-                      <label className="block text-base font-medium mb-2 text-[#3d3435]">
-                        消耗品名称
-                      </label>
-                      <input
+                    <FormRow label="消耗品名称" accentColor="blue">
+                      <Input
                         type="text"
                         value={expConsName}
                         onChange={(e) => setExpConsName(e.target.value)}
                         placeholder="请输入消耗品名称"
-                        className="w-full font-mono text-xl p-3 bg-[#1661ab]/10 backdrop-blur-md border border-[#1661ab]/20 focus:outline-none focus:border-[#1661ab]/50 focus:shadow-[inset_0_0_0_1px_rgba(22,97,171,0.3)] rounded-3xl transition-all text-[#0c0c0c]"
+                        accentColor="blue"
                       />
-                    </div>
+                    </FormRow>
 
-                    <div>
-                      <label className="block text-base font-medium mb-2 text-[#3d3435]">
-                        金额（元）
-                      </label>
-                      <input
+                    <FormRow label="金额（元）" accentColor="blue">
+                      <Input
                         type="text"
                         inputMode="decimal"
                         value={expConsAmount}
                         onChange={(e) => handleNumberChange(e.target.value, setExpConsAmount)}
                         placeholder="0.00"
-                        className="w-full font-mono text-xl p-3 bg-[#1661ab]/10 backdrop-blur-md border border-[#1661ab]/20 focus:outline-none focus:border-[#1661ab]/50 focus:shadow-[inset_0_0_0_1px_rgba(22,97,171,0.3)] rounded-3xl transition-all text-[#0c0c0c]"
+                        accentColor="blue"
                       />
-                    </div>
+                    </FormRow>
 
-                    <div>
-                      <label className="block text-base font-medium mb-2 text-[#3d3435]">
-                        能用多久？
-                      </label>
+                    <FormRow label="能用多久？" accentColor="blue">
                       <div className="grid grid-cols-2 gap-3">
                         {[
                           { value: "1个月", label: "1个月" },
@@ -1420,38 +1425,40 @@ function RecordPageContent() {
                           { value: "6个月以上", label: "6个月以上" },
                           { value: "1年以上", label: "1年以上" },
                         ].map((duration) => (
-                          <button
+                          <Button
                             key={duration.value}
                             type="button"
                             onClick={() => setExpConsDuration(duration.value)}
-                            className={`p-3 text-lg rounded-full transition-all ${
-                              expConsDuration === duration.value
-                                ? "bg-[#ab322a] text-[#f2eada]"
-                                : "bg-white text-[#3d3435] hover:bg-red-50"
-                            }`}
+                            accentColor="blue"
+                            variant={expConsDuration === duration.value ? "primary" : "secondary"}
+                            size="sm"
+                            className="w-full"
                           >
                             {duration.label}
-                          </button>
+                          </Button>
                         ))}
                       </div>
-                    </div>
+                    </FormRow>
                   </div>
 
                   {/* 消耗品汇总显示 - 视觉焦点 */}
-                  <div className="mt-6 pt-6 border-t border-gray-100">
-                    <div className="text-center">
-                      <div className="text-sm font-medium text-[#3d3435] mb-2">本类合计</div>
-                      <div className="text-4xl font-black text-[#1661ab] font-mono">¥ {expenseTotals.consTotal.toFixed(2)}</div>
-                    </div>
-                  </div>
+                  <StatCard
+                    label="本类合计"
+                    value={`¥ ${expenseTotals.consTotal.toFixed(2)}`}
+                    accentColor="blue"
+                    className="mt-6"
+                  />
 
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "cons" })}
-                    className="w-full p-4 text-lg font-semibold bg-[#1661ab] text-white rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/90"
+                    accentColor="blue"
+                    variant="primary"
+                    size="lg"
+                    className="w-full mt-4"
                   >
                     🔒 记入支出
-                  </button>
+                  </Button>
                 </>
               )}
 
@@ -1476,7 +1483,7 @@ function RecordPageContent() {
 
             {/* 【其他支出】模块 */}
             <div>
-              <h3 className="text-lg font-semibold text-[#0c0c0c] mb-4 text-center">【其他支出】</h3>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">【其他支出】</h3>
               {expenseModulesLocked.other && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
                   已锁定
@@ -1484,90 +1491,48 @@ function RecordPageContent() {
               )}
 
               {!expenseModulesLocked.other && (
-                <div className="space-y-4 mb-4">
-                  <div>
-                    <label className="block text-base font-medium mb-2 text-[#3d3435]">
-                      支出项目名称
-                    </label>
-                    <input
-                      type="text"
-                      value={expOtherName}
-                      onChange={(e) => setExpOtherName(e.target.value)}
-                      placeholder="请输入支出项目名称"
-                      className="w-full font-mono text-xl p-3 bg-[#1661ab]/10 backdrop-blur-md border border-[#1661ab]/20 focus:outline-none focus:border-[#1661ab]/50 focus:shadow-[inset_0_0_0_1px_rgba(22,97,171,0.3)] rounded-3xl transition-all text-[#0c0c0c]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-base font-medium mb-2 text-[#3d3435]">
-                      金额（元）
-                    </label>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      value={expOtherAmount}
-                      onChange={(e) => handleNumberChange(e.target.value, setExpOtherAmount)}
-                      placeholder="0.00"
-                      className="w-full font-mono text-xl p-3 bg-[#1661ab]/10 backdrop-blur-md border border-[#1661ab]/20 focus:outline-none focus:border-[#1661ab]/50 focus:shadow-[inset_0_0_0_1px_rgba(22,97,171,0.3)] rounded-3xl transition-all text-[#0c0c0c]"
-                    />
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setExpenseConfirmModal({ isOpen: true, module: "other" })}
-                    className="w-full p-4 text-xl font-bold bg-[#1661ab]/10 border border-[#1661ab]/30 text-[#0c0c0c] rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/20"
-                  >
-                    🔒 记入支出
-                  </button>
-                </div>
-              )}
-
-              {!expenseModulesLocked.other && (
                 <>
                   <div className="space-y-4 mb-4">
-                    <div>
-                      <label className="block text-base font-medium mb-2 text-[#0c0c0c]">
-                        支出项目名称
-                      </label>
-                      <input
+                    <FormRow label="支出项目名称" accentColor="blue">
+                      <Input
                         type="text"
                         value={expOtherName}
                         onChange={(e) => setExpOtherName(e.target.value)}
                         placeholder="请输入支出项目名称"
-                        className="w-full font-mono text-xl p-3 bg-[#1661ab]/10 backdrop-blur-md border border-[#1661ab]/20 focus:outline-none focus:border-[#1661ab]/50 focus:shadow-[inset_0_0_0_1px_rgba(22,97,171,0.3)] rounded-3xl transition-all text-[#0c0c0c]"
+                        accentColor="blue"
                       />
-                    </div>
+                    </FormRow>
 
-                    <div>
-                      <label className="block text-base font-medium mb-2 text-[#0c0c0c]">
-                        金额（元）
-                      </label>
-                      <input
+                    <FormRow label="金额（元）" accentColor="blue">
+                      <Input
                         type="text"
                         inputMode="decimal"
                         value={expOtherAmount}
                         onChange={(e) => handleNumberChange(e.target.value, setExpOtherAmount)}
                         placeholder="0.00"
-                        className="w-full font-mono text-xl p-3 bg-[#1661ab]/10 backdrop-blur-md border border-[#1661ab]/20 focus:outline-none focus:border-[#1661ab]/50 focus:shadow-[inset_0_0_0_1px_rgba(22,97,171,0.3)] rounded-3xl transition-all text-[#0c0c0c]"
+                        accentColor="blue"
                       />
-                    </div>
+                    </FormRow>
                   </div>
 
                   {/* 其他支出汇总显示 - 视觉焦点 */}
-                  <div className="mt-6 pt-6 border-t border-gray-100">
-                    <div className="text-center">
-                      <div className="text-sm font-medium text-[#3d3435] mb-2">本类合计</div>
-                      <div className="text-4xl font-black text-[#1661ab] font-mono">¥ {expenseTotals.otherTotal.toFixed(2)}</div>
-                    </div>
-                  </div>
+                  <StatCard
+                    label="本类合计"
+                    value={`¥ ${expenseTotals.otherTotal.toFixed(2)}`}
+                    accentColor="blue"
+                    className="mt-6"
+                  />
 
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "other" })}
-                    className="w-full p-4 text-lg font-semibold bg-[#1661ab] text-white rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/90"
+                    accentColor="blue"
+                    variant="primary"
+                    size="lg"
+                    className="w-full mt-4"
                   >
                     🔒 记入支出
-                  </button>
+                  </Button>
                 </>
               )}
 
@@ -1588,88 +1553,86 @@ function RecordPageContent() {
             </div>
 
             {/* 当日总支出汇总看板 - 视觉焦点 */}
-            <div className="bg-[#1661ab]/10 border border-[#1661ab]/20 rounded-2xl py-6 px-6 mb-6 backdrop-blur-sm">
-              <div className="text-center">
-                <div className="text-sm font-medium text-[#3d3435] mb-3">💰 当日总支出</div>
-                <div className="text-4xl font-black text-[#1661ab] font-mono mb-2">
-                  ¥ {expenseTotals.grandTotal.toFixed(2)}
-                </div>
-                <div className="text-sm text-[#3d3435]">
-                  包含所有支出分类汇总
-                </div>
-              </div>
+            <StatCard
+              label="💰 当日总支出"
+              value={`¥ ${expenseTotals.grandTotal.toFixed(2)}`}
+              accentColor="blue"
+              className="mt-6"
+            />
             </div>
-            </div>
-          </div>
+          </Card>
 
           {/* 今日经营成绩单 - 仅在最终确认后显示 */}
           {totalIncomeConfirmed && (
-            <div className="bg-white rounded-3xl p-12 shadow-sm border-none">
+            <Card accentColor="red" className="p-12">
               <div className="text-center">
-                <h3 className="text-2xl font-bold text-[#0c0c0c] mb-12">🏆 今日经营成绩单</h3>
+                <h3 className="text-2xl font-semibold text-[#1a1a1a] mb-12">🏆 今日经营成绩单</h3>
 
                 {/* 核心指标 - 净利润 */}
                 <div className="mb-12">
-                  <div className="text-lg font-medium text-[#3d3435] mb-4">今日预估净赚</div>
-                  <div className="text-6xl font-bold text-[#ab322a]">
+                  <div className="text-lg font-medium text-[#4a4a4a] mb-4">今日预估净赚</div>
+                  <div className="text-6xl font-bold" style={{ color: theme.accent.red.base }}>
                     ¥ {((parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")) - calculateTodayCOGS()).toFixed(2)}
                   </div>
                 </div>
 
                 {/* 辅助指标列表 */}
                 <div className="grid grid-cols-2 gap-6 text-left">
-                  <div className="bg-white rounded-3xl p-6 shadow-sm">
-                    <div className="text-sm font-medium text-[#3d3435] mb-2">总收入</div>
-                    <div className="text-xl font-bold text-[#0c0c0c]">
+                  <Card>
+                    <div className="text-sm font-medium text-[#4a4a4a] mb-2">总收入</div>
+                    <div className="text-xl font-bold text-[#1a1a1a]">
                       ¥ {(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}
                     </div>
-                  </div>
+                  </Card>
 
-                  <div className="bg-white rounded-3xl p-6 shadow-sm">
-                    <div className="text-sm font-medium text-[#3d3435] mb-2">总支出</div>
-                    <div className="text-xl font-bold text-[#0c0c0c]">
+                  <Card>
+                    <div className="text-sm font-medium text-[#4a4a4a] mb-2">总支出</div>
+                    <div className="text-xl font-bold text-[#1a1a1a]">
                       ¥ {expenseTotals.grandTotal.toFixed(2)}
                     </div>
-                  </div>
+                  </Card>
 
-                  <div className="bg-white rounded-3xl p-6 shadow-sm">
-                    <div className="text-sm font-medium text-[#3d3435] mb-2">经营成本</div>
-                    <div className="text-lg font-bold text-[#0c0c0c]">
+                  <Card>
+                    <div className="text-sm font-medium text-[#4a4a4a] mb-2">经营成本</div>
+                    <div className="text-lg font-bold text-[#1a1a1a]">
                       ¥ {calculateTodayCOGS().toFixed(2)}
                     </div>
-                    <div className="text-xs text-[#3d3435] mt-1">含固定费摊销</div>
-                  </div>
+                    <div className="text-xs text-[#8a8a8a] mt-1">含固定费摊销</div>
+                  </Card>
 
-                  <div className="bg-white rounded-3xl p-6 shadow-sm">
-                    <div className="text-sm font-medium text-[#3d3435] mb-2">销量汇总</div>
-                    <div className="text-lg font-bold text-[#0c0c0c]">
+                  <Card>
+                    <div className="text-sm font-medium text-[#4a4a4a] mb-2">销量汇总</div>
+                    <div className="text-lg font-bold text-[#1a1a1a]">
                       {skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing +
                        skuFentang + skuHundun + skuXiaomizhou + skuDoujiang + skuJidantang +
                        skuMixianSuSanxian + skuMixianSuSuancai + skuMixianSuMala +
                        skuMixianRouSanxian + skuMixianRouSuancai + skuMixianRouMala +
                        skuSuanlafen + skuChaomianXiangcui + skuChaohufenKuan + skuChaohufenXi} 个
                     </div>
-                  </div>
+                  </Card>
                 </div>
 
                 {/* 鼓励语 */}
                 <div className="mt-12 pt-8">
-                  <div className="text-sm text-[#3d3435]">
+                  <div className="text-sm text-[#4a4a4a]">
                     🎊 今日辛苦了！数据已保存，明天继续加油！
                   </div>
                 </div>
               </div>
-            </div>
+            </Card>
           )}
 
           {/* 提交按钮 */}
-          <button
+          <Button
             type="submit"
             disabled={submitting}
-            className="w-full p-6 text-xl font-semibold bg-[#ab322a] text-white rounded-full shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            accentColor="red"
+            variant="primary"
+            size="lg"
+            className="w-full"
           >
             {submitting ? "保存中..." : "✅ 保存今天的记录"}
-          </button>
+          </Button>
         </form>
       </div>
 
@@ -1683,116 +1646,121 @@ function RecordPageContent() {
       />
 
       {/* 支出确认Modal */}
-      {expenseConfirmModal.isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-sm">
-            <h2 className="text-2xl font-bold mb-4 text-center text-[#0c0c0c]">
-              确定记入吗？
-            </h2>
-            <p className="text-xl text-center text-[#ab322a] mb-6 font-semibold">
-              提交后今日不可更改
-            </p>
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => setExpenseConfirmModal({ isOpen: false, module: "raw" })}
-                className="flex-1 p-4 text-xl bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95 font-medium"
-              >
-                再想想
-              </button>
-              <button
-                type="button"
-                onClick={() => handleExpenseModuleSubmit(expenseConfirmModal.module)}
-                className="flex-1 p-4 text-xl bg-[#ab322a] text-[#f2eada] rounded-full transition-all active:scale-95 font-medium"
-              >
-                确定
-              </button>
-            </div>
-          </div>
+      <Modal
+        isOpen={expenseConfirmModal.isOpen}
+        onClose={() => setExpenseConfirmModal({ isOpen: false, module: "raw" })}
+        title="确定记入吗？"
+        accentColor="blue"
+        showCloseButton={false}
+      >
+        <p className="text-lg text-center mb-6" style={{ color: theme.accent.red.base }}>
+          提交后今日不可更改
+        </p>
+        <div className="flex gap-4">
+          <Button
+            type="button"
+            onClick={() => setExpenseConfirmModal({ isOpen: false, module: "raw" })}
+            accentColor="blue"
+            variant="secondary"
+            size="lg"
+            className="flex-1"
+          >
+            再想想
+          </Button>
+          <Button
+            type="button"
+            onClick={() => handleExpenseModuleSubmit(expenseConfirmModal.module)}
+            accentColor="red"
+            variant="primary"
+            size="lg"
+            className="flex-1"
+          >
+            确定
+          </Button>
         </div>
-      )}
+      </Modal>
 
       {/* Toast 通知组件 */}
-      {toast.show && (
-        <div className="fixed top-4 right-4 z-50">
-          <div className={`px-6 py-3 rounded-full shadow-sm text-white ${
-            toast.type === 'success' ? 'bg-green-500' :
-            toast.type === 'error' ? 'bg-[#ab322a]' :
-            'bg-[#3d3435]'
-          }`}>
-            {toast.message}
-          </div>
-        </div>
-      )}
+      <Toast show={toast.show} message={toast.message} type={toast.type} />
 
       {/* 提交前确认对话框 */}
-      {showConfirmDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-sm">
-            <h2 className="text-2xl font-bold mb-4 text-center text-[#0c0c0c]">
-              请再次检查
-            </h2>
-            <p className="text-xl text-center text-[#3d3435] mb-6">
-              请再次检查是否当天数据都准确无误
-            </p>
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => setShowConfirmDialog(false)}
-                className="flex-1 p-4 text-xl bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95 font-medium"
-              >
-                我再看看
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmSubmit}
-                className="flex-1 p-4 text-xl bg-[#ab322a] text-[#f2eada] rounded-full transition-all active:scale-95 font-medium"
-              >
-                确认提交
-              </button>
-            </div>
-          </div>
+      <Modal
+        isOpen={showConfirmDialog}
+        onClose={() => setShowConfirmDialog(false)}
+        title="请再次检查"
+        accentColor="red"
+        showCloseButton={false}
+      >
+        <p className="text-lg text-center mb-6 text-[#4a4a4a]">
+          请再次检查是否当天数据都准确无误
+        </p>
+        <div className="flex gap-4">
+          <Button
+            type="button"
+            onClick={() => setShowConfirmDialog(false)}
+            accentColor="red"
+            variant="secondary"
+            size="lg"
+            className="flex-1"
+          >
+            我再看看
+          </Button>
+          <Button
+            type="button"
+            onClick={handleConfirmSubmit}
+            accentColor="red"
+            variant="primary"
+            size="lg"
+            className="flex-1"
+          >
+            确认提交
+          </Button>
         </div>
-      )}
+      </Modal>
 
       {/* 确认提交总收入对话框 */}
-      {showTotalIncomeConfirmDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-sm">
-            <h2 className="text-2xl font-bold mb-4 text-center text-[#0c0c0c]">
-              确认提交今日总收入
-            </h2>
-            <p className="text-xl text-center text-[#ab322a] mb-6 font-semibold">
-              确认提交今日总收入，无法再修改
-            </p>
-            <div className="text-center mb-6">
-              <div className="text-3xl font-bold text-[#ab322a]">
-                ¥ {(
-                  parseFloat(incomeWechat || "0") +
-                  parseFloat(incomeAlipay || "0") +
-                  parseFloat(incomeCash || "0")
-                ).toFixed(2)}
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => setShowTotalIncomeConfirmDialog(false)}
-                className="flex-1 p-4 text-xl bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95 font-medium"
-              >
-                再想想
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmTotalIncome}
-                className="flex-1 p-4 text-xl bg-[#ab322a] text-[#f2eada] rounded-full transition-all active:scale-95 font-medium"
-              >
-                确认
-              </button>
-            </div>
+      <Modal
+        isOpen={showTotalIncomeConfirmDialog}
+        onClose={() => setShowTotalIncomeConfirmDialog(false)}
+        title="确认提交今日总收入"
+        accentColor="red"
+        showCloseButton={false}
+      >
+        <p className="text-lg text-center mb-6" style={{ color: theme.accent.red.base }}>
+          确认提交今日总收入，无法再修改
+        </p>
+        <div className="text-center mb-6">
+          <div className="text-3xl font-bold" style={{ color: theme.accent.red.base }}>
+            ¥ {(
+              parseFloat(incomeWechat || "0") +
+              parseFloat(incomeAlipay || "0") +
+              parseFloat(incomeCash || "0")
+            ).toFixed(2)}
           </div>
         </div>
-      )}
+        <div className="flex gap-4">
+          <Button
+            type="button"
+            onClick={() => setShowTotalIncomeConfirmDialog(false)}
+            accentColor="red"
+            variant="secondary"
+            size="lg"
+            className="flex-1"
+          >
+            再想想
+          </Button>
+          <Button
+            type="button"
+            onClick={handleConfirmTotalIncome}
+            accentColor="red"
+            variant="primary"
+            size="lg"
+            className="flex-1"
+          >
+            确认
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }
