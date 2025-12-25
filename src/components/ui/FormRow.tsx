@@ -23,15 +23,29 @@ export function FormRow({
   return (
     <div className={`mb-4 ${className}`}>
       <label 
-        className="block text-sm font-medium mb-2"
-        style={{ color: theme.text.primary }}
+        className="block mb-2"
+        style={{
+          fontSize: theme.typography.fontSize.body, // 14px
+          fontWeight: theme.typography.fontWeight.medium,
+          color: theme.text.primary,
+        }}
       >
         {label}
-        {required && <span style={{ color: accent?.base || theme.accent.red.base }} className="ml-1">*</span>}
+        {required && (
+          <span style={{ color: accent?.base || theme.accent.red.base, marginLeft: '4px' }}>
+            *
+          </span>
+        )}
       </label>
       {children}
       {helperText && (
-        <p className="mt-1 text-xs" style={{ color: theme.text.secondary }}>
+        <p 
+          className="mt-1"
+          style={{
+            fontSize: theme.typography.fontSize.helper, // 12px
+            color: theme.text.tertiary, // 40% opacity
+          }}
+        >
           {helperText}
         </p>
       )}

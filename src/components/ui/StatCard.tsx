@@ -22,33 +22,44 @@ export function StatCard({
     <div 
       className={`
         bg-white
-        rounded-2xl
-        p-6
         text-center
         border-l-4
         ${className}
       `}
       style={{
-        borderLeftColor: accent.base,
-        borderRight: `1px solid ${accent.border}`,
-        borderTop: `1px solid ${accent.border}`,
-        borderBottom: `1px solid ${accent.border}`,
+        borderRadius: theme.radius.card, // 14px
+        padding: theme.spacing.md, // 24px
         boxShadow: theme.shadow.default,
+        borderLeftColor: accent.base,
+        borderLeftWidth: '4px',
       }}
     >
-      {label && (
-        <div className="text-xs font-medium mb-2" style={{ color: theme.text.secondary }}>
-          {label}
-        </div>
-      )}
       <div 
-        className="text-3xl font-semibold font-mono mb-1"
-        style={{ color: accent.base }}
+        className="mb-2"
+        style={{
+          fontSize: theme.typography.fontSize.helper, // 12px
+          fontWeight: theme.typography.fontWeight.medium,
+          color: theme.text.secondary, // 60% opacity
+        }}
+      >
+        {label}
+      </div>
+      <div 
+        className="font-bold font-mono mb-1"
+        style={{
+          fontSize: '2rem', // 32px for key numbers
+          color: accent.base,
+        }}
       >
         {value}
       </div>
       {unit && (
-        <div className="text-xs" style={{ color: theme.text.secondary }}>
+        <div 
+          style={{
+            fontSize: theme.typography.fontSize.helper, // 12px
+            color: theme.text.tertiary, // 40% opacity
+          }}
+        >
           {unit}
         </div>
       )}

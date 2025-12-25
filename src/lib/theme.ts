@@ -1,50 +1,51 @@
 /**
  * Design System Theme Tokens
- * Clean, minimal, professional - Notion/Linear style
+ * Clean, minimal, professional - Notion/Linear/Stripe style
  * 
  * Color System:
  * - Three accent colors only: Red, Yellow, Blue
  * - Colors used as accents (borders, titles, numbers, hover states)
  * - Each card/module uses ONE color only
- * - Create hierarchy using opacity variations of the SAME color
+ * - Page background: light beige
+ * - Card background: white
  */
 
 export const theme = {
   // Base colors
   background: {
-    primary: '#ffffff',
-    secondary: '#ffffff', // Pure white
+    page: '#F5F3F0', // Light beige - 全局背景浅米色
+    card: '#ffffff', // White - 卡片底色始终为白色
   },
   
   text: {
-    primary: '#111827', // Near-black (not pure black)
-    secondary: 'rgba(17, 24, 39, 0.6)', // 60% opacity for secondary text
-    tertiary: 'rgba(17, 24, 39, 0.4)', // 40% opacity for muted text
+    primary: '#111827', // Near-black - 主要文字颜色
+    secondary: 'rgba(17, 24, 39, 0.6)', // 60% opacity - 次级说明
+    tertiary: 'rgba(17, 24, 39, 0.4)', // 40% opacity - 单位/说明文字
   },
 
-  // Three accent colors - strict usage rules
+  // Three accent colors
   accent: {
     red: {
-      base: '#9F3A2F',
+      base: '#9F3A2F', // Red
       border: 'rgba(159, 58, 47, 0.25)', // 25% opacity for borders
-      hover: 'rgba(159, 58, 47, 0.1)', // 10% opacity for hover background
-      focus: 'rgba(159, 58, 47, 0.3)', // 30% opacity for focus ring
+      hover: 'rgba(159, 58, 47, 0.1)', // 10% opacity for hover
+      focus: 'rgba(159, 58, 47, 0.2)', // 20% opacity for focus ring
     },
     yellow: {
-      base: '#E0B84A',
+      base: '#E0B84A', // Yellow
       border: 'rgba(224, 184, 74, 0.25)', // 25% opacity for borders
-      hover: 'rgba(224, 184, 74, 0.1)', // 10% opacity for hover background
-      focus: 'rgba(224, 184, 74, 0.3)', // 30% opacity for focus ring
+      hover: 'rgba(224, 184, 74, 0.1)', // 10% opacity for hover
+      focus: 'rgba(224, 184, 74, 0.2)', // 20% opacity for focus ring
     },
     blue: {
-      base: '#2F5FA7',
+      base: '#2F5FA7', // Blue
       border: 'rgba(47, 95, 167, 0.25)', // 25% opacity for borders
-      hover: 'rgba(47, 95, 167, 0.1)', // 10% opacity for hover background
-      focus: 'rgba(47, 95, 167, 0.3)', // 30% opacity for focus ring
+      hover: 'rgba(47, 95, 167, 0.1)', // 10% opacity for hover
+      focus: 'rgba(47, 95, 167, 0.2)', // 20% opacity for focus ring
     },
   },
 
-  // Spacing scale - 8px system
+  // Spacing scale - 8px体系
   spacing: {
     xs: '0.5rem',    // 8px
     sm: '1rem',      // 16px
@@ -54,41 +55,30 @@ export const theme = {
     '2xl': '4rem',   // 64px
   },
 
-  // Border radius
+  // Border radius - 14-16px
   radius: {
-    sm: '0.5rem',    // 8px
-    md: '0.875rem',  // 14px
-    lg: '1rem',      // 16px
-    xl: '1.5rem',    // 24px
+    card: '0.875rem', // 14px - Card圆角
+    input: '0.5rem',  // 8px - Input圆角
   },
 
   // Typography scale
   typography: {
     // Font sizes
     fontSize: {
-      xs: '0.75rem',    // 12px - 单位/说明
-      sm: '0.875rem',   // 14px - 正文/输入
-      base: '1rem',     // 16px - 模块标题
-      lg: '1.125rem',   // 18px - 模块标题
-      xl: '1.75rem',    // 28px - 页面标题
-      '2xl': '2rem',    // 32px - 页面标题
+      pageTitle: '1.875rem',  // 30px - 页面标题 28-32px
+      moduleTitle: '1rem',     // 16px - 模块标题 16-18px
+      body: '0.875rem',        // 14px - 正文/输入
+      helper: '0.75rem',       // 12px - 单位/说明
     },
     // Font weights
     fontWeight: {
       normal: '400',
       medium: '500',
       semibold: '600',
-      bold: '700',
-    },
-    // Line heights
-    lineHeight: {
-      tight: '1.25',
-      normal: '1.5',
-      relaxed: '1.75',
     },
   },
 
-  // Shadows - subtle, hover enhances
+  // Shadows - 浅阴影，hover增强
   shadow: {
     default: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.1)',
     hover: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
@@ -96,15 +86,14 @@ export const theme = {
 
   // Layout
   layout: {
-    maxWidth: '1200px', // Max width for centered layout
+    maxWidth: '1200px',
     cardPadding: '1.5rem', // 24px
-    sectionGap: '1.5rem', // 24px gap between sections
+    sectionGap: '1.5rem', // 24px
   },
 
   // Transitions
   transition: {
     default: 'all 0.2s ease-in-out',
-    fast: 'all 0.15s ease-in-out',
   },
 } as const;
 

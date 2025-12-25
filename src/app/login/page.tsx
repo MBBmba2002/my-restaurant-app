@@ -41,10 +41,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#F5F3F0' }}>
       <div className="w-full max-w-md">
-        <Card accentColor="red" className="p-8">
-          <h1 className="text-2xl font-semibold mb-8 text-center" style={{ color: '#111827' }}>
+        <Card accentColor="red">
+          <h1 className="mb-8 text-center" style={{ 
+            fontSize: '1.875rem', // 30px
+            fontWeight: 600,
+            color: '#111827'
+          }}>
             登录
           </h1>
 
@@ -72,10 +76,10 @@ export default function LoginPage() {
             </FormRow>
 
             {error && (
-              <div className="text-sm text-center p-3 rounded-lg border" style={{ 
-                borderColor: 'rgba(159, 58, 47, 0.25)',
-                color: '#9F3A2F',
-                backgroundColor: 'rgba(159, 58, 47, 0.05)',
+              <div className="text-center p-3 rounded-lg" style={{ 
+                fontSize: '0.875rem', // 14px
+                backgroundColor: 'rgba(159, 58, 47, 0.1)',
+                color: '#9F3A2F'
               }}>
                 {error}
               </div>

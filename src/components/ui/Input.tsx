@@ -21,10 +21,8 @@ export function Input({
         px-4
         py-3
         font-mono
-        text-sm
         bg-white
         border
-        rounded-lg
         transition-all
         focus:outline-none
         disabled:bg-gray-50
@@ -33,7 +31,9 @@ export function Input({
         ${className}
       `}
       style={{
+        fontSize: theme.typography.fontSize.body, // 14px
         color: theme.text.primary,
+        borderRadius: theme.radius.input, // 8px
         borderColor: error ? theme.accent.red.base : accent.border,
         borderWidth: '1px',
       }}

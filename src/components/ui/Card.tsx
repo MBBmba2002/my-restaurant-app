@@ -22,39 +22,38 @@ export function Card({
     <div
       className={`
         bg-white
-        rounded-2xl
-        p-6
         transition-all
-        ${hoverable ? 'cursor-pointer hover:-translate-y-0.5' : ''}
+        ${hoverable ? 'cursor-pointer' : ''}
         ${className}
       `}
       onClick={onClick}
       style={{
+        borderRadius: theme.radius.card, // 14px
+        padding: theme.spacing.md, // 24px
         boxShadow: theme.shadow.default,
         ...(hoverable && {
-          '--hover-shadow': theme.shadow.hover,
-        } as React.CSSProperties),
-        ...(accent && {
-          borderLeft: `4px solid ${accent.base}`,
-          borderRight: `1px solid ${accent.border}`,
-          borderTop: `1px solid ${accent.border}`,
-          borderBottom: `1px solid ${accent.border}`,
-        }),
-        ...(hoverable && accent && {
           ':hover': {
             boxShadow: theme.shadow.hover,
-            backgroundColor: accent.hover,
+            transform: 'translateY(-2px)',
           },
+        }),
+        ...(accent && {
+          borderLeft: `4px solid ${accent.base}`,
+        }),
+        ...(!accent && {
+          border: `1px solid rgba(0, 0, 0, 0.08)`,
         }),
       }}
       onMouseEnter={(e) => {
         if (hoverable) {
           e.currentTarget.style.boxShadow = theme.shadow.hover;
+          e.currentTarget.style.transform = 'translateY(-2px)';
         }
       }}
       onMouseLeave={(e) => {
         if (hoverable) {
           e.currentTarget.style.boxShadow = theme.shadow.default;
+          e.currentTarget.style.transform = 'translateY(0)';
         }
       }}
     >

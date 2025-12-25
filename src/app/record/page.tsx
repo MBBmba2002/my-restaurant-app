@@ -73,7 +73,7 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
   
   return (
     <div className="flex flex-col">
-      <label className="block text-sm font-medium mb-2" style={{ color: '#111827' }}>
+      <label className="block text-sm font-medium mb-2 text-[#4a4a4a]">
         {label}
       </label>
       <div className="flex items-center justify-center gap-3">
@@ -83,8 +83,8 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           disabled={disabled}
           className="w-8 h-8 rounded-lg flex items-center justify-center transition-all border disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80 active:scale-95"
           style={{
-            backgroundColor: yellow.hover,
-            color: '#111827',
+            backgroundColor: yellow.light,
+            color: yellow.base,
             borderColor: yellow.border,
           }}
         >
@@ -99,10 +99,11 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
             min="0"
             value={inputValue}
             onChange={handleInputChange}
+            onBlur={handleBlur}
             disabled={disabled}
-            className="w-full font-mono text-sm font-semibold text-center py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none border bg-white"
+            className="w-full font-mono text-xl font-bold text-center py-3 rounded-lg transition-all text-[#1a1a1a] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none border"
             style={{
-              color: '#111827',
+              backgroundColor: yellow.light,
               borderColor: yellow.border,
             }}
             onFocus={(e) => {
@@ -124,8 +125,8 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           disabled={disabled}
           className="w-8 h-8 rounded-lg flex items-center justify-center transition-all border disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80 active:scale-95"
           style={{
-            backgroundColor: yellow.hover,
-            color: '#111827',
+            backgroundColor: yellow.light,
+            color: yellow.base,
             borderColor: yellow.border,
           }}
         >
@@ -229,26 +230,6 @@ function RecordPageContent() {
     cons: false,     // 消耗品
     other: false     // 其他
   });
-
-  // 支出模块保存中状态
-  const [expenseModulesSaving, setExpenseModulesSaving] = useState({
-    raw: false,
-    fixed: false,
-    cons: false,
-    other: false
-  });
-
-  // 汤粥类动态子分类（使用 product_details JSONB）
-  const [tangSubCategories, setTangSubCategories] = useState<Array<{ id: string; name: string; count: number }>>([
-    { id: '1', name: '粉汤', count: 0 },
-    { id: '2', name: '馄炖', count: 0 },
-    { id: '3', name: '小米粥', count: 0 },
-    { id: '4', name: '豆浆', count: 0 },
-    { id: '5', name: '鸡蛋汤', count: 0 },
-  ]);
-
-  // 汤粥类锁定状态（从数据库 is_locked 字段读取）
-  const [tangIsLocked, setTangIsLocked] = useState(false);
 
   // 支出确认Modal
   const [expenseConfirmModal, setExpenseConfirmModal] = useState<{
@@ -498,11 +479,6 @@ function RecordPageContent() {
   };
 
   // 自动计算销量模块汇总
-  // 计算汤粥类总计（使用 useMemo 优化性能，实时计算）
-  const totalTangCount = useMemo(() => {
-    return tangSubCategories.reduce((sum, item) => sum + (Number(item.count) || 0), 0);
-  }, [tangSubCategories]);
-
   const salesTotals = useMemo(() => {
     // 饼类总计
     const bingTotal = skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing;
@@ -595,9 +571,6 @@ function RecordPageContent() {
       return;
     }
 
-    // 设置保存中状态
-    setExpenseModulesSaving(prev => ({ ...prev, [module]: true }));
-
     try {
       const expenseData: any = {
         user_id: user.id,
@@ -607,41 +580,39 @@ function RecordPageContent() {
       // 根据模块类型设置不同的字段
       switch (module) {
         case "raw":
-          expenseData.exp_raw_veg = Number(expRawVeg) || 0;
-          expenseData.exp_raw_meat = Number(expRawMeat) || 0;
-          expenseData.exp_raw_egg = Number(expRawEgg) || 0;
-          expenseData.exp_raw_noodle = Number(expRawNoodle) || 0;
-          expenseData.exp_raw_spice = Number(expRawSpice) || 0;
-          expenseData.exp_raw_pack = Number(expRawPack) || 0;
-          expenseData.total_expense_raw = Number(expenseTotals.rawTotal) || 0;
+          expenseData.exp_raw_veg = parseFloat(expRawVeg || "0");
+          expenseData.exp_raw_meat = parseFloat(expRawMeat || "0");
+          expenseData.exp_raw_egg = parseFloat(expRawEgg || "0");
+          expenseData.exp_raw_noodle = parseFloat(expRawNoodle || "0");
+          expenseData.exp_raw_spice = parseFloat(expRawSpice || "0");
+          expenseData.exp_raw_pack = parseFloat(expRawPack || "0");
+          expenseData.total_expense_raw = expenseTotals.rawTotal;
           break;
         case "fixed":
-          expenseData.exp_fix_rent = Number(expFixRent) || 0;
-          expenseData.exp_fix_utility = Number(expFixUtility) || 0;
-          expenseData.exp_fix_gas = Number(expFixGas) || 0;
-          expenseData.exp_fix_salary = Number(expFixSalary) || 0;
-          expenseData.total_expense_fix = Number(expenseTotals.fixTotal) || 0;
+          expenseData.exp_fix_rent = parseFloat(expFixRent || "0");
+          expenseData.exp_fix_utility = parseFloat(expFixUtility || "0");
+          expenseData.exp_fix_gas = parseFloat(expFixGas || "0");
+          expenseData.exp_fix_salary = parseFloat(expFixSalary || "0");
+          expenseData.total_expense_fix = expenseTotals.fixTotal;
           break;
         case "cons":
-          expenseData.exp_cons_name = expConsName || null;
-          expenseData.exp_cons_amount = Number(expConsAmount) || 0;
-          expenseData.exp_cons_duration = expConsDuration || null;
-          expenseData.total_expense_cons = Number(expenseTotals.consTotal) || 0;
+          expenseData.exp_cons_name = expConsName;
+          expenseData.exp_cons_amount = parseFloat(expConsAmount || "0");
+          expenseData.exp_cons_duration = expConsDuration;
+          expenseData.total_expense_cons = expenseTotals.consTotal;
           break;
         case "other":
-          expenseData.exp_other_name = expOtherName || null;
-          expenseData.exp_other_amount = Number(expOtherAmount) || 0;
-          expenseData.total_expense_other = Number(expenseTotals.otherTotal) || 0;
+          expenseData.exp_other_name = expOtherName;
+          expenseData.exp_other_amount = parseFloat(expOtherAmount || "0");
+          expenseData.total_expense_other = expenseTotals.otherTotal;
           break;
       }
 
       // 更新当日总支出
-      expenseData.total_daily_expense = Number(expenseTotals.grandTotal) || 0;
+      expenseData.total_daily_expense = expenseTotals.grandTotal;
 
       // 插入或更新支出记录
-      console.log('[save] table=daily_records payload', expenseData);
-      console.log('[save] table=daily_records payload keys', Object.keys(expenseData));
-      const { error, data } = await supabase
+      const { error } = await supabase
         .from("daily_records")
         .upsert(expenseData, {
           onConflict: 'user_id,record_date',
@@ -649,39 +620,22 @@ function RecordPageContent() {
         });
 
       if (error) {
-        console.error('[save] table=daily_records error', error);
-        console.error('[save] error.message', error.message);
-        console.error('[save] error.code', error.code);
-        console.error('[save] error.details', error.details);
-        console.error('[save] error.hint', error.hint);
-        const errorMsg = `保存支出失败：${error.message}${error.code ? ` (Code: ${error.code})` : ''}${error.details ? ` | Details: ${JSON.stringify(error.details)}` : ''}${error.hint ? ` | Hint: ${error.hint}` : ''}`;
-        showToast(errorMsg, "error");
-        // 失败时重置保存状态，保持弹窗打开
-        setExpenseModulesSaving(prev => ({ ...prev, [module]: false }));
+        console.error("Error saving expense:", error);
+        showToast("保存支出失败：" + error.message, "error");
         return;
       }
-      
-      console.log('[save] table=daily_records success', data);
 
       // 更新锁定状态并保存到localStorage
       const newLocks = { ...expenseModulesLocked, [module]: true };
       setExpenseModulesLocked(newLocks);
       localStorage.setItem("expense_modules_locked", JSON.stringify(newLocks));
 
-      // 重置保存状态
-      setExpenseModulesSaving(prev => ({ ...prev, [module]: false }));
-
       // 关闭确认Modal
       setExpenseConfirmModal({ isOpen: false, module: "raw" });
-
-      // 显示成功提示
-      showToast("已保存，无法修改", "success");
 
     } catch (err: any) {
       console.error("Error:", err);
       showToast("保存失败：" + (err.message || "未知错误"), "error");
-      // 失败时重置保存状态，保持弹窗打开
-      setExpenseModulesSaving(prev => ({ ...prev, [module]: false }));
     }
   };
 
@@ -712,54 +666,48 @@ function RecordPageContent() {
     try {
       const salesData: any = {
         user_id: user.id,
-        record_date: new Date().toISOString().split('T')[0], // 显式提供日期
+        record_date: new Date().toISOString().split('T')[0],
       };
 
       // 根据模块类型设置不同的字段
       switch (module) {
         case "bing":
-          salesData.sku_roubing = Number(skuRoubing) || 0;
-          salesData.sku_shouroubing = Number(skuShouroubing) || 0;
-          salesData.sku_changdanbing = Number(skuChangdanbing) || 0;
-          salesData.sku_roudanbing = Number(skuRoudanbing) || 0;
-          salesData.sku_danbing = Number(skuDanbing) || 0;
-          salesData.sku_changbing = Number(skuChangbing) || 0;
-          // Removed total_bing_count - column doesn't exist in database
+          salesData.sku_roubing = skuRoubing;
+          salesData.sku_shouroubing = skuShouroubing;
+          salesData.sku_changdanbing = skuChangdanbing;
+          salesData.sku_roudanbing = skuRoudanbing;
+          salesData.sku_danbing = skuDanbing;
+          salesData.sku_changbing = skuChangbing;
+          salesData.total_bing_count = salesTotals.bingTotal;
           break;
         case "tang":
-          // 构建 product_details JSONB 对象
-          const productDetails: Record<string, number> = {};
-          tangSubCategories.forEach(item => {
-            if (item.name && item.count > 0) {
-              productDetails[item.name] = Number(item.count) || 0;
-            }
-          });
-          salesData.product_details = productDetails;
-          salesData.total_tang_count = totalTangCount;
-          salesData.is_locked = true; // 保存时锁定记录
+          salesData.sku_fentang = skuFentang;
+          salesData.sku_hundun = skuHundun;
+          salesData.sku_mizhou = skuXiaomizhou;
+          salesData.sku_doujiang = skuDoujiang;
+          salesData.sku_jidantang = skuJidantang;
+          salesData.total_tang_count = salesTotals.tangTotal;
           break;
         case "mixian":
-          salesData.sku_mixian_su_sanxian = Number(skuMixianSuSanxian) || 0;
-          salesData.sku_mixian_su_suancai = Number(skuMixianSuSuancai) || 0;
-          salesData.sku_mixian_su_mala = Number(skuMixianSuMala) || 0;
-          salesData.sku_mixian_rou_sanxian = Number(skuMixianRouSanxian) || 0;
-          salesData.sku_mixian_rou_suancai = Number(skuMixianRouSuancai) || 0;
-          salesData.sku_mixian_rou_mala = Number(skuMixianRouMala) || 0;
-          salesData.sku_suanlafen = Number(skuSuanlafen) || 0;
-          salesData.total_mixian_count = Number(salesTotals.mixianTotal) || 0;
+          salesData.sku_mixian_su_sanxian = skuMixianSuSanxian;
+          salesData.sku_mixian_su_suancai = skuMixianSuSuancai;
+          salesData.sku_mixian_su_mala = skuMixianSuMala;
+          salesData.sku_mixian_rou_sanxian = skuMixianRouSanxian;
+          salesData.sku_mixian_rou_suancai = skuMixianRouSuancai;
+          salesData.sku_mixian_rou_mala = skuMixianRouMala;
+          salesData.sku_suanlafen = skuSuanlafen;
+          salesData.total_mixian_count = salesTotals.mixianTotal;
           break;
         case "chaomian":
-          salesData.sku_chaomian_xiangcui = Number(skuChaomianXiangcui) || 0;
-          salesData.sku_chaohefen_kuan = Number(skuChaohufenKuan) || 0;
-          salesData.sku_chaohefen_xi = Number(skuChaohufenXi) || 0;
-          salesData.total_chaomian_count = Number(salesTotals.chaomianTotal) || 0;
+          salesData.sku_chaomian_xiangcui = skuChaomianXiangcui;
+          salesData.sku_chaohefen_kuan = skuChaohufenKuan;
+          salesData.sku_chaohefen_xi = skuChaohufenXi;
+          salesData.total_chaomian_count = salesTotals.chaomianTotal;
           break;
       }
 
       // 插入或更新销量记录
-      console.log('[save] table=daily_records payload', salesData);
-      console.log('[save] table=daily_records payload keys', Object.keys(salesData));
-      const { error, data } = await supabase
+      const { error } = await supabase
         .from("daily_records")
         .upsert(salesData, {
           onConflict: 'user_id,record_date',
@@ -767,26 +715,13 @@ function RecordPageContent() {
         });
 
       if (error) {
-        console.error('[save] table=daily_records error', error);
-        console.error('[save] error.message', error.message);
-        console.error('[save] error.code', error.code);
-        console.error('[save] error.details', error.details);
-        console.error('[save] error.hint', error.hint);
-        const errorMsg = `保存销量失败：${error.message}${error.code ? ` (Code: ${error.code})` : ''}${error.details ? ` | Details: ${JSON.stringify(error.details)}` : ''}${error.hint ? ` | Hint: ${error.hint}` : ''}`;
-        showToast(errorMsg, "error");
+        console.error("Error saving sales:", error);
+        showToast("保存销量失败：" + error.message, "error");
         return;
       }
-      
-      console.log('[save] table=daily_records success', data);
 
       // 更新保存状态
       setSalesModulesSaved(prev => ({ ...prev, [module]: true }));
-      
-      // 如果是汤粥类，更新锁定状态
-      if (module === "tang") {
-        setTangIsLocked(true);
-      }
-      
       showToast(`已保存${module === "bing" ? "饼类" : module === "tang" ? "汤粥类" : module === "mixian" ? "米线面类" : "炒面河粉类"}销量`, "success");
 
     } catch (err: any) {
@@ -879,9 +814,10 @@ function RecordPageContent() {
 
       // 如果有收入或销量，创建一条记录
       if (totalIncome > 0 || hasSalesData) {
-        const recordData = {
+        const { error: recordError } = await supabase
+          .from("daily_records")
+          .insert({
             user_id: user.id,
-            record_date: new Date().toISOString().split('T')[0],
             income_wechat: parseFloat(incomeWechat || "0"),
             income_alipay: parseFloat(incomeAlipay || "0"),
             income_cash: parseFloat(incomeCash || "0"),
@@ -892,7 +828,7 @@ function RecordPageContent() {
             estimated_profit: estimatedProfit,
             cogs_today: cogsToday,
             // 销量模块汇总字段
-            // Removed total_bing_count - column doesn't exist in database
+            total_bing_count: salesTotals.bingTotal,
             total_tang_count: salesTotals.tangTotal,
             total_mixian_count: salesTotals.mixianTotal,
             total_chaomian_count: salesTotals.chaomianTotal,
@@ -929,59 +865,34 @@ function RecordPageContent() {
             sku_mixian_su: skuMixianSu,
             sku_mixian_rou: skuMixianRou,
             sku_chaomian: skuChaomian,
-          };
-        
-        console.log('[save] table=daily_records payload', recordData);
-        console.log('[save] table=daily_records payload keys', Object.keys(recordData));
-        const { error: recordError, data: recordDataResult } = await supabase
-          .from("daily_records")
-          .insert(recordData);
+          });
 
         if (recordError) {
-          console.error('[save] table=daily_records error', recordError);
-          console.error('[save] error.message', recordError.message);
-          console.error('[save] error.code', recordError.code);
-          console.error('[save] error.details', recordError.details);
-          console.error('[save] error.hint', recordError.hint);
-          const errorMsg = `保存失败：${recordError.message}${recordError.code ? ` (Code: ${recordError.code})` : ''}${recordError.details ? ` | Details: ${JSON.stringify(recordError.details)}` : ''}${recordError.hint ? ` | Hint: ${recordError.hint}` : ''}`;
-          showToast(errorMsg, "error");
+          console.error("Error inserting record:", recordError);
+          showToast("保存失败：" + recordError.message, "error");
           setSubmitting(false);
           return;
         }
-        
-        console.log('[save] table=daily_records success', recordDataResult);
       }
 
       // 为每条支出创建记录
       for (const expense of expenses) {
-        const expenseRecordData = {
-          user_id: user.id,
-          record_date: new Date().toISOString().split('T')[0],
-          expense_type: expense.expense_type,
-          expense_amount: expense.expense_amount,
-          expense_item_name: expense.expense_item_name,
-          usage_duration: expense.usage_duration || null,
-        };
-        
-        console.log('[save] table=daily_records payload', expenseRecordData);
-        console.log('[save] table=daily_records payload keys', Object.keys(expenseRecordData));
-        const { error: expenseError, data: expenseRecordResult } = await supabase
+        const { error: expenseError } = await supabase
           .from("daily_records")
-          .insert(expenseRecordData);
+          .insert({
+            user_id: user.id,
+            expense_type: expense.expense_type,
+            expense_amount: expense.expense_amount,
+            expense_item_name: expense.expense_item_name,
+            usage_duration: expense.usage_duration || null,
+          });
 
         if (expenseError) {
-          console.error('[save] table=daily_records error', expenseError);
-          console.error('[save] error.message', expenseError.message);
-          console.error('[save] error.code', expenseError.code);
-          console.error('[save] error.details', expenseError.details);
-          console.error('[save] error.hint', expenseError.hint);
-          const errorMsg = `保存支出失败：${expenseError.message}${expenseError.code ? ` (Code: ${expenseError.code})` : ''}${expenseError.details ? ` | Details: ${JSON.stringify(expenseError.details)}` : ''}${expenseError.hint ? ` | Hint: ${expenseError.hint}` : ''}`;
-          showToast(errorMsg, "error");
+          console.error("Error inserting expense:", expenseError);
+          showToast("保存支出失败：" + expenseError.message, "error");
           setSubmitting(false);
           return;
         }
-        
-        console.log('[save] table=daily_records success', expenseRecordResult);
       }
 
       // 成功，清空表单
@@ -1024,10 +935,10 @@ function RecordPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen pb-20" style={{ backgroundColor: '#F5F3F0' }}>
       {/* 成功提示 */}
       {showSuccess && (
-        <div className="fixed top-0 left-0 right-0 bg-green-500 text-white text-center py-4 text-sm z-50">
+        <div className="fixed top-0 left-0 right-0 bg-green-500 text-white text-center py-4 z-50" style={{ fontSize: '1rem' }}>
           ✅ 今天的收支记好了，今天辛苦了，明天再接再厉！
         </div>
       )}
@@ -1035,13 +946,19 @@ function RecordPageContent() {
       <div className="max-w-5xl mx-auto p-6">
         {/* 顶部日期 */}
         <div className="text-center py-8 mb-6">
-          <h1 className="text-2xl font-semibold" style={{ color: '#111827' }}>{todayDate}</h1>
+          <h1 style={{ 
+            fontSize: '1.875rem', // 30px
+            fontWeight: 600,
+            color: '#111827'
+          }}>
+            {todayDate}
+          </h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 第一板块：今日收入 */}
           <Card accentColor="red">
-            <SectionHeader title="💰 今日收入" accentColor="red" className="text-center mb-6" />
+            <SectionHeader title="💰 今日收入" accentColor="red" className="text-center mb-6" isPageTitle={false} />
             <div className="max-w-md mx-auto space-y-4">
               <FormRow label="微信" accentColor="red">
                 <Input
@@ -1110,7 +1027,7 @@ function RecordPageContent() {
               {/* 今日总收入显示 - 视觉焦点 */}
               <div className="mt-8 pt-8 border-t border-gray-200">
                 <div className="text-center">
-                  <div className="text-sm font-medium mb-3" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
+                  <div className="text-sm font-medium text-[#4a4a4a] mb-3">
                     今日总收入
                     {totalIncomeConfirmed && (
                       <span className="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded-full">
@@ -1144,12 +1061,12 @@ function RecordPageContent() {
           {/* 第二板块：当日产品销量追踪 */}
           <div className={`${totalIncomeConfirmed ? "opacity-60" : ""}`}>
             <Card accentColor="yellow">
-              <SectionHeader title="📊 当日产品销量追踪" accentColor="yellow" className="text-center mb-6" />
+              <SectionHeader title="📊 当日产品销量追踪" accentColor="yellow" className="text-center mb-6" isPageTitle={false} />
               <div className="max-w-md mx-auto space-y-6">
             
             {/* 饼类产品卡片 */}
             <div>
-              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>饼类产品</h3>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">饼类产品</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
                 <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
@@ -1188,122 +1105,69 @@ function RecordPageContent() {
               )}
             </div>
 
-            {/* 汤粥类产品卡片 - 重构版：动态子分类 + 锁定功能 + Indigo/Blue 主题 */}
-            <div className="flex flex-col items-center w-full">
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <h3 className="text-base font-medium" style={{ color: '#111827' }}>汤/粥类</h3>
-                {tangIsLocked && (
-                  <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full">
-                    🔒 Data Locked
-                  </span>
-                )}
-              </div>
+            {/* 汤粥类产品卡片 */}
+            {(() => {
+              const soupItems = [
+                { label: "粉汤", value: skuFentang, onChange: setSkuFentang },
+                { label: "馄炖", value: skuHundun, onChange: setSkuHundun },
+                { label: "小米粥", value: skuXiaomizhou, onChange: setSkuXiaomizhou },
+                { label: "豆浆", value: skuDoujiang, onChange: setSkuDoujiang },
+                { label: "鸡蛋汤", value: skuJidantang, onChange: setSkuJidantang },
+              ];
 
-              {tangIsLocked ? (
-                // 锁定状态：只读显示（居中，干净样式）
-                <div className="w-full max-w-md space-y-3 mb-6">
-                  {tangSubCategories.map((item) => (
-                    item.count > 0 && (
-                      <div key={item.id} className="flex justify-between items-center p-4 bg-white border rounded-lg" style={{ borderColor: theme.accent.blue.border }}>
-                        <span className="text-sm font-medium" style={{ color: theme.text.secondary }}>{item.name}</span>
-                        <span className="text-lg font-bold" style={{ color: theme.accent.blue.base }}>
-                          {item.count} 个
-                        </span>
-                      </div>
-                    )
-                  ))}
-                </div>
-              ) : (
-                // 编辑状态：动态子分类输入（居中）
-                <div className="w-full max-w-md space-y-3 mb-6">
-                  {tangSubCategories.map((item, index) => (
-                    <div key={item.id} className="flex items-center gap-3">
-                      <div className="flex-1">
-                        <Input
-                          type="text"
-                          value={item.name}
-                          onChange={(e) => {
-                            const updated = [...tangSubCategories];
-                            updated[index].name = e.target.value;
-                            setTangSubCategories(updated);
-                          }}
-                          placeholder="子分类名称"
-                          accentColor="blue"
-                          className="text-sm"
-                        />
-                      </div>
-                      <div className="w-24">
-                        <Input
-                          type="number"
-                          value={item.count}
-                          onChange={(e) => {
-                            const updated = [...tangSubCategories];
-                            updated[index].count = Number(e.target.value) || 0;
-                            setTangSubCategories(updated);
-                          }}
-                          placeholder="数量"
-                          accentColor="blue"
-                          className="text-sm text-center"
-                          min="0"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTangSubCategories(tangSubCategories.filter((_, i) => i !== index));
-                        }}
-                        className="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                      >
-                        删除
-                      </button>
+              return (
+                <div>
+                  <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">汤/粥类</h3>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    {soupItems.map((item) => (
+                      <SkuInput
+                        key={item.label}
+                        label={item.label}
+                        value={item.value}
+                        onChange={item.onChange}
+                        disabled={totalIncomeConfirmed || salesModulesSaved.tang}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* 汇总显示 - 视觉焦点 */}
+                  <StatCard
+                    label="汤/粥类总计"
+                    value={salesTotals.tangTotal}
+                    unit="个"
+                    accentColor="yellow"
+                    className="mb-4"
+                  />
+
+                  {/* 保存按钮 */}
+                  {!salesModulesSaved.tang && !totalIncomeConfirmed && (
+                    <Button
+                      type="button"
+                      onClick={() => handleSaveSalesModule("tang")}
+                      accentColor="yellow"
+                      variant="primary"
+                      size="lg"
+                      className="w-full"
+                    >
+                      保存汤/粥类销量
+                    </Button>
+                  )}
+                  {salesModulesSaved.tang && (
+                    <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-lg">
+                      ✓ 已保存
                     </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTangSubCategories([...tangSubCategories, { id: Date.now().toString(), name: '', count: 0 }]);
-                    }}
-                    className="w-full py-2 text-sm border-2 border-dashed rounded-lg transition-all hover:bg-gray-50"
-                    style={{ borderColor: theme.accent.blue.border, color: theme.accent.blue.base }}
-                  >
-                    + 添加子分类
-                  </button>
+                  )}
                 </div>
-              )}
-
-              {/* 汇总显示 - 视觉焦点（超大字体，完美居中，Indigo/Blue 主题） */}
-              <div className="w-full max-w-md text-center mb-6 p-8 rounded-xl" style={{ backgroundColor: theme.accent.blue.hover }}>
-                <div className="text-xs mb-2 font-medium" style={{ color: theme.text.tertiary }}>汤/粥类总计</div>
-                <div className="text-5xl font-extrabold mb-1" style={{ color: theme.accent.blue.base }}>
-                  {totalTangCount}
-                </div>
-                <div className="text-xs font-medium" style={{ color: theme.text.tertiary }}>个</div>
-              </div>
-
-              {/* 保存按钮（居中） */}
-              {!tangIsLocked && !totalIncomeConfirmed && (
-                <div className="w-full max-w-md">
-                  <Button
-                    type="button"
-                    onClick={() => handleSaveSalesModule("tang")}
-                    accentColor="blue"
-                    variant="primary"
-                    size="lg"
-                    className="w-full"
-                  >
-                    保存汤/粥类销量
-                  </Button>
-                </div>
-              )}
-            </div>
+              );
+            })()}
 
             {/* 米线/面类产品卡片 */}
             <div>
-              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>米线/面类</h3>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">米线/面类</h3>
 
               {/* 【素】米线/面 */}
               <div className="mb-6">
-                <h4 className="text-sm font-medium mb-3" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>【素】米线/面</h4>
+                <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">【素】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="三鲜" value={skuMixianSuSanxian} onChange={setSkuMixianSuSanxian} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
                   <SkuInput label="酸菜" value={skuMixianSuSuancai} onChange={setSkuMixianSuSuancai} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
@@ -1313,7 +1177,7 @@ function RecordPageContent() {
 
               {/* 【肉】米线/面 */}
               <div className="mb-6">
-                <h4 className="text-sm font-medium mb-3" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>【肉】米线/面</h4>
+                <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">【肉】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="三鲜" value={skuMixianRouSanxian} onChange={setSkuMixianRouSanxian} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
                   <SkuInput label="酸菜" value={skuMixianRouSuancai} onChange={setSkuMixianRouSuancai} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
@@ -1323,7 +1187,7 @@ function RecordPageContent() {
 
               {/* 酸辣粉 */}
               <div className="mb-4">
-                <h4 className="text-sm font-medium mb-3" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>酸辣粉</h4>
+                <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">酸辣粉</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
                 </div>
@@ -1360,7 +1224,7 @@ function RecordPageContent() {
 
             {/* 炒面/炒河粉类产品卡片 */}
             <div>
-              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>炒面/炒河粉类</h3>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">炒面/炒河粉类</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
                 <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
@@ -1401,19 +1265,17 @@ function RecordPageContent() {
 
           {/* 第三板块：今日支出 */}
           <Card accentColor="blue">
-            <SectionHeader title="💸 今日支出" accentColor="blue" className="text-center mb-6" />
+            <SectionHeader title="💸 今日支出" accentColor="blue" className="text-center mb-6" isPageTitle={false} />
             <div className="max-w-md mx-auto space-y-6">
 
             {/* 【购买原材料】模块 */}
             <div>
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <h3 className="text-base font-medium" style={{ color: '#111827' }}>【购买原材料】</h3>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">【购买原材料】</h3>
                 {expenseModulesLocked.raw && (
-                  <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full">
-                    已确认
+                  <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
+                    已锁定
                   </span>
                 )}
-              </div>
 
               {(() => {
                 const rawItems = [
@@ -1452,21 +1314,16 @@ function RecordPageContent() {
                     />
 
                     {!expenseModulesLocked.raw && (
-                      <>
-                        <p className="text-xs mt-2 text-center" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
-                          保存后将无法修改
-                        </p>
-                        <Button
-                          type="button"
-                          onClick={() => setExpenseConfirmModal({ isOpen: true, module: "raw" })}
-                          accentColor="blue"
-                          variant="primary"
-                          size="lg"
-                          className="w-full mt-4"
-                        >
-                          🔒 记入支出
-                        </Button>
-                      </>
+                      <Button
+                        type="button"
+                        onClick={() => setExpenseConfirmModal({ isOpen: true, module: "raw" })}
+                        accentColor="blue"
+                        variant="primary"
+                        size="lg"
+                        className="w-full mt-4"
+                      >
+                        🔒 记入支出
+                      </Button>
                     )}
                   </>
                 );
@@ -1475,14 +1332,12 @@ function RecordPageContent() {
 
             {/* 【门店固定费用】模块 */}
             <div className="mb-6">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <h3 className="text-base font-medium" style={{ color: '#111827' }}>【门店固定费用】</h3>
-                {expenseModulesLocked.fixed && (
-                  <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full">
-                    已确认
-                  </span>
-                )}
-              </div>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">【门店固定费用】</h3>
+              {expenseModulesLocked.fixed && (
+                <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
+                  已锁定
+                </span>
+              )}
 
               {(() => {
                 const fixedItems = [
@@ -1519,21 +1374,16 @@ function RecordPageContent() {
                     />
 
                     {!expenseModulesLocked.fixed && (
-                      <>
-                        <p className="text-xs mt-2 text-center" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
-                          保存后将无法修改
-                        </p>
-                        <Button
-                          type="button"
-                          onClick={() => setExpenseConfirmModal({ isOpen: true, module: "fixed" })}
-                          accentColor="blue"
-                          variant="primary"
-                          size="lg"
-                          className="w-full mt-4"
-                        >
-                          🔒 记入支出
-                        </Button>
-                      </>
+                      <Button
+                        type="button"
+                        onClick={() => setExpenseConfirmModal({ isOpen: true, module: "fixed" })}
+                        accentColor="blue"
+                        variant="primary"
+                        size="lg"
+                        className="w-full mt-4"
+                      >
+                        🔒 记入支出
+                      </Button>
                     )}
                   </>
                 );
@@ -1542,14 +1392,12 @@ function RecordPageContent() {
 
             {/* 【经营消耗品】模块 */}
             <div>
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <h3 className="text-base font-medium" style={{ color: '#111827' }}>【经营消耗品】</h3>
-                {expenseModulesLocked.cons && (
-                  <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full">
-                    已确认
-                  </span>
-                )}
-              </div>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">【经营消耗品】</h3>
+              {expenseModulesLocked.cons && (
+                <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
+                  已锁定
+                </span>
+              )}
 
               {!expenseModulesLocked.cons && (
                 <>
@@ -1607,9 +1455,6 @@ function RecordPageContent() {
                     className="mt-6"
                   />
 
-                  <p className="text-xs mt-2 text-center" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
-                    保存后将无法修改
-                  </p>
                   <Button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "cons" })}
@@ -1644,14 +1489,12 @@ function RecordPageContent() {
 
             {/* 【其他支出】模块 */}
             <div>
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <h3 className="text-base font-medium" style={{ color: '#111827' }}>【其他支出】</h3>
-                {expenseModulesLocked.other && (
-                  <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full">
-                    已确认
-                  </span>
-                )}
-              </div>
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">【其他支出】</h3>
+              {expenseModulesLocked.other && (
+                <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
+                  已锁定
+                </span>
+              )}
 
               {!expenseModulesLocked.other && (
                 <>
@@ -1686,9 +1529,6 @@ function RecordPageContent() {
                     className="mt-6"
                   />
 
-                  <p className="text-xs mt-2 text-center" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
-                    保存后将无法修改
-                  </p>
                   <Button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "other" })}
@@ -1732,12 +1572,12 @@ function RecordPageContent() {
           {totalIncomeConfirmed && (
             <Card accentColor="red" className="p-12">
               <div className="text-center">
-                <h3 className="text-xl font-semibold mb-12" style={{ color: '#111827' }}>🏆 今日经营成绩单</h3>
+                <h3 className="text-2xl font-semibold text-[#1a1a1a] mb-12">🏆 今日经营成绩单</h3>
 
                 {/* 核心指标 - 净利润 */}
                 <div className="mb-12">
-                  <div className="text-sm font-medium mb-4" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>今日预估净赚</div>
-                  <div className="text-5xl font-semibold font-mono" style={{ color: theme.accent.red.base }}>
+                  <div className="text-lg font-medium text-[#4a4a4a] mb-4">今日预估净赚</div>
+                  <div className="text-6xl font-bold" style={{ color: theme.accent.red.base }}>
                     ¥ {((parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")) - calculateTodayCOGS()).toFixed(2)}
                   </div>
                 </div>
@@ -1745,30 +1585,30 @@ function RecordPageContent() {
                 {/* 辅助指标列表 */}
                 <div className="grid grid-cols-2 gap-6 text-left">
                   <Card>
-                    <div className="text-xs font-medium mb-2" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>总收入</div>
-                    <div className="text-xl font-semibold" style={{ color: '#111827' }}>
+                    <div className="text-sm font-medium text-[#4a4a4a] mb-2">总收入</div>
+                    <div className="text-xl font-bold text-[#1a1a1a]">
                       ¥ {(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}
                     </div>
                   </Card>
 
                   <Card>
-                    <div className="text-xs font-medium mb-2" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>总支出</div>
-                    <div className="text-xl font-semibold" style={{ color: '#111827' }}>
+                    <div className="text-sm font-medium text-[#4a4a4a] mb-2">总支出</div>
+                    <div className="text-xl font-bold text-[#1a1a1a]">
                       ¥ {expenseTotals.grandTotal.toFixed(2)}
                     </div>
                   </Card>
 
                   <Card>
-                    <div className="text-xs font-medium mb-2" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>经营成本</div>
-                    <div className="text-lg font-semibold" style={{ color: '#111827' }}>
+                    <div className="text-sm font-medium text-[#4a4a4a] mb-2">经营成本</div>
+                    <div className="text-lg font-bold text-[#1a1a1a]">
                       ¥ {calculateTodayCOGS().toFixed(2)}
                     </div>
-                    <div className="text-xs mt-1" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>含固定费摊销</div>
+                    <div className="text-xs text-[#8a8a8a] mt-1">含固定费摊销</div>
                   </Card>
 
                   <Card>
-                    <div className="text-xs font-medium mb-2" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>销量汇总</div>
-                    <div className="text-lg font-semibold" style={{ color: '#111827' }}>
+                    <div className="text-sm font-medium text-[#4a4a4a] mb-2">销量汇总</div>
+                    <div className="text-lg font-bold text-[#1a1a1a]">
                       {skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing +
                        skuFentang + skuHundun + skuXiaomizhou + skuDoujiang + skuJidantang +
                        skuMixianSuSanxian + skuMixianSuSuancai + skuMixianSuMala +
@@ -1780,7 +1620,7 @@ function RecordPageContent() {
 
                 {/* 鼓励语 */}
                 <div className="mt-12 pt-8">
-                  <div className="text-xs" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
+                  <div className="text-sm text-[#4a4a4a]">
                     🎊 今日辛苦了！数据已保存，明天继续加油！
                   </div>
                 </div>
@@ -1836,13 +1676,12 @@ function RecordPageContent() {
           <Button
             type="button"
             onClick={() => handleExpenseModuleSubmit(expenseConfirmModal.module)}
-            disabled={expenseModulesSaving[expenseConfirmModal.module]}
             accentColor="red"
             variant="primary"
             size="lg"
             className="flex-1"
           >
-            {expenseModulesSaving[expenseConfirmModal.module] ? "保存中..." : "确定"}
+            确定
           </Button>
         </div>
       </Modal>
