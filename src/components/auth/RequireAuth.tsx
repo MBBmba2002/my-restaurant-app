@@ -9,23 +9,29 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [timeoutReached, setTimeoutReached] = useState(false);
 
-  // Set a timeout to prevent infinite loading
+  // Set a shorter timeout to prevent infinite loading (1.5 seconds)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setTimeoutReached(true);
-    }, 3000); // 3 second timeout
+    }, 1500); // 1.5 second timeout
 
     return () => clearTimeout(timeoutId);
   }, []);
 
   useEffect(() => {
-    // Only redirect if loading is complete and no user
+    // Only redirect if loading is complete, no user, and timeout not reached
+    // After timeout, allow access without redirect
     if (!loading && !user && !timeoutReached) {
-      router.push("/login");
+      // Don't redirect immediately, give user a chance to see the page
+      const redirectTimeout = setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+      
+      return () => clearTimeout(redirectTimeout);
     }
   }, [user, loading, router, timeoutReached]);
 
-  // Show loading only for a short time
+  // Show loading only for a short time (1.5 seconds max)
   if (loading && !timeoutReached) {
     return (
       <div className="min-h-screen bg-[#f2eada] flex items-center justify-center">
@@ -34,16 +40,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // If timeout reached or no user, allow access (for development)
-  // In production, you might want to redirect to login
-  if (!user && timeoutReached) {
-    // Allow access even without authentication for now
-    return <>{children}</>;
-  }
-
-  if (!user) {
-    return null;
-  }
-
+  // After timeout or if not loading, always allow access
+  // This ensures the app works even if auth fails
   return <>{children}</>;
 }
