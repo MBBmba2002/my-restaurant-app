@@ -83,8 +83,8 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           disabled={disabled}
           className="w-8 h-8 rounded-lg flex items-center justify-center transition-all border disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80 active:scale-95"
           style={{
-            backgroundColor: yellow.light,
-            color: yellow.base,
+            backgroundColor: yellow.hover,
+            color: '#111827',
             borderColor: yellow.border,
           }}
         >
@@ -101,10 +101,9 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
             onChange={handleInputChange}
             onBlur={handleBlur}
             disabled={disabled}
-            className="w-full font-mono text-sm font-semibold text-center py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none border"
-            style={{ color: '#111827' }}
+            className="w-full font-mono text-sm font-semibold text-center py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none border bg-white"
             style={{
-              backgroundColor: yellow.light,
+              color: '#111827',
               borderColor: yellow.border,
             }}
             onFocus={(e) => {
@@ -126,8 +125,8 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           disabled={disabled}
           className="w-8 h-8 rounded-lg flex items-center justify-center transition-all border disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80 active:scale-95"
           style={{
-            backgroundColor: yellow.light,
-            color: yellow.base,
+            backgroundColor: yellow.hover,
+            color: '#111827',
             borderColor: yellow.border,
           }}
         >
