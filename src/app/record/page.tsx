@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { supabase } from "@/lib/supabaseClient";
@@ -400,6 +400,37 @@ function RecordPageContent() {
   const [totalIncomeConfirmed, setTotalIncomeConfirmed] = useState(false);
   const [showTotalIncomeConfirmDialog, setShowTotalIncomeConfirmDialog] = useState(false);
 
+  // 自动计算支出汇总
+  const expenseTotals = useMemo(() => {
+    const rawTotal = parseFloat(expRawVeg || "0") +
+                     parseFloat(expRawMeat || "0") +
+                     parseFloat(expRawEgg || "0") +
+                     parseFloat(expRawNoodle || "0") +
+                     parseFloat(expRawSpice || "0") +
+                     parseFloat(expRawPack || "0");
+
+    const fixTotal = parseFloat(expFixRent || "0") +
+                     parseFloat(expFixUtility || "0") +
+                     parseFloat(expFixGas || "0") +
+                     parseFloat(expFixSalary || "0");
+
+    const consTotal = parseFloat(expConsAmount || "0");
+
+    const otherTotal = parseFloat(expOtherAmount || "0");
+
+    const grandTotal = rawTotal + fixTotal + consTotal + otherTotal;
+
+    return {
+      rawTotal,
+      fixTotal,
+      consTotal,
+      otherTotal,
+      grandTotal
+    };
+  }, [expRawVeg, expRawMeat, expRawEgg, expRawNoodle, expRawSpice, expRawPack,
+      expFixRent, expFixUtility, expFixGas, expFixSalary,
+      expConsAmount, expOtherAmount]);
+
   useEffect(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -446,23 +477,30 @@ function RecordPageContent() {
           expenseData.exp_raw_noodle = parseFloat(expRawNoodle || "0");
           expenseData.exp_raw_spice = parseFloat(expRawSpice || "0");
           expenseData.exp_raw_pack = parseFloat(expRawPack || "0");
+          expenseData.total_expense_raw = expenseTotals.rawTotal;
           break;
         case "fixed":
           expenseData.exp_fix_rent = parseFloat(expFixRent || "0");
           expenseData.exp_fix_utility = parseFloat(expFixUtility || "0");
           expenseData.exp_fix_gas = parseFloat(expFixGas || "0");
           expenseData.exp_fix_salary = parseFloat(expFixSalary || "0");
+          expenseData.total_expense_fix = expenseTotals.fixTotal;
           break;
         case "cons":
           expenseData.exp_cons_name = expConsName;
           expenseData.exp_cons_amount = parseFloat(expConsAmount || "0");
           expenseData.exp_cons_duration = expConsDuration;
+          expenseData.total_expense_cons = expenseTotals.consTotal;
           break;
         case "other":
           expenseData.exp_other_name = expOtherName;
           expenseData.exp_other_amount = parseFloat(expOtherAmount || "0");
+          expenseData.total_expense_other = expenseTotals.otherTotal;
           break;
       }
+
+      // 更新当日总支出
+      expenseData.total_daily_expense = expenseTotals.grandTotal;
 
       // 插入或更新支出记录
       const { error } = await supabase
@@ -517,23 +555,8 @@ function RecordPageContent() {
 
   // 计算今日经营成本 (COGS)
   const calculateTodayCOGS = () => {
-    // 原材料总和
-    const rawMaterialsTotal =
-      parseFloat(expRawVeg || "0") +
-      parseFloat(expRawMeat || "0") +
-      parseFloat(expRawEgg || "0") +
-      parseFloat(expRawNoodle || "0") +
-      parseFloat(expRawSpice || "0") +
-      parseFloat(expRawPack || "0");
-
-    // 固定费用总和（按日分摊）
-    const fixedCostsTotal =
-      (parseFloat(expFixRent || "0") +
-       parseFloat(expFixUtility || "0") +
-       parseFloat(expFixGas || "0") +
-       parseFloat(expFixSalary || "0")) / 30; // 假设每月30天
-
-    return rawMaterialsTotal + fixedCostsTotal;
+    // 使用汇总数据：原材料总和 + 固定费用总和（按日分摊）
+    return expenseTotals.rawTotal + (expenseTotals.fixTotal / 30); // 假设每月30天
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -999,6 +1022,14 @@ function RecordPageContent() {
                       ))}
                     </div>
 
+                    {/* 原材料汇总显示 */}
+                    <div className="mt-4 pt-3 border-t-2 border-green-200 bg-green-50 rounded-lg p-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-semibold text-gray-700">本类合计：</span>
+                        <span className="text-xl font-bold text-green-600">¥ {expenseTotals.rawTotal.toFixed(2)}</span>
+                      </div>
+                    </div>
+
                     {!expenseModulesLocked.raw && (
                       <button
                         type="button"
@@ -1058,6 +1089,14 @@ function RecordPageContent() {
                       ))}
                     </div>
 
+                    {/* 固定费用汇总显示 */}
+                    <div className="mt-4 pt-3 border-t-2 border-blue-200 bg-blue-50 rounded-lg p-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-semibold text-gray-700">本类合计：</span>
+                        <span className="text-xl font-bold text-blue-600">¥ {expenseTotals.fixTotal.toFixed(2)}</span>
+                      </div>
+                    </div>
+
                     {!expenseModulesLocked.fixed && (
                       <button
                         type="button"
@@ -1085,58 +1124,68 @@ function RecordPageContent() {
               </div>
 
               {!expenseModulesLocked.cons && (
-                <div className="space-y-4 mb-4">
-                  <div>
-                    <label className="block text-base font-medium mb-2 text-gray-700">
-                      消耗品名称
-                    </label>
-                    <input
-                      type="text"
-                      value={expConsName}
-                      onChange={(e) => setExpConsName(e.target.value)}
-                      placeholder="请输入消耗品名称"
-                      className="w-full text-xl p-3 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
-                    />
+                <>
+                  <div className="space-y-4 mb-4">
+                    <div>
+                      <label className="block text-base font-medium mb-2 text-gray-700">
+                        消耗品名称
+                      </label>
+                      <input
+                        type="text"
+                        value={expConsName}
+                        onChange={(e) => setExpConsName(e.target.value)}
+                        placeholder="请输入消耗品名称"
+                        className="w-full text-xl p-3 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-base font-medium mb-2 text-gray-700">
+                        金额（元）
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={expConsAmount}
+                        onChange={(e) => setExpConsAmount(e.target.value)}
+                        placeholder="0.00"
+                        className="w-full text-xl p-3 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-base font-medium mb-2 text-gray-700">
+                        能用多久？
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          { value: "1个月", label: "1个月" },
+                          { value: "1-3个月", label: "1-3个月" },
+                          { value: "6个月以上", label: "6个月以上" },
+                          { value: "1年以上", label: "1年以上" },
+                        ].map((duration) => (
+                          <button
+                            key={duration.value}
+                            type="button"
+                            onClick={() => setExpConsDuration(duration.value)}
+                            className={`p-3 text-lg rounded-lg border-2 ${
+                              expConsDuration === duration.value
+                                ? "bg-purple-500 text-white border-purple-500"
+                                : "bg-white text-gray-700 border-gray-300 hover:border-purple-400"
+                            }`}
+                          >
+                            {duration.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="block text-base font-medium mb-2 text-gray-700">
-                      金额（元）
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={expConsAmount}
-                      onChange={(e) => setExpConsAmount(e.target.value)}
-                      placeholder="0.00"
-                      className="w-full text-xl p-3 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-base font-medium mb-2 text-gray-700">
-                      能用多久？
-                    </label>
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { value: "1个月", label: "1个月" },
-                        { value: "1-3个月", label: "1-3个月" },
-                        { value: "6个月以上", label: "6个月以上" },
-                        { value: "1年以上", label: "1年以上" },
-                      ].map((duration) => (
-                        <button
-                          key={duration.value}
-                          type="button"
-                          onClick={() => setExpConsDuration(duration.value)}
-                          className={`p-3 text-lg rounded-lg border-2 ${
-                            expConsDuration === duration.value
-                              ? "bg-purple-500 text-white border-purple-500"
-                              : "bg-white text-gray-700 border-gray-300 hover:border-purple-400"
-                          }`}
-                        >
-                          {duration.label}
-                        </button>
-                      ))}
+                  {/* 消耗品汇总显示 */}
+                  <div className="mt-4 pt-3 border-t-2 border-purple-200 bg-purple-50 rounded-lg p-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-semibold text-gray-700">本类合计：</span>
+                      <span className="text-xl font-bold text-purple-600">¥ {expenseTotals.consTotal.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -1147,7 +1196,7 @@ function RecordPageContent() {
                   >
                     🔒 记入支出
                   </button>
-                </div>
+                </>
               )}
 
               {expenseModulesLocked.cons && (
@@ -1157,6 +1206,13 @@ function RecordPageContent() {
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
                     使用时长：{expConsDuration}
+                  </div>
+                  {/* 消耗品汇总显示 */}
+                  <div className="mt-3 pt-2 border-t border-purple-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-600">本类合计：</span>
+                      <span className="text-lg font-bold text-purple-600">¥ {expenseTotals.consTotal.toFixed(2)}</span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1213,13 +1269,82 @@ function RecordPageContent() {
                 </div>
               )}
 
+              {!expenseModulesLocked.other && (
+                <>
+                  <div className="space-y-4 mb-4">
+                    <div>
+                      <label className="block text-base font-medium mb-2 text-gray-700">
+                        支出项目名称
+                      </label>
+                      <input
+                        type="text"
+                        value={expOtherName}
+                        onChange={(e) => setExpOtherName(e.target.value)}
+                        placeholder="请输入支出项目名称"
+                        className="w-full text-xl p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-base font-medium mb-2 text-gray-700">
+                        金额（元）
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={expOtherAmount}
+                        onChange={(e) => setExpOtherAmount(e.target.value)}
+                        placeholder="0.00"
+                        className="w-full text-xl p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 其他支出汇总显示 */}
+                  <div className="mt-4 pt-3 border-t-2 border-gray-200 bg-gray-50 rounded-lg p-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-semibold text-gray-700">本类合计：</span>
+                      <span className="text-xl font-bold text-gray-600">¥ {expenseTotals.otherTotal.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setExpenseConfirmModal({ isOpen: true, module: "other" })}
+                    className="w-full p-4 text-xl bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-bold"
+                  >
+                    🔒 记入支出
+                  </button>
+                </>
+              )}
+
               {expenseModulesLocked.other && (
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <div className="text-lg font-medium text-gray-800">
                     {expOtherName} - ¥{expOtherAmount}
                   </div>
+                  {/* 其他支出汇总显示 */}
+                  <div className="mt-3 pt-2 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-600">本类合计：</span>
+                      <span className="text-lg font-bold text-gray-600">¥ {expenseTotals.otherTotal.toFixed(2)}</span>
+                    </div>
+                  </div>
                 </div>
               )}
+            </div>
+
+            {/* 当日总支出汇总看板 */}
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-6 shadow-sm mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">💰 当日总支出</h3>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-red-600 mb-2">
+                  ¥ {expenseTotals.grandTotal.toFixed(2)}
+                </div>
+                <div className="text-sm text-gray-600">
+                  包含所有支出分类汇总
+                </div>
+              </div>
             </div>
 
             {/* 今日经营概览 */}
