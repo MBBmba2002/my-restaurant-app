@@ -238,6 +238,27 @@ function RecordPageContent() {
     other: false
   });
 
+  // 汤粥类动态子分类（使用 product_details JSONB）
+  const [tangSubCategories, setTangSubCategories] = useState<Array<{ id: string; name: string; count: number }>>([
+    { id: '1', name: '粉汤', count: 0 },
+    { id: '2', name: '馄炖', count: 0 },
+    { id: '3', name: '小米粥', count: 0 },
+    { id: '4', name: '豆浆', count: 0 },
+    { id: '5', name: '鸡蛋汤', count: 0 },
+  ]);
+
+  // 汤粥类动态子分类（使用 product_details JSONB）
+  const [tangSubCategories, setTangSubCategories] = useState<Array<{ id: string; name: string; count: number }>>([
+    { id: '1', name: '粉汤', count: 0 },
+    { id: '2', name: '馄炖', count: 0 },
+    { id: '3', name: '小米粥', count: 0 },
+    { id: '4', name: '豆浆', count: 0 },
+    { id: '5', name: '鸡蛋汤', count: 0 },
+  ]);
+
+  // 汤粥类锁定状态（从数据库 is_locked 字段读取）
+  const [tangIsLocked, setTangIsLocked] = useState(false);
+
   // 支出确认Modal
   const [expenseConfirmModal, setExpenseConfirmModal] = useState<{
     isOpen: boolean;
@@ -486,6 +507,11 @@ function RecordPageContent() {
   };
 
   // 自动计算销量模块汇总
+  // 计算汤粥类总计（使用 useMemo 优化性能，实时计算）
+  const totalTangCount = useMemo(() => {
+    return tangSubCategories.reduce((sum, item) => sum + (Number(item.count) || 0), 0);
+  }, [tangSubCategories]);
+
   const salesTotals = useMemo(() => {
     // 饼类总计
     const bingTotal = skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing;
@@ -710,12 +736,16 @@ function RecordPageContent() {
           // Removed total_bing_count - column doesn't exist in database
           break;
         case "tang":
-          salesData.sku_fentang = Number(skuFentang) || 0;
-          salesData.sku_hundun = Number(skuHundun) || 0;
-          salesData.sku_mizhou = Number(skuXiaomizhou) || 0;
-          salesData.sku_doujiang = Number(skuDoujiang) || 0;
-          salesData.sku_jidantang = Number(skuJidantang) || 0;
-          salesData.total_tang_count = Number(salesTotals.tangTotal) || 0;
+          // 构建 product_details JSONB 对象
+          const productDetails: Record<string, number> = {};
+          tangSubCategories.forEach(item => {
+            if (item.name && item.count > 0) {
+              productDetails[item.name] = Number(item.count) || 0;
+            }
+          });
+          salesData.product_details = productDetails;
+          salesData.total_tang_count = totalTangCount;
+          salesData.is_locked = true; // 保存时锁定记录
           break;
         case "mixian":
           salesData.sku_mixian_su_sanxian = Number(skuMixianSuSanxian) || 0;
@@ -760,6 +790,12 @@ function RecordPageContent() {
 
       // 更新保存状态
       setSalesModulesSaved(prev => ({ ...prev, [module]: true }));
+      
+      // 如果是汤粥类，更新锁定状态
+      if (module === "tang") {
+        setTangIsLocked(true);
+      }
+      
       showToast(`已保存${module === "bing" ? "饼类" : module === "tang" ? "汤粥类" : module === "mixian" ? "米线面类" : "炒面河粉类"}销量`, "success");
 
     } catch (err: any) {
@@ -1161,61 +1197,112 @@ function RecordPageContent() {
               )}
             </div>
 
-            {/* 汤粥类产品卡片 */}
-            {(() => {
-              const soupItems = [
-                { label: "粉汤", value: skuFentang, onChange: setSkuFentang },
-                { label: "馄炖", value: skuHundun, onChange: setSkuHundun },
-                { label: "小米粥", value: skuXiaomizhou, onChange: setSkuXiaomizhou },
-                { label: "豆浆", value: skuDoujiang, onChange: setSkuDoujiang },
-                { label: "鸡蛋汤", value: skuJidantang, onChange: setSkuJidantang },
-              ];
+            {/* 汤粥类产品卡片 - 重构版：动态子分类 + 锁定功能 */}
+            <div>
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <h3 className="text-base font-medium" style={{ color: '#111827' }}>汤/粥类</h3>
+                {tangIsLocked && (
+                  <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full">
+                    🔒 已锁定，无法修改
+                  </span>
+                )}
+              </div>
 
-              return (
-                <div>
-                  <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>汤/粥类</h3>
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    {soupItems.map((item) => (
-                      <SkuInput
-                        key={item.label}
-                        label={item.label}
-                        value={item.value}
-                        onChange={item.onChange}
-                        disabled={totalIncomeConfirmed || salesModulesSaved.tang}
-                      />
-                    ))}
-                  </div>
-                  
-                  {/* 汇总显示 - 视觉焦点 */}
-                  <StatCard
-                    label="汤/粥类总计"
-                    value={salesTotals.tangTotal}
-                    unit="个"
-                    accentColor="yellow"
-                    className="mb-4"
-                  />
-
-                  {/* 保存按钮 */}
-                  {!salesModulesSaved.tang && !totalIncomeConfirmed && (
-                    <Button
-                      type="button"
-                      onClick={() => handleSaveSalesModule("tang")}
-                      accentColor="yellow"
-                      variant="primary"
-                      size="lg"
-                      className="w-full"
-                    >
-                      保存汤/粥类销量
-                    </Button>
-                  )}
-                  {salesModulesSaved.tang && (
-                    <div className="w-full p-4 text-center text-sm bg-green-500/10 text-green-700 rounded-lg">
-                      ✓ 已保存
-                    </div>
-                  )}
+              {tangIsLocked ? (
+                // 锁定状态：只读显示
+                <div className="space-y-3 mb-4">
+                  {tangSubCategories.map((item) => (
+                    item.count > 0 && (
+                      <div key={item.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm font-medium" style={{ color: '#111827' }}>{item.name}</span>
+                        <span className="text-lg font-bold" style={{ color: theme.accent.yellow.base }}>
+                          {item.count} 个
+                        </span>
+                      </div>
+                    )
+                  ))}
                 </div>
-              );
-            })()}
+              ) : (
+                // 编辑状态：动态子分类输入
+                <div className="space-y-3 mb-4">
+                  {tangSubCategories.map((item, index) => (
+                    <div key={item.id} className="flex items-center gap-3">
+                      <div className="flex-1">
+                        <Input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) => {
+                            const updated = [...tangSubCategories];
+                            updated[index].name = e.target.value;
+                            setTangSubCategories(updated);
+                          }}
+                          placeholder="子分类名称"
+                          accentColor="yellow"
+                          className="text-sm"
+                        />
+                      </div>
+                      <div className="w-24">
+                        <Input
+                          type="number"
+                          value={item.count}
+                          onChange={(e) => {
+                            const updated = [...tangSubCategories];
+                            updated[index].count = Number(e.target.value) || 0;
+                            setTangSubCategories(updated);
+                          }}
+                          placeholder="数量"
+                          accentColor="yellow"
+                          className="text-sm text-center"
+                          min="0"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTangSubCategories(tangSubCategories.filter((_, i) => i !== index));
+                        }}
+                        className="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTangSubCategories([...tangSubCategories, { id: Date.now().toString(), name: '', count: 0 }]);
+                    }}
+                    className="w-full py-2 text-sm border-2 border-dashed rounded-lg transition-all hover:bg-gray-50"
+                    style={{ borderColor: theme.accent.yellow.border, color: theme.accent.yellow.base }}
+                  >
+                    + 添加子分类
+                  </button>
+                </div>
+              )}
+
+              {/* 汇总显示 - 视觉焦点（大字体，居中） */}
+              <div className="text-center mb-4 p-6 rounded-xl" style={{ backgroundColor: theme.accent.yellow.hover }}>
+                <div className="text-xs mb-1" style={{ color: theme.text.secondary }}>汤/粥类总计</div>
+                <div className="text-4xl font-bold" style={{ color: theme.accent.yellow.base }}>
+                  {totalTangCount}
+                </div>
+                <div className="text-xs mt-1" style={{ color: theme.text.tertiary }}>个</div>
+              </div>
+
+              {/* 保存按钮 */}
+              {!tangIsLocked && !totalIncomeConfirmed && (
+                <Button
+                  type="button"
+                  onClick={() => handleSaveSalesModule("tang")}
+                  accentColor="yellow"
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
+                >
+                  保存汤/粥类销量
+                </Button>
+              )}
+            </div>
 
             {/* 米线/面类产品卡片 */}
             <div>
