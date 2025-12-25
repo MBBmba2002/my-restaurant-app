@@ -29,7 +29,7 @@ function ExpenseModal({ isOpen, onClose, type, onSubmit }: ExpenseModalProps) {
     e.preventDefault();
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount <= 0) {
-      alert("请输入有效的金额");
+      showToast("请输入有效的金额", "error");
       return;
     }
 
@@ -400,6 +400,21 @@ function RecordPageContent() {
   const [totalIncomeConfirmed, setTotalIncomeConfirmed] = useState(false);
   const [showTotalIncomeConfirmDialog, setShowTotalIncomeConfirmDialog] = useState(false);
 
+  // Toast 通知状态
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error' | 'info';
+  }>({ show: false, message: '', type: 'info' });
+
+  // 显示 Toast 通知
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => {
+      setToast({ show: false, message: '', type: 'info' });
+    }, 4000); // 4秒后自动消失
+  };
+
   // 自动计算支出汇总
   const expenseTotals = useMemo(() => {
     const rawTotal = parseFloat(expRawVeg || "0") +
@@ -457,7 +472,7 @@ function RecordPageContent() {
   // 处理支出模块确认提交
   const handleExpenseModuleSubmit = async (module: "raw" | "fixed" | "cons" | "other") => {
     if (!user) {
-      alert("请先登录");
+      showToast("请先登录", "error");
       router.push("/login/");
       return;
     }
@@ -512,7 +527,7 @@ function RecordPageContent() {
 
       if (error) {
         console.error("Error saving expense:", error);
-        alert("保存支出失败：" + error.message);
+        showToast("保存支出失败：" + error.message, "error");
         return;
       }
 
@@ -526,7 +541,7 @@ function RecordPageContent() {
 
     } catch (err: any) {
       console.error("Error:", err);
-      alert("保存失败：" + (err.message || "未知错误"));
+      showToast("保存失败：" + (err.message || "未知错误"), "error");
     }
   };
 
@@ -562,7 +577,7 @@ function RecordPageContent() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      alert("请先登录");
+      showToast("请先登录", "error");
       router.push("/login/");
       return;
     }
@@ -584,7 +599,7 @@ function RecordPageContent() {
 
     // 如果没有任何数据，提示用户
     if (totalIncome === 0 && !hasSalesData && expenses.length === 0) {
-      alert("请至少输入一项数据");
+      showToast("请至少输入一项数据", "error");
       return;
     }
 
@@ -594,7 +609,7 @@ function RecordPageContent() {
 
   const handleConfirmSubmit = async () => {
     if (!user) {
-      alert("请先登录");
+      showToast("请先登录", "error");
       router.push("/login/");
       return;
     }
@@ -681,7 +696,7 @@ function RecordPageContent() {
 
         if (recordError) {
           console.error("Error inserting record:", recordError);
-          alert("保存失败：" + recordError.message);
+          showToast("保存失败：" + recordError.message, "error");
           setSubmitting(false);
           return;
         }
@@ -701,7 +716,7 @@ function RecordPageContent() {
 
         if (expenseError) {
           console.error("Error inserting expense:", expenseError);
-          alert("保存支出失败：" + expenseError.message);
+          showToast("保存支出失败：" + expenseError.message, "error");
           setSubmitting(false);
           return;
         }
@@ -740,7 +755,7 @@ function RecordPageContent() {
       }, 3000);
     } catch (err: any) {
       console.error("Error:", err);
-      alert("保存失败：" + (err.message || "未知错误"));
+      showToast("保存失败：" + (err.message || "未知错误"), "error");
     } finally {
       setSubmitting(false);
     }
@@ -1477,6 +1492,19 @@ function RecordPageContent() {
                 确定
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast 通知组件 */}
+      {toast.show && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className={`px-6 py-3 rounded-lg shadow-lg text-white ${
+            toast.type === 'success' ? 'bg-green-500' :
+            toast.type === 'error' ? 'bg-red-500' :
+            'bg-blue-500'
+          }`}>
+            {toast.message}
           </div>
         </div>
       )}
