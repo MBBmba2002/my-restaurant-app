@@ -22,32 +22,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let mounted = true;
     let timeoutId: NodeJS.Timeout;
 
-    // Set a timeout to prevent infinite loading
+    // Set a shorter timeout to prevent infinite loading (2 seconds)
     timeoutId = setTimeout(() => {
       if (mounted) {
+        console.log("Auth timeout - allowing access without authentication");
         setLoading(false);
       }
-    }, 5000); // 5 second timeout
+    }, 2000); // 2 second timeout
 
     // Get initial session with error handling
-    supabase.auth.getSession()
-      .then(({ data: { session }, error }) => {
-        if (!mounted) return;
+    const initAuth = async () => {
+      try {
+        // Add a timeout for the auth call itself (1.5 seconds)
+        const authPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error("Auth timeout")), 1500)
+        );
         
-        if (error) {
-          console.error("Auth session error:", error);
+        try {
+          const result = await Promise.race([authPromise, timeoutPromise]);
+          const { data: { session }, error } = result;
+          
+          if (!mounted) return;
+          
+          if (error) {
+            console.warn("Auth session error (non-blocking):", error);
+            setLoading(false);
+            clearTimeout(timeoutId);
+            return;
+          }
+          
+          setUser(session?.user ?? null);
+          setLoading(false);
+          clearTimeout(timeoutId);
+        } catch (raceError) {
+          // Timeout or other error - allow app to continue
+          if (!mounted) return;
+          console.warn("Auth check timed out or failed (non-blocking):", raceError);
+          setLoading(false);
+          clearTimeout(timeoutId);
         }
-        
-        setUser(session?.user ?? null);
-        setLoading(false);
-        clearTimeout(timeoutId);
-      })
-      .catch((error) => {
+      } catch (error) {
         if (!mounted) return;
-        console.error("Auth session failed:", error);
+        console.warn("Auth initialization failed (non-blocking):", error);
+        // Allow app to continue even if auth fails
         setLoading(false);
         clearTimeout(timeoutId);
-      });
+      }
+    };
+
+    initAuth();
 
     // Listen for auth changes
     const {

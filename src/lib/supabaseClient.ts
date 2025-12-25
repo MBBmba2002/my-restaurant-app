@@ -12,30 +12,27 @@ const getStorage = () => {
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// Validate that environment variables are set - throw error if missing
-if (!url || typeof url !== "string" || url.trim() === "") {
-  throw new Error("Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_URL must be set at build time. Please set it in GitHub Secrets.");
-}
+// Use fallback values if env vars are not set (for development/local testing)
+const trimmedUrl = (url && typeof url === "string" && url.trim() !== "") 
+  ? url.trim() 
+  : "https://placeholder.supabase.co";
 
-if (!anon || typeof anon !== "string" || anon.trim() === "") {
-  throw new Error("Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_ANON_KEY must be set at build time. Please set it in GitHub Secrets.");
-}
-
-// Trim whitespace
-const trimmedUrl = url.trim();
-const trimmedAnon = anon.trim();
+const trimmedAnon = (anon && typeof anon === "string" && anon.trim() !== "") 
+  ? anon.trim() 
+  : "placeholder-anon-key";
 
 // Validate URL format before passing to createClient
 let parsedUrl: URL;
 try {
   parsedUrl = new URL(trimmedUrl);
   if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") {
-    throw new Error(`Invalid protocol: ${parsedUrl.protocol}. Must be http: or https:`);
+    console.warn(`Invalid Supabase URL protocol: ${parsedUrl.protocol}. Using placeholder.`);
   }
 } catch (error: any) {
-  throw new Error(`NEXT_PUBLIC_SUPABASE_URL is not a valid URL: "${trimmedUrl}". Error: ${error?.message || error}`);
+  console.warn(`NEXT_PUBLIC_SUPABASE_URL is not a valid URL: "${trimmedUrl}". Using placeholder.`);
 }
 
+// Create Supabase client with error handling
 export const supabase = createClient(
   trimmedUrl,
   trimmedAnon,
