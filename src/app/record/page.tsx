@@ -64,10 +64,10 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           type="button"
           onClick={handleDecrement}
           disabled={disabled}
-          className={`w-8 h-8 bg-red-50 text-[#ab322a] rounded-full flex items-center justify-center transition-all border-none ${
+          className={`w-8 h-8 bg-[#ffcc00]/20 text-[#ffcc00] rounded-full flex items-center justify-center transition-all border-none ${
             disabled
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-red-100 active:scale-95"
+              : "hover:bg-[#ffcc00]/30 active:scale-95"
           }`}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,10 +96,10 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           type="button"
           onClick={handleIncrement}
           disabled={disabled}
-          className={`w-8 h-8 bg-red-50 text-[#ab322a] rounded-full flex items-center justify-center transition-all border-none ${
+          className={`w-8 h-8 bg-[#ffcc00]/20 text-[#ffcc00] rounded-full flex items-center justify-center transition-all border-none ${
             disabled
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-red-100 active:scale-95"
+              : "hover:bg-[#ffcc00]/30 active:scale-95"
           }`}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -923,7 +923,7 @@ function RecordPageContent() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 第一板块：今日收入 */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
+          <div className="bg-[#f2eada]/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border-none">
             <h2 className="text-2xl font-bold mb-6 tracking-tight text-[#0c0c0c]">💰 今日收入</h2>
             <div className="space-y-4">
               <div>
@@ -1055,7 +1055,7 @@ function RecordPageContent() {
             <h2 className="text-2xl font-bold mb-6 tracking-tight text-[#0c0c0c]">📊 当日产品销量追踪</h2>
             
             {/* 饼类产品卡片 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
+            <div className="bg-[#f2eada]/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border-none">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">饼类产品</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
@@ -1079,7 +1079,7 @@ function RecordPageContent() {
                 <button
                   type="button"
                   onClick={() => handleSaveSalesModule("bing")}
-                  className="w-full p-4 text-lg font-semibold bg-white border border-[#3d3435] text-[#3d3435] rounded-full transition-all active:scale-95 hover:bg-gray-50"
+                  className="w-full p-4 text-lg font-semibold bg-white border border-[#ffcc00] text-[#ffcc00] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/5"
                 >
                   保存饼类销量
                 </button>
@@ -1102,7 +1102,7 @@ function RecordPageContent() {
               ];
 
               return (
-                <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
+                <div className="bg-[#f2eada]/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border-none">
                   <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">汤/粥类</h3>
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     {soupItems.map((item) => (
@@ -1129,7 +1129,7 @@ function RecordPageContent() {
                     <button
                       type="button"
                       onClick={() => handleSaveSalesModule("tang")}
-                      className="w-full p-4 text-lg font-semibold bg-white border border-[#3d3435] text-[#3d3435] rounded-full transition-all active:scale-95 hover:bg-gray-50"
+                      className="w-full p-4 text-lg font-semibold bg-white border border-[#ffcc00] text-[#ffcc00] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/5"
                     >
                       保存汤/粥类销量
                     </button>
@@ -1144,7 +1144,7 @@ function RecordPageContent() {
             })()}
 
             {/* 米线/面类产品卡片 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
+            <div className="bg-[#f2eada]/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border-none">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">米线/面类</h3>
 
               {/* 【素】米线/面 */}
@@ -1188,7 +1188,7 @@ function RecordPageContent() {
                 <button
                   type="button"
                   onClick={() => handleSaveSalesModule("mixian")}
-                  className="w-full p-4 text-lg font-semibold bg-white border border-[#3d3435] text-[#3d3435] rounded-full transition-all active:scale-95 hover:bg-gray-50"
+                  className="w-full p-4 text-lg font-semibold bg-white border border-[#ffcc00] text-[#ffcc00] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/5"
                 >
                   保存米线/面类销量
                 </button>
@@ -1201,7 +1201,7 @@ function RecordPageContent() {
             </div>
 
             {/* 炒面/炒河粉类产品卡片 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
+            <div className="bg-[#f2eada]/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border-none">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">炒面/炒河粉类</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
@@ -1222,7 +1222,7 @@ function RecordPageContent() {
                 <button
                   type="button"
                   onClick={() => handleSaveSalesModule("chaomian")}
-                  className="w-full p-4 text-lg font-semibold bg-white border border-[#3d3435] text-[#3d3435] rounded-full transition-all active:scale-95 hover:bg-gray-50"
+                  className="w-full p-4 text-lg font-semibold bg-white border border-[#ffcc00] text-[#ffcc00] rounded-full transition-all active:scale-95 hover:bg-[#ffcc00]/5"
                 >
                   保存炒面/炒河粉类销量
                 </button>
@@ -1240,8 +1240,8 @@ function RecordPageContent() {
             <h2 className="text-2xl font-bold mb-6 tracking-tight text-[#0c0c0c]">💸 今日支出</h2>
 
             {/* 【购买原材料】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
-              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【购买原材料】</h3>
+            <div className="bg-[#f2eada]/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border-none">
+              <h3 className="text-xl font-bold text-[#1661ab] mb-6">【购买原材料】</h3>
                 {expenseModulesLocked.raw && (
                   <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
                     已锁定
@@ -1295,7 +1295,7 @@ function RecordPageContent() {
                       <button
                         type="button"
                         onClick={() => setExpenseConfirmModal({ isOpen: true, module: "raw" })}
-                        className="w-full p-4 text-lg font-semibold bg-white border border-gray-200 text-gray-700 rounded-full transition-all active:scale-95"
+                        className="w-full p-4 text-lg font-semibold bg-white border border-[#1661ab] text-[#1661ab] rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/5"
                       >
                         🔒 记入支出
                       </button>
@@ -1306,8 +1306,8 @@ function RecordPageContent() {
             </div>
 
             {/* 【门店固定费用】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
-              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【门店固定费用】</h3>
+            <div className="bg-[#f2eada]/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border-none">
+              <h3 className="text-xl font-bold text-[#1661ab] mb-6">【门店固定费用】</h3>
               {expenseModulesLocked.fixed && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
                   已锁定
@@ -1359,7 +1359,7 @@ function RecordPageContent() {
                       <button
                         type="button"
                         onClick={() => setExpenseConfirmModal({ isOpen: true, module: "fixed" })}
-                        className="w-full p-4 text-lg font-semibold bg-white border border-gray-200 text-gray-700 rounded-full transition-all active:scale-95"
+                        className="w-full p-4 text-lg font-semibold bg-white border border-[#1661ab] text-[#1661ab] rounded-full transition-all active:scale-95 hover:bg-[#1661ab]/5"
                       >
                         🔒 记入支出
                       </button>
@@ -1370,8 +1370,8 @@ function RecordPageContent() {
             </div>
 
             {/* 【经营消耗品】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
-              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【经营消耗品】</h3>
+            <div className="bg-[#f2eada]/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border-none">
+              <h3 className="text-xl font-bold text-[#1661ab] mb-6">【经营消耗品】</h3>
               {expenseModulesLocked.cons && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
                   已锁定
@@ -1474,8 +1474,8 @@ function RecordPageContent() {
             </div>
 
             {/* 【其他支出】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
-              <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【其他支出】</h3>
+            <div className="bg-[#f2eada]/50 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border-none">
+              <h3 className="text-xl font-bold text-[#1661ab] mb-6">【其他支出】</h3>
               {expenseModulesLocked.other && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
                   已锁定
