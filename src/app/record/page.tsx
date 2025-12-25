@@ -1056,7 +1056,7 @@ function RecordPageContent() {
   };
 
   return (
-    <div className="min-h-screen pb-20" style={{ backgroundColor: '#F5F3F0' }}>
+    <div className="min-h-screen pb-20 relative" style={{ backgroundColor: '#F5F3F0' }}>
       {/* 成功提示 */}
       {showSuccess && (
         <div className="fixed top-0 left-0 right-0 bg-green-500 text-white text-center py-4 z-50" style={{ fontSize: '1rem' }}>
@@ -1064,7 +1064,25 @@ function RecordPageContent() {
         </div>
       )}
 
-      <div className="max-w-5xl mx-auto p-6">
+      {/* 锁定状态遮罩层 - 父母端防呆 */}
+      {isDayLocked && (
+        <div 
+          className="fixed inset-0 bg-white bg-opacity-80 z-40 flex items-center justify-center pointer-events-auto"
+          style={{ backdropFilter: 'blur(2px)' }}
+        >
+          <div className="text-center p-8 bg-white rounded-xl shadow-lg border-4" style={{ borderColor: theme.accent.red.base }}>
+            <div className="text-6xl mb-4">🔒</div>
+            <div className="text-2xl font-bold mb-2" style={{ color: theme.accent.red.base }}>
+              今日账目已锁定
+            </div>
+            <p className="text-lg" style={{ color: theme.text.secondary }}>
+              今日数据已提交并锁定，无法修改
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className={`max-w-5xl mx-auto p-6 ${isDayLocked ? 'pointer-events-none opacity-60' : ''}`}>
         {/* 顶部日期 */}
         <div className="text-center py-8 mb-6">
           <h1 style={{ 
@@ -1843,72 +1861,91 @@ function RecordPageContent() {
         </div>
       </Modal>
 
-      {/* 全局汇总总览弹窗 */}
+      {/* 全局汇总总览弹窗 - 父母端防呆确认 */}
       <Modal
         isOpen={showGlobalSummaryModal}
         onClose={() => setShowGlobalSummaryModal(false)}
-        title="📊 今日录入总览"
+        title="确认提交今日数据"
         accentColor="red"
         showCloseButton={true}
       >
         <div className="space-y-4">
-          {/* 收入汇总 */}
-          <Card accentColor="red">
-            <div className="text-sm font-medium mb-3" style={{ color: theme.accent.red.base }}>
-              收入汇总
-            </div>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span style={{ color: theme.text.secondary }}>微信：</span>
-                <span className="font-mono font-semibold">¥ {globalSummary.income.wechat.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span style={{ color: theme.text.secondary }}>支付宝：</span>
-                <span className="font-mono font-semibold">¥ {globalSummary.income.alipay.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span style={{ color: theme.text.secondary }}>现金：</span>
-                <span className="font-mono font-semibold">¥ {globalSummary.income.cash.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between pt-2 border-t" style={{ borderColor: theme.accent.red.border }}>
-                <span className="font-medium">总收入：</span>
-                <span className="font-mono font-bold text-lg" style={{ color: theme.accent.red.base }}>
-                  ¥ {globalSummary.income.total.toFixed(2)}
-                </span>
-              </div>
-            </div>
-          </Card>
+          {/* 核心确认信息 - 父母端友好提示 */}
+          <div className="text-center py-4">
+            <p className="text-lg font-medium mb-2" style={{ color: theme.text.primary }}>
+              今日饼类共 <span className="font-bold" style={{ color: theme.accent.yellow.base }}>{globalSummary.sales.bing}</span> 个，
+            </p>
+            <p className="text-lg font-medium mb-4" style={{ color: theme.text.primary }}>
+              汤粥共 <span className="font-bold" style={{ color: theme.accent.yellow.base }}>{globalSummary.sales.tang}</span> 个，
+            </p>
+            <p className="text-xl font-semibold mb-4" style={{ color: theme.accent.red.base }}>
+              确认结账吗？
+            </p>
+          </div>
 
-          {/* 销量汇总 */}
-          <Card accentColor="yellow">
-            <div className="text-sm font-medium mb-3" style={{ color: theme.accent.yellow.base }}>
-              销量汇总
-            </div>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span style={{ color: theme.text.secondary }}>饼类：</span>
-                <span className="font-mono font-semibold">{globalSummary.sales.bing} 个</span>
+          {/* 详细汇总（可折叠） */}
+          <details className="space-y-3">
+            <summary className="cursor-pointer text-sm font-medium mb-3" style={{ color: theme.text.secondary }}>
+              查看详细汇总
+            </summary>
+            
+            {/* 收入汇总 */}
+            <Card accentColor="red">
+              <div className="text-sm font-medium mb-3" style={{ color: theme.accent.red.base }}>
+                收入汇总
               </div>
-              <div className="flex justify-between">
-                <span style={{ color: theme.text.secondary }}>汤粥类：</span>
-                <span className="font-mono font-semibold">{globalSummary.sales.tang} 个</span>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span style={{ color: theme.text.secondary }}>微信：</span>
+                  <span className="font-mono font-semibold">¥ {globalSummary.income.wechat.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: theme.text.secondary }}>支付宝：</span>
+                  <span className="font-mono font-semibold">¥ {globalSummary.income.alipay.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: theme.text.secondary }}>现金：</span>
+                  <span className="font-mono font-semibold">¥ {globalSummary.income.cash.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between pt-2 border-t" style={{ borderColor: theme.accent.red.border }}>
+                  <span className="font-medium">总收入：</span>
+                  <span className="font-mono font-bold text-lg" style={{ color: theme.accent.red.base }}>
+                    ¥ {globalSummary.income.total.toFixed(2)}
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span style={{ color: theme.text.secondary }}>米线面类：</span>
-                <span className="font-mono font-semibold">{globalSummary.sales.mixian} 个</span>
+            </Card>
+
+            {/* 销量汇总 */}
+            <Card accentColor="yellow">
+              <div className="text-sm font-medium mb-3" style={{ color: theme.accent.yellow.base }}>
+                销量汇总
               </div>
-              <div className="flex justify-between">
-                <span style={{ color: theme.text.secondary }}>炒面河粉类：</span>
-                <span className="font-mono font-semibold">{globalSummary.sales.chaomian} 个</span>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span style={{ color: theme.text.secondary }}>饼类：</span>
+                  <span className="font-mono font-semibold">{globalSummary.sales.bing} 个</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: theme.text.secondary }}>汤粥类：</span>
+                  <span className="font-mono font-semibold">{globalSummary.sales.tang} 个</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: theme.text.secondary }}>米线面类：</span>
+                  <span className="font-mono font-semibold">{globalSummary.sales.mixian} 个</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: theme.text.secondary }}>炒面河粉类：</span>
+                  <span className="font-mono font-semibold">{globalSummary.sales.chaomian} 个</span>
+                </div>
+                <div className="flex justify-between pt-2 border-t" style={{ borderColor: theme.accent.yellow.border }}>
+                  <span className="font-medium">总销量：</span>
+                  <span className="font-mono font-bold text-lg" style={{ color: theme.accent.yellow.base }}>
+                    {globalSummary.sales.total} 个
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between pt-2 border-t" style={{ borderColor: theme.accent.yellow.border }}>
-                <span className="font-medium">总销量：</span>
-                <span className="font-mono font-bold text-lg" style={{ color: theme.accent.yellow.base }}>
-                  {globalSummary.sales.total} 个
-                </span>
-              </div>
-            </div>
-          </Card>
+            </Card>
 
           {/* 支出汇总 */}
           <Card accentColor="blue">
