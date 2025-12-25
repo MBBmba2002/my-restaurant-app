@@ -632,6 +632,9 @@ function RecordPageContent() {
       // 关闭确认Modal
       setExpenseConfirmModal({ isOpen: false, module: "raw" });
 
+      // 显示成功提示
+      showToast("已保存，无法修改", "success");
+
     } catch (err: any) {
       console.error("Error:", err);
       showToast("保存失败：" + (err.message || "未知错误"), "error");
@@ -677,7 +680,7 @@ function RecordPageContent() {
           salesData.sku_roudanbing = skuRoudanbing;
           salesData.sku_danbing = skuDanbing;
           salesData.sku_changbing = skuChangbing;
-          salesData.total_bing_count = salesTotals.bingTotal;
+          // Removed total_bing_count - column doesn't exist in database
           break;
         case "tang":
           salesData.sku_fentang = skuFentang;
@@ -827,7 +830,7 @@ function RecordPageContent() {
             estimated_profit: estimatedProfit,
             cogs_today: cogsToday,
             // 销量模块汇总字段
-            total_bing_count: salesTotals.bingTotal,
+            // Removed total_bing_count - column doesn't exist in database
             total_tang_count: salesTotals.tangTotal,
             total_mixian_count: salesTotals.mixianTotal,
             total_chaomian_count: salesTotals.chaomianTotal,
@@ -1307,16 +1310,21 @@ function RecordPageContent() {
                     />
 
                     {!expenseModulesLocked.raw && (
-                      <Button
-                        type="button"
-                        onClick={() => setExpenseConfirmModal({ isOpen: true, module: "raw" })}
-                        accentColor="blue"
-                        variant="primary"
-                        size="lg"
-                        className="w-full mt-4"
-                      >
-                        🔒 记入支出
-                      </Button>
+                      <>
+                        <p className="text-xs mt-2 text-center" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
+                          保存后将无法修改
+                        </p>
+                        <Button
+                          type="button"
+                          onClick={() => setExpenseConfirmModal({ isOpen: true, module: "raw" })}
+                          accentColor="blue"
+                          variant="primary"
+                          size="lg"
+                          className="w-full mt-4"
+                        >
+                          🔒 记入支出
+                        </Button>
+                      </>
                     )}
                   </>
                 );
@@ -1367,16 +1375,21 @@ function RecordPageContent() {
                     />
 
                     {!expenseModulesLocked.fixed && (
-                      <Button
-                        type="button"
-                        onClick={() => setExpenseConfirmModal({ isOpen: true, module: "fixed" })}
-                        accentColor="blue"
-                        variant="primary"
-                        size="lg"
-                        className="w-full mt-4"
-                      >
-                        🔒 记入支出
-                      </Button>
+                      <>
+                        <p className="text-xs mt-2 text-center" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
+                          保存后将无法修改
+                        </p>
+                        <Button
+                          type="button"
+                          onClick={() => setExpenseConfirmModal({ isOpen: true, module: "fixed" })}
+                          accentColor="blue"
+                          variant="primary"
+                          size="lg"
+                          className="w-full mt-4"
+                        >
+                          🔒 记入支出
+                        </Button>
+                      </>
                     )}
                   </>
                 );
@@ -1448,6 +1461,9 @@ function RecordPageContent() {
                     className="mt-6"
                   />
 
+                  <p className="text-xs mt-2 text-center" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
+                    保存后将无法修改
+                  </p>
                   <Button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "cons" })}
@@ -1522,6 +1538,9 @@ function RecordPageContent() {
                     className="mt-6"
                   />
 
+                  <p className="text-xs mt-2 text-center" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
+                    保存后将无法修改
+                  </p>
                   <Button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "other" })}
