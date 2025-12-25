@@ -64,17 +64,17 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           type="button"
           onClick={handleDecrement}
           disabled={disabled}
-          className={`w-10 h-10 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center transition-all ${
+          className={`w-7 h-7 bg-[#ab322a] text-white rounded-full flex items-center justify-center transition-all ${
             disabled
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-gray-300 active:scale-95 shadow-sm"
+              : "hover:bg-[#ab322a]/80 active:scale-95 shadow-sm"
           }`}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" />
           </svg>
         </button>
-        <div className="flex-1 max-w-[90px]">
+        <div className="flex-1 max-w-[120px]">
           <input
             type={useStringValue ? "text" : "number"}
             inputMode={useStringValue ? "decimal" : undefined}
@@ -87,8 +87,8 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
               onChange(Math.max(0, numValue));
             }}
             disabled={disabled}
-            className={`w-full font-mono text-xl text-center py-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-xl transition-all ${
-              disabled ? "opacity-50 cursor-not-allowed bg-gray-100" : ""
+            className={`w-full font-mono text-2xl font-bold text-center py-4 bg-white border border-[#ab322a]/20 focus:outline-none focus:ring-2 focus:ring-[#ab322a] rounded-xl transition-all text-[#0c0c0c] ${
+              disabled ? "opacity-50 cursor-not-allowed bg-[#e1e2e4]" : ""
             }`}
           />
         </div>
@@ -96,14 +96,14 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
           type="button"
           onClick={handleIncrement}
           disabled={disabled}
-          className={`w-10 h-10 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center transition-all ${
+          className={`w-7 h-7 bg-[#ab322a] text-white rounded-full flex items-center justify-center transition-all ${
             disabled
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-gray-300 active:scale-95 shadow-sm"
+              : "hover:bg-[#ab322a]/80 active:scale-95 shadow-sm"
           }`}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
         </button>
       </div>
@@ -785,7 +785,7 @@ function RecordPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-[#f2eada] pb-20">
       {/* 成功提示 */}
       {showSuccess && (
         <div className="fixed top-0 left-0 right-0 bg-green-500 text-white text-center py-4 text-xl z-50">
@@ -801,7 +801,7 @@ function RecordPageContent() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 第一板块：今日收入 */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-green-400">
+          <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
             <h2 className="text-2xl font-bold mb-6 tracking-tight text-gray-800">💰 今日收入</h2>
             <div className="space-y-4">
               <div>
@@ -820,9 +820,9 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full font-mono text-xl p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:shadow-lg transition-all ${
+                  className={`w-full font-mono text-xl p-4 bg-white border border-[#ab322a]/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ab322a] focus:shadow-lg transition-all text-[#0c0c0c] ${
                     totalIncomeConfirmed
-                      ? "bg-gray-100 cursor-not-allowed opacity-60"
+                      ? "bg-[#e1e2e4] cursor-not-allowed opacity-60"
                       : ""
                   }`}
                 />
@@ -843,9 +843,9 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full font-mono text-xl p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:shadow-lg transition-all ${
+                  className={`w-full font-mono text-xl p-4 bg-white border border-[#ab322a]/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ab322a] focus:shadow-lg transition-all text-[#0c0c0c] ${
                     totalIncomeConfirmed
-                      ? "bg-gray-100 cursor-not-allowed opacity-60"
+                      ? "bg-[#e1e2e4] cursor-not-allowed opacity-60"
                       : ""
                   }`}
                 />
@@ -866,9 +866,9 @@ function RecordPageContent() {
                   }}
                   placeholder="0.00"
                   disabled={totalIncomeConfirmed}
-                  className={`w-full font-mono text-xl p-4 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:shadow-lg transition-all ${
+                  className={`w-full font-mono text-xl p-4 bg-white border border-[#ab322a]/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ab322a] focus:shadow-lg transition-all text-[#0c0c0c] ${
                     totalIncomeConfirmed
-                      ? "bg-gray-100 cursor-not-allowed opacity-60"
+                      ? "bg-[#e1e2e4] cursor-not-allowed opacity-60"
                       : ""
                   }`}
                 />
@@ -933,7 +933,7 @@ function RecordPageContent() {
             <h2 className="text-2xl font-bold mb-6 tracking-tight text-gray-800">📊 当日产品销量追踪</h2>
             
             {/* 饼类产品卡片 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-purple-400">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
               <div className="flex items-center mb-6">
                 <div className="w-2 h-8 bg-purple-400 rounded-full mr-4"></div>
                 <h3 className="text-xl font-bold text-gray-800">饼类产品</h3>
@@ -959,7 +959,7 @@ function RecordPageContent() {
               ];
 
               return (
-                <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-purple-400">
+                <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
                   <div className="flex items-center mb-6">
                     <div className="w-2 h-8 bg-purple-400 rounded-full mr-4"></div>
                     <h3 className="text-xl font-bold text-gray-800">汤/粥类</h3>
@@ -980,7 +980,7 @@ function RecordPageContent() {
             })()}
 
             {/* 米线/面类产品卡片 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-purple-400">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
               <div className="flex items-center mb-6">
                 <div className="w-2 h-8 bg-purple-400 rounded-full mr-4"></div>
                 <h3 className="text-xl font-bold text-gray-800">米线/面类</h3>
@@ -1016,7 +1016,7 @@ function RecordPageContent() {
             </div>
 
             {/* 炒面/炒河粉类产品卡片 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-purple-400">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
               <div className="flex items-center mb-6">
                 <div className="w-2 h-8 bg-purple-400 rounded-full mr-4"></div>
                 <h3 className="text-xl font-bold text-gray-800">炒面/炒河粉类</h3>
@@ -1034,7 +1034,7 @@ function RecordPageContent() {
             <h2 className="text-2xl font-bold mb-6 tracking-tight text-gray-800">💸 今日支出</h2>
 
             {/* 【购买原材料】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-pink-400">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
               <div className="flex items-center mb-6">
                 <div className="w-2 h-8 bg-pink-400 rounded-full mr-4"></div>
                 <h3 className="text-xl font-bold text-gray-800">【购买原材料】</h3>
@@ -1103,7 +1103,7 @@ function RecordPageContent() {
             </div>
 
             {/* 【门店固定费用】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-pink-400">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
               <div className="flex items-center mb-6">
                 <div className="w-2 h-8 bg-pink-400 rounded-full mr-4"></div>
                 <h3 className="text-xl font-bold text-gray-800">【门店固定费用】</h3>
@@ -1170,7 +1170,7 @@ function RecordPageContent() {
             </div>
 
             {/* 【经营消耗品】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-pink-400">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
               <div className="flex items-center mb-6">
                 <div className="w-2 h-8 bg-pink-400 rounded-full mr-4"></div>
                 <h3 className="text-xl font-bold text-gray-800">【经营消耗品】</h3>
@@ -1277,7 +1277,7 @@ function RecordPageContent() {
             </div>
 
             {/* 【其他支出】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-pink-400">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-l-4 border-[#ab322a] border-[#3d3435]/20">
               <div className="flex items-center mb-6">
                 <div className="w-2 h-8 bg-pink-400 rounded-full mr-4"></div>
                 <h3 className="text-xl font-bold text-gray-800">【其他支出】</h3>
