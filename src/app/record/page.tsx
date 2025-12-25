@@ -307,6 +307,7 @@ function RecordPageContent() {
   const [skuChangdanbing, setSkuChangdanbing] = useState(0);  // 肠蛋饼
   const [skuRoudanbing, setSkuRoudanbing] = useState(0);  // 肉蛋饼
   const [skuDanbing, setSkuDanbing] = useState(0);  // 蛋饼
+  const [skuChangbing, setSkuChangbing] = useState(0);  // 肠饼
 
   // 汤类(素)
   const [skuFentang, setSkuFentang] = useState(0);  // 粉汤
@@ -425,8 +426,8 @@ function RecordPageContent() {
       parseFloat(incomeCash || "0");
 
     // 检查是否有销量数据
-    const hasSalesData = 
-      skuRoubing > 0 || skuShouroubing > 0 || skuChangdanbing > 0 || skuRoudanbing > 0 || skuDanbing > 0 ||
+    const hasSalesData =
+      skuRoubing > 0 || skuShouroubing > 0 || skuChangdanbing > 0 || skuRoudanbing > 0 || skuDanbing > 0 || skuChangbing > 0 ||
       skuFentang > 0 || skuHundun > 0 || skuXiaomizhou > 0 || skuDoujiang > 0 || skuJidantang > 0 || skuSanxiantang > 0 ||
       skuSanxianSu > 0 || skuSuancaiSu > 0 || skuMalaSu > 0 ||
       skuSanxianRou > 0 || skuSuancaiRou > 0 || skuMalaRou > 0 || skuMalamixian > 0 ||
@@ -461,8 +462,8 @@ function RecordPageContent() {
         parseFloat(incomeCash || "0");
 
       // 检查是否有销量数据
-      const hasSalesData = 
-        skuRoubing > 0 || skuShouroubing > 0 || skuChangdanbing > 0 || skuRoudanbing > 0 || skuDanbing > 0 ||
+      const hasSalesData =
+        skuRoubing > 0 || skuShouroubing > 0 || skuChangdanbing > 0 || skuRoudanbing > 0 || skuDanbing > 0 || skuChangbing > 0 ||
         skuFentang > 0 || skuHundun > 0 || skuXiaomizhou > 0 || skuDoujiang > 0 || skuJidantang > 0 || skuSanxiantang > 0 ||
         skuSanxianSu > 0 || skuSuancaiSu > 0 || skuMalaSu > 0 ||
         skuSanxianRou > 0 || skuSuancaiRou > 0 || skuMalaRou > 0 || skuMalamixian > 0 ||
@@ -484,6 +485,7 @@ function RecordPageContent() {
             sku_changdanbing: skuChangdanbing,
             sku_roudanbing: skuRoudanbing,
             sku_danbing: skuDanbing,
+            sku_changbing: skuChangbing,
             // 汤类(素)
             sku_fentang: skuFentang,
             sku_hundun: skuHundun,
@@ -547,7 +549,7 @@ function RecordPageContent() {
       setIncomeAlipay("");
       setIncomeCash("");
       // 清空所有销量
-      setSkuRoubing(0); setSkuShouroubing(0); setSkuChangdanbing(0); setSkuRoudanbing(0); setSkuDanbing(0);
+      setSkuRoubing(0); setSkuShouroubing(0); setSkuChangdanbing(0); setSkuRoudanbing(0); setSkuDanbing(0); setSkuChangbing(0);
       setSkuFentang(0); setSkuHundun(0); setSkuXiaomizhou(0); setSkuDoujiang(0); setSkuJidantang(0); setSkuSanxiantang(0);
       setSkuSanxianSu(0); setSkuSuancaiSu(0); setSkuMalaSu(0);
       setSkuSanxianRou(0); setSkuSuancaiRou(0); setSkuMalaRou(0); setSkuMalamixian(0);
@@ -729,6 +731,7 @@ function RecordPageContent() {
                 <SkuInput label="肠蛋饼" value={skuChangdanbing} onChange={setSkuChangdanbing} disabled={totalIncomeConfirmed} />
                 <SkuInput label="肉蛋饼" value={skuRoudanbing} onChange={setSkuRoudanbing} disabled={totalIncomeConfirmed} />
                 <SkuInput label="蛋饼" value={skuDanbing} onChange={setSkuDanbing} disabled={totalIncomeConfirmed} />
+                <SkuInput label="肠饼" value={skuChangbing} onChange={setSkuChangbing} disabled={totalIncomeConfirmed} />
               </div>
             </div>
 
