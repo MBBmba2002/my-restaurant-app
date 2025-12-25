@@ -530,23 +530,23 @@ function RecordPageContent() {
     skuChaomianXiangcui, skuChaohufenKuan, skuChaohufenXi,
   ]);
 
-  // 自动计算支出汇总
+  // 自动计算支出汇总 - 使用安全的数值解析
   const expenseTotals = useMemo(() => {
-    const rawTotal = parseFloat(expRawVeg || "0") +
-                     parseFloat(expRawMeat || "0") +
-                     parseFloat(expRawEgg || "0") +
-                     parseFloat(expRawNoodle || "0") +
-                     parseFloat(expRawSpice || "0") +
-                     parseFloat(expRawPack || "0");
+    const rawTotal = parseNonNegativeNumber(expRawVeg) +
+                     parseNonNegativeNumber(expRawMeat) +
+                     parseNonNegativeNumber(expRawEgg) +
+                     parseNonNegativeNumber(expRawNoodle) +
+                     parseNonNegativeNumber(expRawSpice) +
+                     parseNonNegativeNumber(expRawPack);
 
-    const fixTotal = parseFloat(expFixRent || "0") +
-                     parseFloat(expFixUtility || "0") +
-                     parseFloat(expFixGas || "0") +
-                     parseFloat(expFixSalary || "0");
+    const fixTotal = parseNonNegativeNumber(expFixRent) +
+                     parseNonNegativeNumber(expFixUtility) +
+                     parseNonNegativeNumber(expFixGas) +
+                     parseNonNegativeNumber(expFixSalary);
 
-    const consTotal = parseFloat(expConsAmount || "0");
+    const consTotal = parseNonNegativeNumber(expConsAmount);
 
-    const otherTotal = parseFloat(expOtherAmount || "0");
+    const otherTotal = parseNonNegativeNumber(expOtherAmount);
 
     const grandTotal = rawTotal + fixTotal + consTotal + otherTotal;
 
@@ -561,8 +561,40 @@ function RecordPageContent() {
       expFixRent, expFixUtility, expFixGas, expFixSalary,
       expConsAmount, expOtherAmount]);
 
-  // 全局锁定状态
-  const [isDayLocked, setIsDayLocked] = useState(false);
+  // 全局汇总数据 - 用于总览弹窗
+  const globalSummary = useMemo(() => {
+    const totalIncome = parseNonNegativeNumber(incomeWechat) + 
+                       parseNonNegativeNumber(incomeAlipay) + 
+                       parseNonNegativeNumber(incomeCash);
+    
+    const totalSales = salesTotals.bingTotal + salesTotals.tangTotal + 
+                      salesTotals.mixianTotal + salesTotals.chaomianTotal;
+    
+    return {
+      income: {
+        wechat: parseNonNegativeNumber(incomeWechat),
+        alipay: parseNonNegativeNumber(incomeAlipay),
+        cash: parseNonNegativeNumber(incomeCash),
+        total: totalIncome,
+      },
+      sales: {
+        bing: salesTotals.bingTotal,
+        tang: salesTotals.tangTotal,
+        mixian: salesTotals.mixianTotal,
+        chaomian: salesTotals.chaomianTotal,
+        total: totalSales,
+      },
+      expenses: {
+        raw: expenseTotals.rawTotal,
+        fixed: expenseTotals.fixTotal,
+        cons: expenseTotals.consTotal,
+        other: expenseTotals.otherTotal,
+        total: expenseTotals.grandTotal,
+      },
+    };
+  }, [incomeWechat, incomeAlipay, incomeCash, salesTotals, expenseTotals]);
+
+  // 全局汇总弹窗状态
   const [showGlobalSummaryModal, setShowGlobalSummaryModal] = useState(false);
   const [globalSubmitting, setGlobalSubmitting] = useState(false);
 
