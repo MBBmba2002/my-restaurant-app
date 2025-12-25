@@ -14,6 +14,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { Modal } from "@/components/ui/Modal";
 import { Toast } from "@/components/ui/Toast";
 import { theme } from "@/lib/theme";
+import { DailyRecord, ExpenseData, ExpenseModule, SalesModule } from "@/types/dailyRecords";
 
 
 // 销量输入组件（可复用）- 极简主义美化版
@@ -215,7 +216,7 @@ function RecordPageContent() {
   const [expOtherAmount, setExpOtherAmount] = useState("");    // 其他支出金额
 
   // 支出
-  const [expenses, setExpenses] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState<ExpenseData[]>([]);
 
   // 支出模态框
   const [expenseModal, setExpenseModal] = useState<{
@@ -471,11 +472,32 @@ function RecordPageContent() {
     );
   }
 
-  // 数值输入校验函数
+  // 数值输入校验函数 - 禁止负数，空值自动补0
   const handleNumberChange = (value: string, setter: (value: string) => void) => {
     // 使用正则表达式过滤非数字字符，仅保留数字和小数点
-    const filteredValue = value.replace(/[^0-9.]/g, '');
+    let filteredValue = value.replace(/[^0-9.]/g, '');
+    
+    // 如果为空，设置为"0"
+    if (filteredValue === '' || filteredValue === '.') {
+      filteredValue = '0';
+    }
+    
+    // 确保不会出现负数（前端校验）
+    const numValue = parseFloat(filteredValue);
+    if (numValue < 0) {
+      filteredValue = '0';
+    }
+    
     setter(filteredValue);
+  };
+  
+  // 安全的数值解析函数 - 确保非负数
+  const parseNonNegativeNumber = (value: string | number | undefined, defaultValue: number = 0): number => {
+    if (value === undefined || value === null || value === '') {
+      return defaultValue;
+    }
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    return isNaN(num) || num < 0 ? defaultValue : num;
   };
 
   // 自动计算销量模块汇总
@@ -564,7 +586,7 @@ function RecordPageContent() {
   };
 
   // 处理支出模块确认提交
-  const handleExpenseModuleSubmit = async (module: "raw" | "fixed" | "cons" | "other") => {
+  const handleExpenseModuleSubmit = async (module: ExpenseModule) => {
     if (!user) {
       showToast("请先登录", "error");
       router.push("/login/");
@@ -572,38 +594,38 @@ function RecordPageContent() {
     }
 
     try {
-      const expenseData: any = {
+      const expenseData: Partial<DailyRecord> = {
         user_id: user.id,
         record_date: new Date().toISOString().split('T')[0], // 今天的日期
       };
 
-      // 根据模块类型设置不同的字段
+      // 根据模块类型设置不同的字段 - 使用安全的数值解析
       switch (module) {
         case "raw":
-          expenseData.exp_raw_veg = parseFloat(expRawVeg || "0");
-          expenseData.exp_raw_meat = parseFloat(expRawMeat || "0");
-          expenseData.exp_raw_egg = parseFloat(expRawEgg || "0");
-          expenseData.exp_raw_noodle = parseFloat(expRawNoodle || "0");
-          expenseData.exp_raw_spice = parseFloat(expRawSpice || "0");
-          expenseData.exp_raw_pack = parseFloat(expRawPack || "0");
+          expenseData.exp_raw_veg = parseNonNegativeNumber(expRawVeg);
+          expenseData.exp_raw_meat = parseNonNegativeNumber(expRawMeat);
+          expenseData.exp_raw_egg = parseNonNegativeNumber(expRawEgg);
+          expenseData.exp_raw_noodle = parseNonNegativeNumber(expRawNoodle);
+          expenseData.exp_raw_spice = parseNonNegativeNumber(expRawSpice);
+          expenseData.exp_raw_pack = parseNonNegativeNumber(expRawPack);
           expenseData.total_expense_raw = expenseTotals.rawTotal;
           break;
         case "fixed":
-          expenseData.exp_fix_rent = parseFloat(expFixRent || "0");
-          expenseData.exp_fix_utility = parseFloat(expFixUtility || "0");
-          expenseData.exp_fix_gas = parseFloat(expFixGas || "0");
-          expenseData.exp_fix_salary = parseFloat(expFixSalary || "0");
+          expenseData.exp_fix_rent = parseNonNegativeNumber(expFixRent);
+          expenseData.exp_fix_utility = parseNonNegativeNumber(expFixUtility);
+          expenseData.exp_fix_gas = parseNonNegativeNumber(expFixGas);
+          expenseData.exp_fix_salary = parseNonNegativeNumber(expFixSalary);
           expenseData.total_expense_fix = expenseTotals.fixTotal;
           break;
         case "cons":
           expenseData.exp_cons_name = expConsName;
-          expenseData.exp_cons_amount = parseFloat(expConsAmount || "0");
+          expenseData.exp_cons_amount = parseNonNegativeNumber(expConsAmount);
           expenseData.exp_cons_duration = expConsDuration;
           expenseData.total_expense_cons = expenseTotals.consTotal;
           break;
         case "other":
           expenseData.exp_other_name = expOtherName;
-          expenseData.exp_other_amount = parseFloat(expOtherAmount || "0");
+          expenseData.exp_other_amount = parseNonNegativeNumber(expOtherAmount);
           expenseData.total_expense_other = expenseTotals.otherTotal;
           break;
       }
@@ -633,9 +655,10 @@ function RecordPageContent() {
       // 关闭确认Modal
       setExpenseConfirmModal({ isOpen: false, module: "raw" });
 
-    } catch (err: any) {
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "未知错误";
       console.error("Error:", err);
-      showToast("保存失败：" + (err.message || "未知错误"), "error");
+      showToast("保存失败：" + errorMessage, "error");
     }
   };
 
@@ -657,14 +680,14 @@ function RecordPageContent() {
   };
 
   // 处理销量模块局部保存
-  const handleSaveSalesModule = async (module: "bing" | "tang" | "mixian" | "chaomian") => {
+  const handleSaveSalesModule = async (module: SalesModule) => {
     if (!user) {
       showToast("请先登录", "error");
       return;
     }
 
     try {
-      const salesData: any = {
+      const salesData: Partial<DailyRecord> = {
         user_id: user.id,
         record_date: new Date().toISOString().split('T')[0],
       };
@@ -724,9 +747,10 @@ function RecordPageContent() {
       setSalesModulesSaved(prev => ({ ...prev, [module]: true }));
       showToast(`已保存${module === "bing" ? "饼类" : module === "tang" ? "汤粥类" : module === "mixian" ? "米线面类" : "炒面河粉类"}销量`, "success");
 
-    } catch (err: any) {
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "未知错误";
       console.error("Error:", err);
-      showToast("保存失败：" + (err.message || "未知错误"), "error");
+      showToast("保存失败：" + errorMessage, "error");
     }
   };
 
@@ -750,11 +774,11 @@ function RecordPageContent() {
       return;
     }
 
-    // 先检查是否有数据
+    // 先检查是否有数据 - 使用安全的数值解析
     const totalIncome =
-      parseFloat(incomeWechat || "0") +
-      parseFloat(incomeAlipay || "0") +
-      parseFloat(incomeCash || "0");
+      parseNonNegativeNumber(incomeWechat) +
+      parseNonNegativeNumber(incomeAlipay) +
+      parseNonNegativeNumber(incomeCash);
 
     // 检查是否有销量数据
     const hasSalesData =
@@ -786,11 +810,11 @@ function RecordPageContent() {
     setSubmitting(true);
 
     try {
-      // 计算总收入
+      // 计算总收入 - 使用安全的数值解析
       const totalIncome =
-        parseFloat(incomeWechat || "0") +
-        parseFloat(incomeAlipay || "0") +
-        parseFloat(incomeCash || "0");
+        parseNonNegativeNumber(incomeWechat) +
+        parseNonNegativeNumber(incomeAlipay) +
+        parseNonNegativeNumber(incomeCash);
 
       // 检查是否有销量数据
       const hasSalesData =
@@ -812,15 +836,14 @@ function RecordPageContent() {
       const cogsToday = calculateTodayCOGS();
       const estimatedProfit = totalIncome - cogsToday;
 
-      // 如果有收入或销量，创建一条记录
+      // 如果有收入或销量，使用upsert创建或更新记录
       if (totalIncome > 0 || hasSalesData) {
-        const { error: recordError } = await supabase
-          .from("daily_records")
-          .insert({
-            user_id: user.id,
-            income_wechat: parseFloat(incomeWechat || "0"),
-            income_alipay: parseFloat(incomeAlipay || "0"),
-            income_cash: parseFloat(incomeCash || "0"),
+        const recordData: Partial<DailyRecord> = {
+          user_id: user.id,
+          record_date: new Date().toISOString().split('T')[0],
+          income_wechat: parseNonNegativeNumber(incomeWechat),
+          income_alipay: parseNonNegativeNumber(incomeAlipay),
+          income_cash: parseNonNegativeNumber(incomeCash),
             // 汇总字段
             total_income: totalIncome,
             total_sales: totalSalesCount,
@@ -865,10 +888,18 @@ function RecordPageContent() {
             sku_mixian_su: skuMixianSu,
             sku_mixian_rou: skuMixianRou,
             sku_chaomian: skuChaomian,
+          };
+
+        // 使用upsert替代insert，确保按天更新
+        const { error: recordError } = await supabase
+          .from("daily_records")
+          .upsert(recordData, {
+            onConflict: 'user_id,record_date',
+            ignoreDuplicates: false
           });
 
         if (recordError) {
-          console.error("Error inserting record:", recordError);
+          console.error("Error upserting record:", recordError);
           showToast("保存失败：" + recordError.message, "error");
           setSubmitting(false);
           return;
@@ -926,9 +957,10 @@ function RecordPageContent() {
       setTimeout(() => {
         setShowSuccess(false);
       }, 3000);
-    } catch (err: any) {
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "未知错误";
       console.error("Error:", err);
-      showToast("保存失败：" + (err.message || "未知错误"), "error");
+      showToast("保存失败：" + errorMessage, "error");
     } finally {
       setSubmitting(false);
     }
@@ -1037,7 +1069,7 @@ function RecordPageContent() {
                   </div>
                   <StatCard
                     label=""
-                    value={`¥ ${(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}`}
+                    value={`¥ ${(parseNonNegativeNumber(incomeWechat) + parseNonNegativeNumber(incomeAlipay) + parseNonNegativeNumber(incomeCash)).toFixed(2)}`}
                     accentColor="red"
                     className="mt-4"
                   />
@@ -1578,7 +1610,7 @@ function RecordPageContent() {
                 <div className="mb-12">
                   <div className="text-lg font-medium text-[#4a4a4a] mb-4">今日预估净赚</div>
                   <div className="text-6xl font-bold" style={{ color: theme.accent.red.base }}>
-                    ¥ {((parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")) - calculateTodayCOGS()).toFixed(2)}
+                    ¥ {((parseNonNegativeNumber(incomeWechat) + parseNonNegativeNumber(incomeAlipay) + parseNonNegativeNumber(incomeCash)) - calculateTodayCOGS()).toFixed(2)}
                   </div>
                 </div>
 
@@ -1587,7 +1619,7 @@ function RecordPageContent() {
                   <Card>
                     <div className="text-sm font-medium text-[#4a4a4a] mb-2">总收入</div>
                     <div className="text-xl font-bold text-[#1a1a1a]">
-                      ¥ {(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}
+                      ¥ {(parseNonNegativeNumber(incomeWechat) + parseNonNegativeNumber(incomeAlipay) + parseNonNegativeNumber(incomeCash)).toFixed(2)}
                     </div>
                   </Card>
 
@@ -1738,9 +1770,9 @@ function RecordPageContent() {
         <div className="text-center mb-6">
           <div className="text-3xl font-bold" style={{ color: theme.accent.red.base }}>
             ¥ {(
-              parseFloat(incomeWechat || "0") +
-              parseFloat(incomeAlipay || "0") +
-              parseFloat(incomeCash || "0")
+              parseNonNegativeNumber(incomeWechat) +
+              parseNonNegativeNumber(incomeAlipay) +
+              parseNonNegativeNumber(incomeCash)
             ).toFixed(2)}
           </div>
         </div>
