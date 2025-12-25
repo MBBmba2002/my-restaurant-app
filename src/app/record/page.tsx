@@ -247,15 +247,6 @@ function RecordPageContent() {
     { id: '5', name: '鸡蛋汤', count: 0 },
   ]);
 
-  // 汤粥类动态子分类（使用 product_details JSONB）
-  const [tangSubCategories, setTangSubCategories] = useState<Array<{ id: string; name: string; count: number }>>([
-    { id: '1', name: '粉汤', count: 0 },
-    { id: '2', name: '馄炖', count: 0 },
-    { id: '3', name: '小米粥', count: 0 },
-    { id: '4', name: '豆浆', count: 0 },
-    { id: '5', name: '鸡蛋汤', count: 0 },
-  ]);
-
   // 汤粥类锁定状态（从数据库 is_locked 字段读取）
   const [tangIsLocked, setTangIsLocked] = useState(false);
 
@@ -1197,25 +1188,25 @@ function RecordPageContent() {
               )}
             </div>
 
-            {/* 汤粥类产品卡片 - 重构版：动态子分类 + 锁定功能 */}
-            <div>
-              <div className="flex items-center justify-center gap-2 mb-4">
+            {/* 汤粥类产品卡片 - 重构版：动态子分类 + 锁定功能 + Indigo/Blue 主题 */}
+            <div className="flex flex-col items-center w-full">
+              <div className="flex items-center justify-center gap-2 mb-6">
                 <h3 className="text-base font-medium" style={{ color: '#111827' }}>汤/粥类</h3>
                 {tangIsLocked && (
                   <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full">
-                    🔒 已锁定，无法修改
+                    🔒 Data Locked
                   </span>
                 )}
               </div>
 
               {tangIsLocked ? (
-                // 锁定状态：只读显示
-                <div className="space-y-3 mb-4">
+                // 锁定状态：只读显示（居中，干净样式）
+                <div className="w-full max-w-md space-y-3 mb-6">
                   {tangSubCategories.map((item) => (
                     item.count > 0 && (
-                      <div key={item.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <span className="text-sm font-medium" style={{ color: '#111827' }}>{item.name}</span>
-                        <span className="text-lg font-bold" style={{ color: theme.accent.yellow.base }}>
+                      <div key={item.id} className="flex justify-between items-center p-4 bg-white border rounded-lg" style={{ borderColor: theme.accent.blue.border }}>
+                        <span className="text-sm font-medium" style={{ color: theme.text.secondary }}>{item.name}</span>
+                        <span className="text-lg font-bold" style={{ color: theme.accent.blue.base }}>
                           {item.count} 个
                         </span>
                       </div>
@@ -1223,8 +1214,8 @@ function RecordPageContent() {
                   ))}
                 </div>
               ) : (
-                // 编辑状态：动态子分类输入
-                <div className="space-y-3 mb-4">
+                // 编辑状态：动态子分类输入（居中）
+                <div className="w-full max-w-md space-y-3 mb-6">
                   {tangSubCategories.map((item, index) => (
                     <div key={item.id} className="flex items-center gap-3">
                       <div className="flex-1">
@@ -1237,7 +1228,7 @@ function RecordPageContent() {
                             setTangSubCategories(updated);
                           }}
                           placeholder="子分类名称"
-                          accentColor="yellow"
+                          accentColor="blue"
                           className="text-sm"
                         />
                       </div>
@@ -1251,7 +1242,7 @@ function RecordPageContent() {
                             setTangSubCategories(updated);
                           }}
                           placeholder="数量"
-                          accentColor="yellow"
+                          accentColor="blue"
                           className="text-sm text-center"
                           min="0"
                         />
@@ -1273,34 +1264,36 @@ function RecordPageContent() {
                       setTangSubCategories([...tangSubCategories, { id: Date.now().toString(), name: '', count: 0 }]);
                     }}
                     className="w-full py-2 text-sm border-2 border-dashed rounded-lg transition-all hover:bg-gray-50"
-                    style={{ borderColor: theme.accent.yellow.border, color: theme.accent.yellow.base }}
+                    style={{ borderColor: theme.accent.blue.border, color: theme.accent.blue.base }}
                   >
                     + 添加子分类
                   </button>
                 </div>
               )}
 
-              {/* 汇总显示 - 视觉焦点（大字体，居中） */}
-              <div className="text-center mb-4 p-6 rounded-xl" style={{ backgroundColor: theme.accent.yellow.hover }}>
-                <div className="text-xs mb-1" style={{ color: theme.text.secondary }}>汤/粥类总计</div>
-                <div className="text-4xl font-bold" style={{ color: theme.accent.yellow.base }}>
+              {/* 汇总显示 - 视觉焦点（超大字体，完美居中，Indigo/Blue 主题） */}
+              <div className="w-full max-w-md text-center mb-6 p-8 rounded-xl" style={{ backgroundColor: theme.accent.blue.hover }}>
+                <div className="text-xs mb-2 font-medium" style={{ color: theme.text.tertiary }}>汤/粥类总计</div>
+                <div className="text-5xl font-extrabold mb-1" style={{ color: theme.accent.blue.base }}>
                   {totalTangCount}
                 </div>
-                <div className="text-xs mt-1" style={{ color: theme.text.tertiary }}>个</div>
+                <div className="text-xs font-medium" style={{ color: theme.text.tertiary }}>个</div>
               </div>
 
-              {/* 保存按钮 */}
+              {/* 保存按钮（居中） */}
               {!tangIsLocked && !totalIncomeConfirmed && (
-                <Button
-                  type="button"
-                  onClick={() => handleSaveSalesModule("tang")}
-                  accentColor="yellow"
-                  variant="primary"
-                  size="lg"
-                  className="w-full"
-                >
-                  保存汤/粥类销量
-                </Button>
+                <div className="w-full max-w-md">
+                  <Button
+                    type="button"
+                    onClick={() => handleSaveSalesModule("tang")}
+                    accentColor="blue"
+                    variant="primary"
+                    size="lg"
+                    className="w-full"
+                  >
+                    保存汤/粥类销量
+                  </Button>
+                </div>
               )}
             </div>
 
