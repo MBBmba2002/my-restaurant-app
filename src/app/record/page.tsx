@@ -622,7 +622,8 @@ function RecordPageContent() {
       expenseData.total_daily_expense = expenseTotals.grandTotal;
 
       // 插入或更新支出记录
-      const { error } = await supabase
+      console.log('[save expense] payload keys', Object.keys(expenseData), expenseData);
+      const { error, data } = await supabase
         .from("daily_records")
         .upsert(expenseData, {
           onConflict: 'user_id,record_date',
@@ -630,12 +631,19 @@ function RecordPageContent() {
         });
 
       if (error) {
-        console.error("Error saving expense:", error);
-        showToast("保存支出失败：" + error.message, "error");
+        console.error('[save expense] error', error);
+        console.error('[save expense] error.message', error.message);
+        console.error('[save expense] error.details', error.details);
+        console.error('[save expense] error.hint', error.hint);
+        console.error('[save expense] error.code', error.code);
+        const errorMsg = `保存支出失败：${error.message}${error.details ? ` | ${JSON.stringify(error.details)}` : ''}${error.hint ? ` | ${error.hint}` : ''}${error.code ? ` | Code: ${error.code}` : ''}`;
+        showToast(errorMsg, "error");
         // 失败时重置保存状态，保持弹窗打开
         setExpenseModulesSaving(prev => ({ ...prev, [module]: false }));
         return;
       }
+      
+      console.log('[save expense] success', data);
 
       // 更新锁定状态并保存到localStorage
       const newLocks = { ...expenseModulesLocked, [module]: true };
@@ -686,7 +694,7 @@ function RecordPageContent() {
     try {
       const salesData: any = {
         user_id: user.id,
-        record_date: new Date().toISOString().split('T')[0],
+        record_date: new Date().toISOString().split('T')[0], // 显式提供日期
       };
 
       // 根据模块类型设置不同的字段
@@ -727,7 +735,8 @@ function RecordPageContent() {
       }
 
       // 插入或更新销量记录
-      const { error } = await supabase
+      console.log('[save sales] payload keys', Object.keys(salesData), salesData);
+      const { error, data } = await supabase
         .from("daily_records")
         .upsert(salesData, {
           onConflict: 'user_id,record_date',
@@ -735,10 +744,17 @@ function RecordPageContent() {
         });
 
       if (error) {
-        console.error("Error saving sales:", error);
-        showToast("保存销量失败：" + error.message, "error");
+        console.error('[save sales] error', error);
+        console.error('[save sales] error.message', error.message);
+        console.error('[save sales] error.details', error.details);
+        console.error('[save sales] error.hint', error.hint);
+        console.error('[save sales] error.code', error.code);
+        const errorMsg = `保存销量失败：${error.message}${error.details ? ` | ${JSON.stringify(error.details)}` : ''}${error.hint ? ` | ${error.hint}` : ''}${error.code ? ` | Code: ${error.code}` : ''}`;
+        showToast(errorMsg, "error");
         return;
       }
+      
+      console.log('[save sales] success', data);
 
       // 更新保存状态
       setSalesModulesSaved(prev => ({ ...prev, [module]: true }));
@@ -834,10 +850,9 @@ function RecordPageContent() {
 
       // 如果有收入或销量，创建一条记录
       if (totalIncome > 0 || hasSalesData) {
-        const { error: recordError } = await supabase
-          .from("daily_records")
-          .insert({
+        const recordData = {
             user_id: user.id,
+            record_date: new Date().toISOString().split('T')[0],
             income_wechat: parseFloat(incomeWechat || "0"),
             income_alipay: parseFloat(incomeAlipay || "0"),
             income_cash: parseFloat(incomeCash || "0"),
@@ -885,34 +900,57 @@ function RecordPageContent() {
             sku_mixian_su: skuMixianSu,
             sku_mixian_rou: skuMixianRou,
             sku_chaomian: skuChaomian,
-          });
+          };
+        
+        console.log('[save record] payload keys', Object.keys(recordData), recordData);
+        const { error: recordError, data: recordDataResult } = await supabase
+          .from("daily_records")
+          .insert(recordData);
 
         if (recordError) {
-          console.error("Error inserting record:", recordError);
-          showToast("保存失败：" + recordError.message, "error");
+          console.error('[save record] error', recordError);
+          console.error('[save record] error.message', recordError.message);
+          console.error('[save record] error.details', recordError.details);
+          console.error('[save record] error.hint', recordError.hint);
+          console.error('[save record] error.code', recordError.code);
+          const errorMsg = `保存失败：${recordError.message}${recordError.details ? ` | ${JSON.stringify(recordError.details)}` : ''}${recordError.hint ? ` | ${recordError.hint}` : ''}${recordError.code ? ` | Code: ${recordError.code}` : ''}`;
+          showToast(errorMsg, "error");
           setSubmitting(false);
           return;
         }
+        
+        console.log('[save record] success', recordDataResult);
       }
 
       // 为每条支出创建记录
       for (const expense of expenses) {
-        const { error: expenseError } = await supabase
+        const expenseRecordData = {
+          user_id: user.id,
+          record_date: new Date().toISOString().split('T')[0],
+          expense_type: expense.expense_type,
+          expense_amount: expense.expense_amount,
+          expense_item_name: expense.expense_item_name,
+          usage_duration: expense.usage_duration || null,
+        };
+        
+        console.log('[save expense record] payload keys', Object.keys(expenseRecordData), expenseRecordData);
+        const { error: expenseError, data: expenseRecordResult } = await supabase
           .from("daily_records")
-          .insert({
-            user_id: user.id,
-            expense_type: expense.expense_type,
-            expense_amount: expense.expense_amount,
-            expense_item_name: expense.expense_item_name,
-            usage_duration: expense.usage_duration || null,
-          });
+          .insert(expenseRecordData);
 
         if (expenseError) {
-          console.error("Error inserting expense:", expenseError);
-          showToast("保存支出失败：" + expenseError.message, "error");
+          console.error('[save expense record] error', expenseError);
+          console.error('[save expense record] error.message', expenseError.message);
+          console.error('[save expense record] error.details', expenseError.details);
+          console.error('[save expense record] error.hint', expenseError.hint);
+          console.error('[save expense record] error.code', expenseError.code);
+          const errorMsg = `保存支出失败：${expenseError.message}${expenseError.details ? ` | ${JSON.stringify(expenseError.details)}` : ''}${expenseError.hint ? ` | ${expenseError.hint}` : ''}${expenseError.code ? ` | Code: ${expenseError.code}` : ''}`;
+          showToast(errorMsg, "error");
           setSubmitting(false);
           return;
         }
+        
+        console.log('[save expense record] success', expenseRecordResult);
       }
 
       // 成功，清空表单
