@@ -1947,36 +1947,37 @@ function RecordPageContent() {
               </div>
             </Card>
 
-          {/* 支出汇总 */}
-          <Card accentColor="blue">
-            <div className="text-sm font-medium mb-3" style={{ color: theme.accent.blue.base }}>
-              支出汇总
-            </div>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span style={{ color: theme.text.secondary }}>原材料：</span>
-                <span className="font-mono font-semibold">¥ {globalSummary.expenses.raw.toFixed(2)}</span>
+            {/* 支出汇总 */}
+            <Card accentColor="blue">
+              <div className="text-sm font-medium mb-3" style={{ color: theme.accent.blue.base }}>
+                支出汇总
               </div>
-              <div className="flex justify-between">
-                <span style={{ color: theme.text.secondary }}>固定费用：</span>
-                <span className="font-mono font-semibold">¥ {globalSummary.expenses.fixed.toFixed(2)}</span>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span style={{ color: theme.text.secondary }}>原材料：</span>
+                  <span className="font-mono font-semibold">¥ {globalSummary.expenses.raw.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: theme.text.secondary }}>固定费用：</span>
+                  <span className="font-mono font-semibold">¥ {globalSummary.expenses.fixed.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: theme.text.secondary }}>消耗品：</span>
+                  <span className="font-mono font-semibold">¥ {globalSummary.expenses.cons.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: theme.text.secondary }}>其他：</span>
+                  <span className="font-mono font-semibold">¥ {globalSummary.expenses.other.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between pt-2 border-t" style={{ borderColor: theme.accent.blue.border }}>
+                  <span className="font-medium">总支出：</span>
+                  <span className="font-mono font-bold text-lg" style={{ color: theme.accent.blue.base }}>
+                    ¥ {globalSummary.expenses.total.toFixed(2)}
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span style={{ color: theme.text.secondary }}>消耗品：</span>
-                <span className="font-mono font-semibold">¥ {globalSummary.expenses.cons.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span style={{ color: theme.text.secondary }}>其他：</span>
-                <span className="font-mono font-semibold">¥ {globalSummary.expenses.other.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between pt-2 border-t" style={{ borderColor: theme.accent.blue.border }}>
-                <span className="font-medium">总支出：</span>
-                <span className="font-mono font-bold text-lg" style={{ color: theme.accent.blue.base }}>
-                  ¥ {globalSummary.expenses.total.toFixed(2)}
-                </span>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </details>
 
           {/* 警告提示 */}
           <div className="p-3 rounded-lg" style={{ backgroundColor: theme.accent.red.hover }}>
