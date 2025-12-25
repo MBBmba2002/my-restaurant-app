@@ -18,15 +18,20 @@ export function FormRow({
   className = '',
   required = false 
 }: FormRowProps) {
+  const accent = accentColor ? theme.accent[accentColor] : null;
+  
   return (
     <div className={`mb-4 ${className}`}>
-      <label className="block text-sm font-medium text-[#4a4a4a] mb-2">
+      <label 
+        className="block text-sm font-medium mb-2"
+        style={{ color: theme.text.primary }}
+      >
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
+        {required && <span style={{ color: accent?.base || theme.accent.red.base }} className="ml-1">*</span>}
       </label>
       {children}
       {helperText && (
-        <p className="mt-1 text-xs text-[#8a8a8a]">
+        <p className="mt-1 text-xs" style={{ color: theme.text.secondary }}>
           {helperText}
         </p>
       )}

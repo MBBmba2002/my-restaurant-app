@@ -73,7 +73,7 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
   
   return (
     <div className="flex flex-col">
-      <label className="block text-sm font-medium mb-2 text-[#4a4a4a]">
+      <label className="block text-sm font-medium mb-2" style={{ color: '#111827' }}>
         {label}
       </label>
       <div className="flex items-center justify-center gap-3">
@@ -101,7 +101,8 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
             onChange={handleInputChange}
             onBlur={handleBlur}
             disabled={disabled}
-            className="w-full font-mono text-xl font-bold text-center py-3 rounded-lg transition-all text-[#1a1a1a] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none border"
+            className="w-full font-mono text-sm font-semibold text-center py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none border"
+            style={{ color: '#111827' }}
             style={{
               backgroundColor: yellow.light,
               borderColor: yellow.border,
@@ -935,10 +936,10 @@ function RecordPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] pb-20">
+    <div className="min-h-screen bg-white pb-20">
       {/* 成功提示 */}
       {showSuccess && (
-        <div className="fixed top-0 left-0 right-0 bg-green-500 text-white text-center py-4 text-xl z-50">
+        <div className="fixed top-0 left-0 right-0 bg-green-500 text-white text-center py-4 text-sm z-50">
           ✅ 今天的收支记好了，今天辛苦了，明天再接再厉！
         </div>
       )}
@@ -946,7 +947,7 @@ function RecordPageContent() {
       <div className="max-w-5xl mx-auto p-6">
         {/* 顶部日期 */}
         <div className="text-center py-8 mb-6">
-          <h1 className="text-3xl font-semibold text-[#1a1a1a]">{todayDate}</h1>
+          <h1 className="text-2xl font-semibold" style={{ color: '#111827' }}>{todayDate}</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -1021,7 +1022,7 @@ function RecordPageContent() {
               {/* 今日总收入显示 - 视觉焦点 */}
               <div className="mt-8 pt-8 border-t border-gray-200">
                 <div className="text-center">
-                  <div className="text-sm font-medium text-[#4a4a4a] mb-3">
+                  <div className="text-sm font-medium mb-3" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
                     今日总收入
                     {totalIncomeConfirmed && (
                       <span className="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded-full">
@@ -1060,7 +1061,7 @@ function RecordPageContent() {
             
             {/* 饼类产品卡片 */}
             <div>
-              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">饼类产品</h3>
+              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>饼类产品</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
                 <SkuInput label="瘦肉饼" value={skuShouroubing} onChange={setSkuShouroubing} disabled={totalIncomeConfirmed || salesModulesSaved.bing} />
@@ -1111,7 +1112,7 @@ function RecordPageContent() {
 
               return (
                 <div>
-                  <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">汤/粥类</h3>
+                  <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>汤/粥类</h3>
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     {soupItems.map((item) => (
                       <SkuInput
@@ -1157,11 +1158,11 @@ function RecordPageContent() {
 
             {/* 米线/面类产品卡片 */}
             <div>
-              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">米线/面类</h3>
+              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>米线/面类</h3>
 
               {/* 【素】米线/面 */}
               <div className="mb-6">
-                <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">【素】米线/面</h4>
+                <h4 className="text-sm font-medium mb-3" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>【素】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="三鲜" value={skuMixianSuSanxian} onChange={setSkuMixianSuSanxian} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
                   <SkuInput label="酸菜" value={skuMixianSuSuancai} onChange={setSkuMixianSuSuancai} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
@@ -1171,7 +1172,7 @@ function RecordPageContent() {
 
               {/* 【肉】米线/面 */}
               <div className="mb-6">
-                <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">【肉】米线/面</h4>
+                <h4 className="text-sm font-medium mb-3" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>【肉】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="三鲜" value={skuMixianRouSanxian} onChange={setSkuMixianRouSanxian} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
                   <SkuInput label="酸菜" value={skuMixianRouSuancai} onChange={setSkuMixianRouSuancai} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
@@ -1181,7 +1182,7 @@ function RecordPageContent() {
 
               {/* 酸辣粉 */}
               <div className="mb-4">
-                <h4 className="text-base font-semibold text-[#4a4a4a] mb-3">酸辣粉</h4>
+                <h4 className="text-sm font-medium mb-3" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>酸辣粉</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} disabled={totalIncomeConfirmed || salesModulesSaved.mixian} />
                 </div>
@@ -1218,7 +1219,7 @@ function RecordPageContent() {
 
             {/* 炒面/炒河粉类产品卡片 */}
             <div>
-              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">炒面/炒河粉类</h3>
+              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>炒面/炒河粉类</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
                 <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={totalIncomeConfirmed || salesModulesSaved.chaomian} />
@@ -1264,7 +1265,7 @@ function RecordPageContent() {
 
             {/* 【购买原材料】模块 */}
             <div>
-              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">【购买原材料】</h3>
+              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>【购买原材料】</h3>
                 {expenseModulesLocked.raw && (
                   <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
                     已锁定
@@ -1326,7 +1327,7 @@ function RecordPageContent() {
 
             {/* 【门店固定费用】模块 */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">【门店固定费用】</h3>
+              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>【门店固定费用】</h3>
               {expenseModulesLocked.fixed && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
                   已锁定
@@ -1386,7 +1387,7 @@ function RecordPageContent() {
 
             {/* 【经营消耗品】模块 */}
             <div>
-              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">【经营消耗品】</h3>
+              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>【经营消耗品】</h3>
               {expenseModulesLocked.cons && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
                   已锁定
@@ -1483,7 +1484,7 @@ function RecordPageContent() {
 
             {/* 【其他支出】模块 */}
             <div>
-              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-4 text-center">【其他支出】</h3>
+              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>【其他支出】</h3>
               {expenseModulesLocked.other && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
                   已锁定
@@ -1566,12 +1567,12 @@ function RecordPageContent() {
           {totalIncomeConfirmed && (
             <Card accentColor="red" className="p-12">
               <div className="text-center">
-                <h3 className="text-2xl font-semibold text-[#1a1a1a] mb-12">🏆 今日经营成绩单</h3>
+                <h3 className="text-xl font-semibold mb-12" style={{ color: '#111827' }}>🏆 今日经营成绩单</h3>
 
                 {/* 核心指标 - 净利润 */}
                 <div className="mb-12">
-                  <div className="text-lg font-medium text-[#4a4a4a] mb-4">今日预估净赚</div>
-                  <div className="text-6xl font-bold" style={{ color: theme.accent.red.base }}>
+                  <div className="text-sm font-medium mb-4" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>今日预估净赚</div>
+                  <div className="text-5xl font-semibold font-mono" style={{ color: theme.accent.red.base }}>
                     ¥ {((parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")) - calculateTodayCOGS()).toFixed(2)}
                   </div>
                 </div>
@@ -1579,30 +1580,30 @@ function RecordPageContent() {
                 {/* 辅助指标列表 */}
                 <div className="grid grid-cols-2 gap-6 text-left">
                   <Card>
-                    <div className="text-sm font-medium text-[#4a4a4a] mb-2">总收入</div>
-                    <div className="text-xl font-bold text-[#1a1a1a]">
+                    <div className="text-xs font-medium mb-2" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>总收入</div>
+                    <div className="text-xl font-semibold" style={{ color: '#111827' }}>
                       ¥ {(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}
                     </div>
                   </Card>
 
                   <Card>
-                    <div className="text-sm font-medium text-[#4a4a4a] mb-2">总支出</div>
-                    <div className="text-xl font-bold text-[#1a1a1a]">
+                    <div className="text-xs font-medium mb-2" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>总支出</div>
+                    <div className="text-xl font-semibold" style={{ color: '#111827' }}>
                       ¥ {expenseTotals.grandTotal.toFixed(2)}
                     </div>
                   </Card>
 
                   <Card>
-                    <div className="text-sm font-medium text-[#4a4a4a] mb-2">经营成本</div>
-                    <div className="text-lg font-bold text-[#1a1a1a]">
+                    <div className="text-xs font-medium mb-2" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>经营成本</div>
+                    <div className="text-lg font-semibold" style={{ color: '#111827' }}>
                       ¥ {calculateTodayCOGS().toFixed(2)}
                     </div>
-                    <div className="text-xs text-[#8a8a8a] mt-1">含固定费摊销</div>
+                    <div className="text-xs mt-1" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>含固定费摊销</div>
                   </Card>
 
                   <Card>
-                    <div className="text-sm font-medium text-[#4a4a4a] mb-2">销量汇总</div>
-                    <div className="text-lg font-bold text-[#1a1a1a]">
+                    <div className="text-xs font-medium mb-2" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>销量汇总</div>
+                    <div className="text-lg font-semibold" style={{ color: '#111827' }}>
                       {skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing +
                        skuFentang + skuHundun + skuXiaomizhou + skuDoujiang + skuJidantang +
                        skuMixianSuSanxian + skuMixianSuSuancai + skuMixianSuMala +
@@ -1614,7 +1615,7 @@ function RecordPageContent() {
 
                 {/* 鼓励语 */}
                 <div className="mt-12 pt-8">
-                  <div className="text-sm text-[#4a4a4a]">
+                  <div className="text-xs" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
                     🎊 今日辛苦了！数据已保存，明天继续加油！
                   </div>
                 </div>

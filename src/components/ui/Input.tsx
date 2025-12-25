@@ -14,28 +14,28 @@ export function Input({
 }: InputProps) {
   const accent = theme.accent[accentColor];
   
-  const baseStyles = `
-    w-full
-    px-4
-    py-3
-    font-mono
-    text-base
-    bg-white
-    border
-    rounded-lg
-    transition-all
-    text-[#1a1a1a]
-    focus:outline-none
-    disabled:bg-gray-50
-    disabled:cursor-not-allowed
-    disabled:opacity-60
-  `;
-
   return (
     <input
-      className={`${baseStyles} ${className}`}
+      className={`
+        w-full
+        px-4
+        py-3
+        font-mono
+        text-sm
+        bg-white
+        border
+        rounded-lg
+        transition-all
+        focus:outline-none
+        disabled:bg-gray-50
+        disabled:cursor-not-allowed
+        disabled:opacity-60
+        ${className}
+      `}
       style={{
+        color: theme.text.primary,
         borderColor: error ? theme.accent.red.base : accent.border,
+        borderWidth: '1px',
       }}
       onFocus={(e) => {
         if (!props.disabled) {

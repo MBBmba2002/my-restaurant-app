@@ -18,36 +18,44 @@ export function Card({
 }: CardProps) {
   const accent = accentColor ? theme.accent[accentColor] : null;
   
-  const baseStyles = `
-    bg-white
-    rounded-xl
-    p-6
-    transition-all
-    ${hoverable ? 'cursor-pointer' : ''}
-  `;
-
-  const borderStyles = accent
-    ? 'border-l-4'
-    : 'border border-gray-200';
-
-  const hoverStyles = hoverable
-    ? 'hover:shadow-lg hover:-translate-y-0.5'
-    : '';
-
   return (
     <div
       className={`
-        ${baseStyles}
-        ${borderStyles}
-        ${hoverStyles}
+        bg-white
+        rounded-2xl
+        p-6
+        transition-all
+        ${hoverable ? 'cursor-pointer hover:-translate-y-0.5' : ''}
         ${className}
       `}
       onClick={onClick}
       style={{
+        boxShadow: theme.shadow.default,
+        ...(hoverable && {
+          '--hover-shadow': theme.shadow.hover,
+        } as React.CSSProperties),
         ...(accent && {
-          borderLeftColor: accent.base,
-          backgroundColor: accent.light,
+          borderLeft: `4px solid ${accent.base}`,
+          borderRight: `1px solid ${accent.border}`,
+          borderTop: `1px solid ${accent.border}`,
+          borderBottom: `1px solid ${accent.border}`,
         }),
+        ...(hoverable && accent && {
+          ':hover': {
+            boxShadow: theme.shadow.hover,
+            backgroundColor: accent.hover,
+          },
+        }),
+      }}
+      onMouseEnter={(e) => {
+        if (hoverable) {
+          e.currentTarget.style.boxShadow = theme.shadow.hover;
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (hoverable) {
+          e.currentTarget.style.boxShadow = theme.shadow.default;
+        }
       }}
     >
       {children}

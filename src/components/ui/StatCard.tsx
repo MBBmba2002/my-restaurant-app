@@ -21,28 +21,34 @@ export function StatCard({
   return (
     <div 
       className={`
-        rounded-xl
+        bg-white
+        rounded-2xl
         p-6
         text-center
         border-l-4
         ${className}
       `}
       style={{
-        backgroundColor: accent.light,
         borderLeftColor: accent.base,
+        borderRight: `1px solid ${accent.border}`,
+        borderTop: `1px solid ${accent.border}`,
+        borderBottom: `1px solid ${accent.border}`,
+        boxShadow: theme.shadow.default,
       }}
     >
-      <div className="text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-        {label}
-      </div>
+      {label && (
+        <div className="text-xs font-medium mb-2" style={{ color: theme.text.secondary }}>
+          {label}
+        </div>
+      )}
       <div 
-        className="text-4xl font-bold font-mono mb-1"
+        className="text-3xl font-semibold font-mono mb-1"
         style={{ color: accent.base }}
       >
         {value}
       </div>
       {unit && (
-        <div className="text-xs" style={{ color: theme.text.tertiary }}>
+        <div className="text-xs" style={{ color: theme.text.secondary }}>
           {unit}
         </div>
       )}

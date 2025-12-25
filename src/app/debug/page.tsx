@@ -47,7 +47,7 @@ export default function DebugPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] p-8">
+    <div className="min-h-screen bg-white p-8">
       <main className="max-w-3xl mx-auto">
         <SectionHeader 
           title="环境变量调试页面" 
@@ -56,7 +56,7 @@ export default function DebugPage() {
         />
         
         <Card accentColor="blue" className="mb-6">
-          <pre className="text-sm text-[#1a1a1a] font-mono whitespace-pre-wrap">
+          <pre className="text-sm font-mono whitespace-pre-wrap" style={{ color: '#111827' }}>
 {`hasSupabaseUrl: ${hasSupabaseUrl}
 hasSupabaseAnonKey: ${hasSupabaseAnonKey}
 supabaseUrlHost: ${supabaseUrlHost}
@@ -77,14 +77,17 @@ currentLocation: ${currentLocation}
             {healthCheckLoading ? "检查中..." : "Health Check"}
           </Button>
           {healthCheckResult && (
-            <pre className="mt-4 p-4 bg-[#fafafa] rounded-lg text-sm text-[#1a1a1a] font-mono whitespace-pre-wrap border border-gray-200">
+            <pre className="mt-4 p-4 bg-white rounded-lg text-sm font-mono whitespace-pre-wrap border" style={{ 
+              color: '#111827',
+              borderColor: 'rgba(47, 95, 167, 0.25)',
+            }}>
               {healthCheckResult}
             </pre>
           )}
         </Card>
         
         <Card>
-          <div className="text-sm text-[#4a4a4a] space-y-2">
+          <div className="text-xs space-y-2" style={{ color: 'rgba(17, 24, 39, 0.6)' }}>
             <p>✓ 如果 hasSupabaseUrl 和 hasSupabaseAnonKey 都是 true，说明环境变量已正确配置</p>
             <p>⚠️ 如果都是 false，需要在 GitHub Secrets 中设置 NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY</p>
           </div>
