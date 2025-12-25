@@ -203,7 +203,7 @@ function ExpenseModal({ isOpen, onClose, type, onSubmit }: ExpenseModalProps) {
   );
 }
 
-// 销量输入组件（可复用）- 极简美化版
+// 销量输入组件（可复用）- 极简主义美化版
 interface SkuInputProps {
   label: string;
   value: number;
@@ -240,23 +240,23 @@ function SkuInput({ label, value, onChange, disabled = false }: SkuInputProps) {
 
   return (
     <div className="flex flex-col">
-      <label className="block text-base font-medium mb-2 text-gray-600">
+      <label className="block text-base font-medium mb-3 text-gray-700">
         {label}
       </label>
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex items-center justify-center gap-4 bg-gray-50 rounded-xl p-3 shadow-sm">
         <button
           type="button"
           onClick={handleDecrement}
           disabled={disabled}
-          className={`w-10 h-10 text-xl font-semibold bg-gray-100 rounded-full flex items-center justify-center transition-transform ${
+          className={`w-12 h-12 text-2xl font-bold bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition-all ${
             disabled
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-gray-200 active:scale-90"
+              : "hover:bg-gray-300 active:scale-95 active:bg-gray-400"
           }`}
         >
           -
         </button>
-        <div className="flex-1 max-w-[80px]">
+        <div className="flex-1 max-w-[90px]">
           <input
             type="number"
             min="0"
@@ -268,8 +268,8 @@ function SkuInput({ label, value, onChange, disabled = false }: SkuInputProps) {
               onChange(Math.max(0, numValue));
             }}
             disabled={disabled}
-            className={`w-full text-xl font-bold text-center py-2 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:border-blue-400 transition-colors ${
-              disabled ? "opacity-50 cursor-not-allowed" : ""
+            className={`w-full text-xl font-bold text-center py-3 bg-transparent border-0 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-lg transition-all ${
+              disabled ? "opacity-50 cursor-not-allowed bg-gray-100" : ""
             }`}
           />
         </div>
@@ -277,10 +277,10 @@ function SkuInput({ label, value, onChange, disabled = false }: SkuInputProps) {
           type="button"
           onClick={handleIncrement}
           disabled={disabled}
-          className={`w-10 h-10 text-xl font-semibold bg-gray-100 rounded-full flex items-center justify-center transition-transform ${
+          className={`w-12 h-12 text-2xl font-bold bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition-all ${
             disabled
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-gray-200 active:scale-90"
+              : "hover:bg-gray-300 active:scale-95 active:bg-gray-400"
           }`}
         >
           +
@@ -317,24 +317,23 @@ function RecordPageContent() {
   const [skuJidantang, setSkuJidantang] = useState(0);  // 鸡蛋汤
   const [skuSanxiantang, setSkuSanxiantang] = useState(0);  // 三鲜汤
 
-  // 【素】米线/面
-  const [skuSanxianSu, setSkuSanxianSu] = useState(0);  // 三鲜(素)
-  const [skuSuancaiSu, setSkuSuancaiSu] = useState(0);  // 酸菜(素)
-  const [skuMalaSu, setSkuMalaSu] = useState(0);  // 麻辣(素)
+  // 【素】米线/面 - 精确分类
+  const [skuMixianSuSanxian, setSkuMixianSuSanxian] = useState(0);     // 【素】米线三鲜
+  const [skuMixianSuSuancai, setSkuMixianSuSuancai] = useState(0);     // 【素】米线酸菜
+  const [skuMixianSuMala, setSkuMixianSuMala] = useState(0);           // 【素】米线麻辣
 
-  // 【肉】米线/面
-  const [skuSanxianRou, setSkuSanxianRou] = useState(0);  // 三鲜(肉)
-  const [skuSuancaiRou, setSkuSuancaiRou] = useState(0);  // 酸菜(肉)
-  const [skuMalaRou, setSkuMalaRou] = useState(0);  // 麻辣(肉)
-  const [skuMalamixian, setSkuMalamixian] = useState(0);  // 麻辣米线
+  // 【肉】米线/面 - 精确分类
+  const [skuMixianRouSanxian, setSkuMixianRouSanxian] = useState(0);   // 【肉】米线三鲜
+  const [skuMixianRouSuancai, setSkuMixianRouSuancai] = useState(0);   // 【肉】米线酸菜
+  const [skuMixianRouMala, setSkuMixianRouMala] = useState(0);         // 【肉】米线麻辣
 
   // 酸辣粉
-  const [skuSuanlafen, setSkuSuanlafen] = useState(0);  // 酸辣粉
+  const [skuSuanlafen, setSkuSuanlafen] = useState(0);                 // 酸辣粉
 
-  // 炒面/炒河粉
-  const [skuXiangcuichaomian, setSkuXiangcuichaomian] = useState(0);  // 香脆炒面
-  const [skuSuancaichaohufenkuan, setSkuSuancaichaohufenkuan] = useState(0);  // 酸菜炒河粉[宽]
-  const [skuMalachaohufenxi, setSkuMalachaohufenxi] = useState(0);  // 麻辣炒河粉[细]
+  // 炒面/炒河粉 - 精确分类
+  const [skuChaomianXiangcui, setSkuChaomianXiangcui] = useState(0);    // 香脆炒面
+  const [skuChaohufenKuan, setSkuChaohufenKuan] = useState(0);          // 【宽粉】炒河粉
+  const [skuChaohufenXi, setSkuChaohufenXi] = useState(0);              // 【细粉】炒河粉
 
   // 保留旧字段用于兼容（如果需要）
   const [skuBing, setSkuBing] = useState(0);
@@ -429,10 +428,10 @@ function RecordPageContent() {
     const hasSalesData =
       skuRoubing > 0 || skuShouroubing > 0 || skuChangdanbing > 0 || skuRoudanbing > 0 || skuDanbing > 0 || skuChangbing > 0 ||
       skuFentang > 0 || skuHundun > 0 || skuXiaomizhou > 0 || skuDoujiang > 0 || skuJidantang > 0 || skuSanxiantang > 0 ||
-      skuSanxianSu > 0 || skuSuancaiSu > 0 || skuMalaSu > 0 ||
-      skuSanxianRou > 0 || skuSuancaiRou > 0 || skuMalaRou > 0 || skuMalamixian > 0 ||
+      skuMixianSuSanxian > 0 || skuMixianSuSuancai > 0 || skuMixianSuMala > 0 ||
+      skuMixianRouSanxian > 0 || skuMixianRouSuancai > 0 || skuMixianRouMala > 0 ||
       skuSuanlafen > 0 ||
-      skuXiangcuichaomian > 0 || skuSuancaichaohufenkuan > 0 || skuMalachaohufenxi > 0;
+      skuChaomianXiangcui > 0 || skuChaohufenKuan > 0 || skuChaohufenXi > 0;
 
     // 如果没有任何数据，提示用户
     if (totalIncome === 0 && !hasSalesData && expenses.length === 0) {
@@ -465,10 +464,10 @@ function RecordPageContent() {
       const hasSalesData =
         skuRoubing > 0 || skuShouroubing > 0 || skuChangdanbing > 0 || skuRoudanbing > 0 || skuDanbing > 0 || skuChangbing > 0 ||
         skuFentang > 0 || skuHundun > 0 || skuXiaomizhou > 0 || skuDoujiang > 0 || skuJidantang > 0 || skuSanxiantang > 0 ||
-        skuSanxianSu > 0 || skuSuancaiSu > 0 || skuMalaSu > 0 ||
-        skuSanxianRou > 0 || skuSuancaiRou > 0 || skuMalaRou > 0 || skuMalamixian > 0 ||
+        skuMixianSuSanxian > 0 || skuMixianSuSuancai > 0 || skuMixianSuMala > 0 ||
+        skuMixianRouSanxian > 0 || skuMixianRouSuancai > 0 || skuMixianRouMala > 0 ||
         skuSuanlafen > 0 ||
-        skuXiangcuichaomian > 0 || skuSuancaichaohufenkuan > 0 || skuMalachaohufenxi > 0;
+        skuChaomianXiangcui > 0 || skuChaohufenKuan > 0 || skuChaohufenXi > 0;
 
       // 如果有收入或销量，创建一条记录
       if (totalIncome > 0 || hasSalesData) {
@@ -493,21 +492,20 @@ function RecordPageContent() {
             sku_doujiang: skuDoujiang,
             sku_jidantang: skuJidantang,
             sku_sanxiantang: skuSanxiantang,
-            // 【素】米线/面
-            sku_sanxian_su: skuSanxianSu,
-            sku_suancai_su: skuSuancaiSu,
-            sku_mala_su: skuMalaSu,
-            // 【肉】米线/面
-            sku_sanxian_rou: skuSanxianRou,
-            sku_suancai_rou: skuSuancaiRou,
-            sku_mala_rou: skuMalaRou,
-            sku_malamixian: skuMalamixian,
+            // 【素】米线/面 - 精确分类
+            sku_mixian_su_sanxian: skuMixianSuSanxian,
+            sku_mixian_su_suancai: skuMixianSuSuancai,
+            sku_mixian_su_mala: skuMixianSuMala,
+            // 【肉】米线/面 - 精确分类
+            sku_mixian_rou_sanxian: skuMixianRouSanxian,
+            sku_mixian_rou_suancai: skuMixianRouSuancai,
+            sku_mixian_rou_mala: skuMixianRouMala,
             // 酸辣粉
             sku_suanlafen: skuSuanlafen,
-            // 炒面/炒河粉
-            sku_xiangcuichaomian: skuXiangcuichaomian,
-            sku_suancaichaohufenkuan: skuSuancaichaohufenkuan,
-            sku_malachaohufenxi: skuMalachaohufenxi,
+            // 炒面/炒河粉 - 精确分类
+            sku_chaomian_xiangcui: skuChaomianXiangcui,
+            sku_chaohefen_kuan: skuChaohufenKuan,
+            sku_chaohefen_xi: skuChaohufenXi,
             // 兼容旧字段
             sku_bing: skuBing,
             sku_tang_su: skuTangSu,
@@ -551,10 +549,10 @@ function RecordPageContent() {
       // 清空所有销量
       setSkuRoubing(0); setSkuShouroubing(0); setSkuChangdanbing(0); setSkuRoudanbing(0); setSkuDanbing(0); setSkuChangbing(0);
       setSkuFentang(0); setSkuHundun(0); setSkuXiaomizhou(0); setSkuDoujiang(0); setSkuJidantang(0); setSkuSanxiantang(0);
-      setSkuSanxianSu(0); setSkuSuancaiSu(0); setSkuMalaSu(0);
-      setSkuSanxianRou(0); setSkuSuancaiRou(0); setSkuMalaRou(0); setSkuMalamixian(0);
+      setSkuMixianSuSanxian(0); setSkuMixianSuSuancai(0); setSkuMixianSuMala(0);
+      setSkuMixianRouSanxian(0); setSkuMixianRouSuancai(0); setSkuMixianRouMala(0);
       setSkuSuanlafen(0);
-      setSkuXiangcuichaomian(0); setSkuSuancaichaohufenkuan(0); setSkuMalachaohufenxi(0);
+      setSkuChaomianXiangcui(0); setSkuChaohufenKuan(0); setSkuChaohufenXi(0);
       setSkuBing(0); setSkuTangSu(0); setSkuMixianSu(0); setSkuMixianRou(0); setSkuChaomian(0);
       setExpenses([]);
       setShowSuccess(true);
@@ -735,20 +733,20 @@ function RecordPageContent() {
               </div>
             </div>
 
-            {/* 粉面类产品卡片 */}
+            {/* 米线/面类产品卡片 */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center mb-4">
                 <div className="w-1 h-6 bg-blue-400 rounded-full mr-3"></div>
-                <h3 className="text-lg font-bold text-gray-800">粉面类</h3>
+                <h3 className="text-lg font-bold text-gray-800">米线/面类</h3>
               </div>
-              
+
               {/* 【素】米线/面 */}
               <div className="mb-6">
                 <h4 className="text-base font-semibold text-gray-700 mb-3 ml-4">【素】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
-                  <SkuInput label="三鲜" value={skuSanxianSu} onChange={setSkuSanxianSu} disabled={totalIncomeConfirmed} />
-                  <SkuInput label="酸菜" value={skuSuancaiSu} onChange={setSkuSuancaiSu} disabled={totalIncomeConfirmed} />
-                  <SkuInput label="麻辣" value={skuMalaSu} onChange={setSkuMalaSu} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="三鲜" value={skuMixianSuSanxian} onChange={setSkuMixianSuSanxian} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="酸菜" value={skuMixianSuSuancai} onChange={setSkuMixianSuSuancai} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="麻辣" value={skuMixianSuMala} onChange={setSkuMixianSuMala} disabled={totalIncomeConfirmed} />
                 </div>
               </div>
 
@@ -756,29 +754,31 @@ function RecordPageContent() {
               <div className="mb-6">
                 <h4 className="text-base font-semibold text-gray-700 mb-3 ml-4">【肉】米线/面</h4>
                 <div className="grid grid-cols-2 gap-4">
-                  <SkuInput label="三鲜" value={skuSanxianRou} onChange={setSkuSanxianRou} disabled={totalIncomeConfirmed} />
-                  <SkuInput label="酸菜" value={skuSuancaiRou} onChange={setSkuSuancaiRou} disabled={totalIncomeConfirmed} />
-                  <SkuInput label="麻辣" value={skuMalaRou} onChange={setSkuMalaRou} disabled={totalIncomeConfirmed} />
-                  <SkuInput label="麻辣米线" value={skuMalamixian} onChange={setSkuMalamixian} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="三鲜" value={skuMixianRouSanxian} onChange={setSkuMixianRouSanxian} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="酸菜" value={skuMixianRouSuancai} onChange={setSkuMixianRouSuancai} disabled={totalIncomeConfirmed} />
+                  <SkuInput label="麻辣" value={skuMixianRouMala} onChange={setSkuMixianRouMala} disabled={totalIncomeConfirmed} />
                 </div>
               </div>
 
               {/* 酸辣粉 */}
-              <div className="mb-6">
+              <div>
                 <h4 className="text-base font-semibold text-gray-700 mb-3 ml-4">酸辣粉</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <SkuInput label="酸辣粉" value={skuSuanlafen} onChange={setSkuSuanlafen} disabled={totalIncomeConfirmed} />
                 </div>
               </div>
+            </div>
 
-              {/* 炒面/炒河粉 */}
-              <div>
-                <h4 className="text-base font-semibold text-gray-700 mb-3 ml-4">炒面/炒河粉</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <SkuInput label="香脆炒面" value={skuXiangcuichaomian} onChange={setSkuXiangcuichaomian} disabled={totalIncomeConfirmed} />
-                  <SkuInput label="酸菜炒河粉[宽]" value={skuSuancaichaohufenkuan} onChange={setSkuSuancaichaohufenkuan} disabled={totalIncomeConfirmed} />
-                  <SkuInput label="麻辣炒河粉[细]" value={skuMalachaohufenxi} onChange={setSkuMalachaohufenxi} disabled={totalIncomeConfirmed} />
-                </div>
+            {/* 炒面/炒河粉类产品卡片 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="w-1 h-6 bg-green-400 rounded-full mr-3"></div>
+                <h3 className="text-lg font-bold text-gray-800">炒面/炒河粉类</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed} />
+                <SkuInput label="【宽粉】炒河粉" value={skuChaohufenKuan} onChange={setSkuChaohufenKuan} disabled={totalIncomeConfirmed} />
+                <SkuInput label="【细粉】炒河粉" value={skuChaohufenXi} onChange={setSkuChaohufenXi} disabled={totalIncomeConfirmed} />
               </div>
             </div>
 
