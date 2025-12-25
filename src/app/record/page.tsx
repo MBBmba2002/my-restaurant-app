@@ -889,7 +889,7 @@ function RecordPageContent() {
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                       : incomeSavedMessage
                       ? "bg-green-500 text-white"
-                      : "bg-white border border-gray-200 text-gray-700"
+                      : "bg-[#3d3435] text-white"
                   }`}
                 >
                   {incomeSavedMessage ? "✅ 已保存" : "💾 保存"}
