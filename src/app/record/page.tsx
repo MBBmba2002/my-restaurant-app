@@ -75,6 +75,7 @@ function SkuInput({ label, value, onChange, disabled = false, useStringValue = f
         <div className="flex-1 max-w-[90px]">
           <input
             type={useStringValue ? "text" : "number"}
+            inputMode={useStringValue ? "decimal" : undefined}
             min="0"
             value={inputValue}
             onChange={handleInputChange}
@@ -428,10 +429,9 @@ function RecordPageContent() {
 
   // 数值输入校验函数
   const handleNumberChange = (value: string, setter: (value: string) => void) => {
-    // 只允许数字、小数点和空字符串
-    if (value === "" || /^\d*\.?\d*$/.test(value)) {
-      setter(value);
-    }
+    // 使用正则表达式过滤非数字字符，仅保留数字和小数点
+    const filteredValue = value.replace(/[^0-9.]/g, '');
+    setter(filteredValue);
   };
 
   // 自动计算支出汇总
@@ -805,12 +805,12 @@ function RecordPageContent() {
                   微信
                 </label>
                 <input
-                  type="number"
-                  step="0.01"
+                  type="text"
+                  inputMode="decimal"
                   value={incomeWechat}
                   onChange={(e) => {
                     if (!totalIncomeConfirmed) {
-                      setIncomeWechat(e.target.value);
+                      handleNumberChange(e.target.value, setIncomeWechat);
                       setIncomeSaved(false);
                     }
                   }}
@@ -828,12 +828,12 @@ function RecordPageContent() {
                   支付宝
                 </label>
                 <input
-                  type="number"
-                  step="0.01"
+                  type="text"
+                  inputMode="decimal"
                   value={incomeAlipay}
                   onChange={(e) => {
                     if (!totalIncomeConfirmed) {
-                      setIncomeAlipay(e.target.value);
+                      handleNumberChange(e.target.value, setIncomeAlipay);
                       setIncomeSaved(false);
                     }
                   }}
@@ -851,12 +851,12 @@ function RecordPageContent() {
                   现金
                 </label>
                 <input
-                  type="number"
-                  step="0.01"
+                  type="text"
+                  inputMode="decimal"
                   value={incomeCash}
                   onChange={(e) => {
                     if (!totalIncomeConfirmed) {
-                      setIncomeCash(e.target.value);
+                      handleNumberChange(e.target.value, setIncomeCash);
                       setIncomeSaved(false);
                     }
                   }}
@@ -1198,10 +1198,10 @@ function RecordPageContent() {
                         金额（元）
                       </label>
                       <input
-                        type="number"
-                        step="0.01"
+                        type="text"
+                        inputMode="decimal"
                         value={expConsAmount}
-                        onChange={(e) => setExpConsAmount(e.target.value)}
+                        onChange={(e) => handleNumberChange(e.target.value, setExpConsAmount)}
                         placeholder="0.00"
                         className="w-full text-xl p-3 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
                       />
@@ -1304,10 +1304,10 @@ function RecordPageContent() {
                       金额（元）
                     </label>
                     <input
-                      type="number"
-                      step="0.01"
+                      type="text"
+                      inputMode="decimal"
                       value={expOtherAmount}
-                      onChange={(e) => setExpOtherAmount(e.target.value)}
+                      onChange={(e) => handleNumberChange(e.target.value, setExpOtherAmount)}
                       placeholder="0.00"
                       className="w-full text-xl p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
                     />
@@ -1344,10 +1344,10 @@ function RecordPageContent() {
                         金额（元）
                       </label>
                       <input
-                        type="number"
-                        step="0.01"
+                        type="text"
+                        inputMode="decimal"
                         value={expOtherAmount}
-                        onChange={(e) => setExpOtherAmount(e.target.value)}
+                        onChange={(e) => handleNumberChange(e.target.value, setExpOtherAmount)}
                         placeholder="0.00"
                         className="w-full text-xl p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
                       />
