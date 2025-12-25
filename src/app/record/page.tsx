@@ -365,6 +365,9 @@ function RecordPageContent() {
   const [expOtherName, setExpOtherName] = useState("");      // 其他支出名称
   const [expOtherAmount, setExpOtherAmount] = useState("");    // 其他支出金额
 
+  // 支出
+  const [expenses, setExpenses] = useState<any[]>([]);
+
   // 支出模块锁定状态
   const [expenseModulesLocked, setExpenseModulesLocked] = useState({
     raw: false,      // 原材料
