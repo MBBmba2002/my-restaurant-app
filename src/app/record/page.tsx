@@ -308,7 +308,7 @@ function RecordPageContent() {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-[0_10px_40px_rgba(171,50,42,0.04)]">
+        <div className="bg-white rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-sm">
           <h2 className="text-2xl font-bold mb-6 text-center text-[#0c0c0c]">
             {config.title}
           </h2>
@@ -418,7 +418,7 @@ function RecordPageContent() {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 p-4 text-xl bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95"
+                className="flex-1 p-4 text-xl bg-white border border-gray-200 text-gray-700 rounded-full transition-all active:scale-95"
               >
                 取消
               </button>
@@ -805,7 +805,7 @@ function RecordPageContent() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 第一板块：今日收入 */}
-          <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)] border-none">
+          <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
             <h2 className="text-2xl font-bold mb-6 tracking-tight text-[#0c0c0c]">💰 今日收入</h2>
             <div className="space-y-4">
               <div>
@@ -898,7 +898,7 @@ function RecordPageContent() {
 
               {/* 今日总收入显示 */}
               <div className="mt-6 pt-6">
-                <div className="bg-white rounded-3xl p-8 shadow-[0_10px_40px_rgba(171,50,42,0.04)]">
+                <div className="bg-white rounded-3xl p-8 shadow-sm">
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-3 mb-4">
                       <div className="text-xl font-bold text-[#3d3435]">
@@ -937,7 +937,7 @@ function RecordPageContent() {
             <h2 className="text-2xl font-bold mb-6 tracking-tight text-[#0c0c0c]">📊 当日产品销量追踪</h2>
             
             {/* 饼类产品卡片 */}
-            <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)] border-none">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">饼类产品</h3>
               <div className="grid grid-cols-2 gap-4">
                 <SkuInput label="肉饼" value={skuRoubing} onChange={setSkuRoubing} disabled={totalIncomeConfirmed} />
@@ -960,7 +960,7 @@ function RecordPageContent() {
               ];
 
               return (
-                <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)] border-none">
+                <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
                   <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">汤/粥类</h3>
                   <div className="grid grid-cols-2 gap-4">
                     {soupItems.map((item) => (
@@ -978,7 +978,7 @@ function RecordPageContent() {
             })()}
 
             {/* 米线/面类产品卡片 */}
-            <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)] border-none">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">米线/面类</h3>
 
               {/* 【素】米线/面 */}
@@ -1011,7 +1011,7 @@ function RecordPageContent() {
             </div>
 
             {/* 炒面/炒河粉类产品卡片 */}
-            <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)] border-none">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">炒面/炒河粉类</h3>
               <div className="grid grid-cols-2 gap-4">
                 <SkuInput label="香脆炒面" value={skuChaomianXiangcui} onChange={setSkuChaomianXiangcui} disabled={totalIncomeConfirmed} />
@@ -1026,7 +1026,7 @@ function RecordPageContent() {
             <h2 className="text-2xl font-bold mb-6 tracking-tight text-[#0c0c0c]">💸 今日支出</h2>
 
             {/* 【购买原材料】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)] border-none">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【购买原材料】</h3>
                 {expenseModulesLocked.raw && (
                   <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
@@ -1092,7 +1092,7 @@ function RecordPageContent() {
             </div>
 
             {/* 【门店固定费用】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)] border-none">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【门店固定费用】</h3>
               {expenseModulesLocked.fixed && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
@@ -1156,7 +1156,7 @@ function RecordPageContent() {
             </div>
 
             {/* 【经营消耗品】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)] border-none">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【经营消耗品】</h3>
               {expenseModulesLocked.cons && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
@@ -1233,7 +1233,7 @@ function RecordPageContent() {
                   <button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "cons" })}
-                    className="w-full p-4 text-lg font-semibold bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95"
+                    className="w-full p-4 text-lg font-semibold bg-white border border-gray-200 text-gray-700 rounded-full transition-all active:scale-95"
                   >
                     🔒 记入支出
                   </button>
@@ -1241,7 +1241,7 @@ function RecordPageContent() {
               )}
 
               {expenseModulesLocked.cons && (
-                <div className="p-4 bg-white rounded-3xl shadow-[0_10px_40px_rgba(171,50,42,0.04)]">
+                <div className="p-4 bg-white rounded-3xl shadow-sm">
                   <div className="text-lg font-medium text-[#0c0c0c]">
                     {expConsName} - ¥{expConsAmount}
                   </div>
@@ -1260,7 +1260,7 @@ function RecordPageContent() {
             </div>
 
             {/* 【其他支出】模块 */}
-            <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)] border-none">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border-none">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">【其他支出】</h3>
               {expenseModulesLocked.other && (
                 <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
@@ -1300,7 +1300,7 @@ function RecordPageContent() {
                   <button
                     type="button"
                     onClick={() => setExpenseConfirmModal({ isOpen: true, module: "other" })}
-                    className="w-full p-4 text-xl font-bold bg-[#3d3435] text-[#f2eada] rounded-full transition-all active:scale-95"
+                    className="w-full p-4 text-xl font-bold bg-white border border-gray-200 text-gray-700 rounded-full transition-all active:scale-95"
                   >
                     🔒 记入支出
                   </button>
@@ -1357,7 +1357,7 @@ function RecordPageContent() {
               )}
 
               {expenseModulesLocked.other && (
-                <div className="p-4 bg-white rounded-3xl shadow-[0_10px_40px_rgba(171,50,42,0.04)]">
+                <div className="p-4 bg-white rounded-3xl shadow-sm">
                   <div className="text-lg font-medium text-[#0c0c0c]">
                     {expOtherName} - ¥{expOtherAmount}
                   </div>
@@ -1373,7 +1373,7 @@ function RecordPageContent() {
             </div>
 
             {/* 当日总支出汇总看板 */}
-            <div className="bg-white rounded-3xl p-8 shadow-[0_10px_40px_rgba(171,50,42,0.04)] border-none mb-6">
+            <div className="bg-white rounded-3xl p-8 shadow-sm border-none mb-6">
               <h3 className="text-xl font-bold text-[#0c0c0c] mb-6">💰 当日总支出</h3>
               <div className="text-center">
                 <div className="text-4xl font-bold text-[#0c0c0c] mb-2">
@@ -1387,7 +1387,7 @@ function RecordPageContent() {
 
             {/* 今日经营成绩单 - 仅在最终确认后显示 */}
             {totalIncomeConfirmed && (
-              <div className="bg-white rounded-3xl p-12 shadow-[0_10px_40px_rgba(171,50,42,0.04)] border-none">
+              <div className="bg-white rounded-3xl p-12 shadow-sm border-none">
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-[#0c0c0c] mb-12">🏆 今日经营成绩单</h3>
 
@@ -1401,21 +1401,21 @@ function RecordPageContent() {
 
                   {/* 辅助指标列表 */}
                   <div className="grid grid-cols-2 gap-6 text-left">
-                    <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)]">
+                    <div className="bg-white rounded-3xl p-6 shadow-sm">
                       <div className="text-sm font-medium text-[#3d3435] mb-2">总收入</div>
                       <div className="text-xl font-bold text-[#0c0c0c]">
                         ¥ {(parseFloat(incomeWechat || "0") + parseFloat(incomeAlipay || "0") + parseFloat(incomeCash || "0")).toFixed(2)}
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)]">
+                    <div className="bg-white rounded-3xl p-6 shadow-sm">
                       <div className="text-sm font-medium text-[#3d3435] mb-2">总支出</div>
                       <div className="text-xl font-bold text-[#0c0c0c]">
                         ¥ {expenseTotals.grandTotal.toFixed(2)}
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)]">
+                    <div className="bg-white rounded-3xl p-6 shadow-sm">
                       <div className="text-sm font-medium text-[#3d3435] mb-2">经营成本</div>
                       <div className="text-lg font-bold text-[#0c0c0c]">
                         ¥ {calculateTodayCOGS().toFixed(2)}
@@ -1423,7 +1423,7 @@ function RecordPageContent() {
                       <div className="text-xs text-[#3d3435] mt-1">含固定费摊销</div>
                     </div>
 
-                    <div className="bg-white rounded-3xl p-6 shadow-[0_10px_40px_rgba(171,50,42,0.04)]">
+                    <div className="bg-white rounded-3xl p-6 shadow-sm">
                       <div className="text-sm font-medium text-[#3d3435] mb-2">销量汇总</div>
                       <div className="text-lg font-bold text-[#0c0c0c]">
                         {skuRoubing + skuShouroubing + skuChangdanbing + skuRoudanbing + skuDanbing + skuChangbing +
@@ -1469,7 +1469,7 @@ function RecordPageContent() {
       {/* 支出确认Modal */}
       {expenseConfirmModal.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-[0_10px_40px_rgba(171,50,42,0.04)]">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-sm">
             <h2 className="text-2xl font-bold mb-4 text-center text-[#0c0c0c]">
               确定记入吗？
             </h2>
@@ -1499,7 +1499,7 @@ function RecordPageContent() {
       {/* Toast 通知组件 */}
       {toast.show && (
         <div className="fixed top-4 right-4 z-50">
-          <div className={`px-6 py-3 rounded-full shadow-[0_10px_40px_rgba(171,50,42,0.04)] text-white ${
+          <div className={`px-6 py-3 rounded-full shadow-sm text-white ${
             toast.type === 'success' ? 'bg-green-500' :
             toast.type === 'error' ? 'bg-[#ab322a]' :
             'bg-[#3d3435]'
@@ -1512,7 +1512,7 @@ function RecordPageContent() {
       {/* 提交前确认对话框 */}
       {showConfirmDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-[0_10px_40px_rgba(171,50,42,0.04)]">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-sm">
             <h2 className="text-2xl font-bold mb-4 text-center text-[#0c0c0c]">
               请再次检查
             </h2>
@@ -1542,7 +1542,7 @@ function RecordPageContent() {
       {/* 确认提交总收入对话框 */}
       {showTotalIncomeConfirmDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-[0_10px_40px_rgba(171,50,42,0.04)]">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-sm">
             <h2 className="text-2xl font-bold mb-4 text-center text-[#0c0c0c]">
               确认提交今日总收入
             </h2>
