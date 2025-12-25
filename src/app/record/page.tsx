@@ -368,6 +368,12 @@ function RecordPageContent() {
   // 支出
   const [expenses, setExpenses] = useState<any[]>([]);
 
+  // 支出模态框
+  const [expenseModal, setExpenseModal] = useState<{
+    isOpen: boolean;
+    type: "material" | "fixed" | "equipment" | "other";
+  }>({ isOpen: false, type: "material" });
+
   // 支出模块锁定状态
   const [expenseModulesLocked, setExpenseModulesLocked] = useState({
     raw: false,      // 原材料
