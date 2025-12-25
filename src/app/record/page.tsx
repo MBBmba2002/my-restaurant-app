@@ -230,6 +230,14 @@ function RecordPageContent() {
     other: false     // 其他
   });
 
+  // 支出模块保存中状态
+  const [expenseModulesSaving, setExpenseModulesSaving] = useState({
+    raw: false,
+    fixed: false,
+    cons: false,
+    other: false
+  });
+
   // 支出确认Modal
   const [expenseConfirmModal, setExpenseConfirmModal] = useState<{
     isOpen: boolean;
@@ -570,6 +578,9 @@ function RecordPageContent() {
       return;
     }
 
+    // 设置保存中状态
+    setExpenseModulesSaving(prev => ({ ...prev, [module]: true }));
+
     try {
       const expenseData: any = {
         user_id: user.id,
@@ -621,6 +632,8 @@ function RecordPageContent() {
       if (error) {
         console.error("Error saving expense:", error);
         showToast("保存支出失败：" + error.message, "error");
+        // 失败时重置保存状态，保持弹窗打开
+        setExpenseModulesSaving(prev => ({ ...prev, [module]: false }));
         return;
       }
 
@@ -628,6 +641,9 @@ function RecordPageContent() {
       const newLocks = { ...expenseModulesLocked, [module]: true };
       setExpenseModulesLocked(newLocks);
       localStorage.setItem("expense_modules_locked", JSON.stringify(newLocks));
+
+      // 重置保存状态
+      setExpenseModulesSaving(prev => ({ ...prev, [module]: false }));
 
       // 关闭确认Modal
       setExpenseConfirmModal({ isOpen: false, module: "raw" });
@@ -638,6 +654,8 @@ function RecordPageContent() {
     } catch (err: any) {
       console.error("Error:", err);
       showToast("保存失败：" + (err.message || "未知错误"), "error");
+      // 失败时重置保存状态，保持弹窗打开
+      setExpenseModulesSaving(prev => ({ ...prev, [module]: false }));
     }
   };
 
@@ -1266,12 +1284,14 @@ function RecordPageContent() {
 
             {/* 【购买原材料】模块 */}
             <div>
-              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>【购买原材料】</h3>
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <h3 className="text-base font-medium" style={{ color: '#111827' }}>【购买原材料】</h3>
                 {expenseModulesLocked.raw && (
-                  <span className="ml-2 text-sm bg-green-500 text-white px-3 py-1 rounded-full">
-                    已锁定
+                  <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full">
+                    已确认
                   </span>
                 )}
+              </div>
 
               {(() => {
                 const rawItems = [
@@ -1333,12 +1353,14 @@ function RecordPageContent() {
 
             {/* 【门店固定费用】模块 */}
             <div className="mb-6">
-              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>【门店固定费用】</h3>
-              {expenseModulesLocked.fixed && (
-                <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
-                  已锁定
-                </span>
-              )}
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <h3 className="text-base font-medium" style={{ color: '#111827' }}>【门店固定费用】</h3>
+                {expenseModulesLocked.fixed && (
+                  <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full">
+                    已确认
+                  </span>
+                )}
+              </div>
 
               {(() => {
                 const fixedItems = [
@@ -1398,12 +1420,14 @@ function RecordPageContent() {
 
             {/* 【经营消耗品】模块 */}
             <div>
-              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>【经营消耗品】</h3>
-              {expenseModulesLocked.cons && (
-                <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
-                  已锁定
-                </span>
-              )}
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <h3 className="text-base font-medium" style={{ color: '#111827' }}>【经营消耗品】</h3>
+                {expenseModulesLocked.cons && (
+                  <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full">
+                    已确认
+                  </span>
+                )}
+              </div>
 
               {!expenseModulesLocked.cons && (
                 <>
@@ -1498,12 +1522,14 @@ function RecordPageContent() {
 
             {/* 【其他支出】模块 */}
             <div>
-              <h3 className="text-base font-medium mb-4 text-center" style={{ color: '#111827' }}>【其他支出】</h3>
-              {expenseModulesLocked.other && (
-                <span className="text-sm bg-green-500 text-white px-3 py-1 rounded-full mb-4 inline-block">
-                  已锁定
-                </span>
-              )}
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <h3 className="text-base font-medium" style={{ color: '#111827' }}>【其他支出】</h3>
+                {expenseModulesLocked.other && (
+                  <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full">
+                    已确认
+                  </span>
+                )}
+              </div>
 
               {!expenseModulesLocked.other && (
                 <>
@@ -1688,12 +1714,13 @@ function RecordPageContent() {
           <Button
             type="button"
             onClick={() => handleExpenseModuleSubmit(expenseConfirmModal.module)}
+            disabled={expenseModulesSaving[expenseConfirmModal.module]}
             accentColor="red"
             variant="primary"
             size="lg"
             className="flex-1"
           >
-            确定
+            {expenseModulesSaving[expenseConfirmModal.module] ? "保存中..." : "确定"}
           </Button>
         </div>
       </Modal>
